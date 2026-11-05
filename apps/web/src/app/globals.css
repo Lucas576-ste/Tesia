@@ -161,3 +161,25 @@
     @apply font-serif;
   }
 }
+
+@layer components {
+  .editor-peca {
+    @apply flex min-h-96 flex-col gap-3 p-5 font-serif text-sm leading-relaxed outline-none md:p-8 md:text-base;
+  }
+
+  .editor-peca h2 {
+    @apply text-center text-lg font-semibold;
+  }
+
+  .editor-peca h3 {
+    @apply mt-2 font-semibold;
+  }
+
+  .editor-peca ul {
+    @apply list-disc pl-5;
+  }
+
+  .pendencia-confirmar {
+    @apply rounded-sm bg-destaque px-0.5 text-menu;
+  }
+}

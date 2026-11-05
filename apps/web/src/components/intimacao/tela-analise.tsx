@@ -47,7 +47,7 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
           <Badge variant="secondary">Dados de exemplo</Badge>
         </div>
         <p className="text-sm text-texto-secundario">
-          <span className="tabular-nums">{analise.cnj}</span> · {analise.orgao}
+          <span className="whitespace-nowrap tabular-nums">{analise.cnj}</span> · {analise.orgao}
         </p>
       </header>
       <BalaoLia className="text-sm">
