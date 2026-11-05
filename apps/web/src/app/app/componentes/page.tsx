@@ -30,7 +30,7 @@ export default function ComponentesPage() {
         <div className="flex flex-col gap-2 overflow-hidden rounded-xl">
           <FaixaAlertaPrazo
             peca="Contestação"
-            partes="Maria Souza x Banco X"
+            partes="Banco X x Maria Souza"
             prazo="em 2 dias úteis (06/11)"
             href="/app/intimacoes/1"
           />

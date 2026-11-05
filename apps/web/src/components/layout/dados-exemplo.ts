@@ -11,7 +11,7 @@ export const usoExemplo = {
 };
 
 export const processosExemplo = [
-  { id: "1", cnj: "0000000-00.2026.8.07.0001", partes: "Maria Souza x Banco X" },
+  { id: "1", cnj: "0000000-00.2026.8.07.0001", partes: "Banco X x Maria Souza" },
   { id: "2", cnj: "0000001-00.2026.5.10.0002", partes: "João Lima x Construtora Y" },
   { id: "3", cnj: "0000002-00.2026.4.01.3400", partes: "Carla Dias x INSS" },
   { id: "4", cnj: "0000003-00.2026.8.07.0003", partes: "Paulo Araújo x Seguradora Z" },
@@ -41,7 +41,7 @@ export const prazosExemplo: LinhaPrazo[] = [
   },
   {
     id: "1",
-    partes: "Maria Souza x Banco X",
+    partes: "Banco X x Maria Souza",
     cnj: "0000000-00.2026.8.07.0001",
     peca: "Contestação",
     area: "Cível e consumidor",
