@@ -1,5 +1,5 @@
 import { BellRing, Calculator, FileSearch, PenLine } from "lucide-react";
-import { AvatarLia } from "./avatar-lia";
+import { AvatarLia } from "@/components/lia/avatar-lia";
 import { SecaoLanding } from "./secao-landing";
 
 const habilidades = [

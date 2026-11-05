@@ -55,3 +55,4 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Definir WhatsApp, e-mail de contato, CNPJ e razão social | Lucas | Antes de divulgar a landing |
 | Consultar o nome Lia no INPI junto com Tesia | Lucas | Antes do dia 32 |
 | Deixar a cobrança pelo Asaas pronta antes do fim dos 15 dias grátis do primeiro fundador | Lucas | Até 15 dias após o dia 34 |
+| Decidir como tratar advogados fora do DF no lançamento: o calendário local só cobre o DF, e a landing aceita qualquer UF | Lucas | Antes de divulgar a landing |

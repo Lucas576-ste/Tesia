@@ -1,9 +1,9 @@
 import { CheckCircle2, FileText, Upload } from "lucide-react";
 import type { ReactNode } from "react";
+import { BalaoLia } from "@/components/lia/balao-lia";
 import { SeloStatus } from "@/components/selo-status";
 import type { StatusPrazo } from "@/lib/prazo";
 import { cn } from "@/lib/utils";
-import { AvatarLia } from "./avatar-lia";
 
 function TelaMini({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
@@ -13,17 +13,6 @@ function TelaMini({ titulo, children }: { titulo: string; children: ReactNode })
         {titulo}
       </p>
       <div className="flex flex-col gap-2 p-3">{children}</div>
-    </div>
-  );
-}
-
-function BalaoLia({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-center gap-2">
-      <AvatarLia />
-      <p className="rounded-lg rounded-tl-none bg-primaria-fundo px-2 py-1.5 text-texto">
-        {children}
-      </p>
     </div>
   );
 }

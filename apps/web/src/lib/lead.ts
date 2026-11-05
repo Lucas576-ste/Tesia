@@ -39,16 +39,15 @@ export const AREAS = [
   "Plano Empresas (lista de espera)",
 ] as const;
 
+export const REGEX_WHATSAPP = /^\(?\d{2}\)?[\s-]?9?\d{4}[\s-]?\d{4}$/;
+
 export const leadSchema = z.object({
   nome: z.string().trim().min(2, "Informe seu nome.").max(120),
   email: z.email("Informe um e-mail válido."),
   oab: z.string().trim().min(1, "Informe o número da OAB.").max(12),
   uf: z.enum(UFS, { error: "Escolha a UF." }),
   area: z.enum(AREAS, { error: "Escolha a área principal." }),
-  whatsapp: z
-    .string()
-    .trim()
-    .regex(/^\(?\d{2}\)?[\s-]?9?\d{4}[\s-]?\d{4}$/, "Informe o WhatsApp com DDD."),
+  whatsapp: z.string().trim().regex(REGEX_WHATSAPP, "Informe o WhatsApp com DDD."),
 });
 
 export const CAMPOS_UTM = [

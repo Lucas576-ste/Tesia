@@ -15,7 +15,14 @@ export default function CadastroPage() {
         descricao="Programa fundador: 15 dias grátis, sem cartão de crédito."
       />
       <BotaoGoogle />
-      <FormularioDemonstracao textoBotao="Criar conta">
+      <FormularioDemonstracao
+        textoBotao="Criar conta"
+        depoisDeEnviar={
+          <Link href="/onboarding/perfil" className="py-1.5 text-primaria hover:underline">
+            Ver o primeiro acesso
+          </Link>
+        }
+      >
         <CampoFormulario id="nome" rotulo="Nome" autoComplete="off" />
         <CampoFormulario id="email" rotulo="E-mail" type="email" autoComplete="off" />
         <CampoFormulario

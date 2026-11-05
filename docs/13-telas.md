@@ -104,6 +104,8 @@ Aplicativo (menu lateral)
 
 Barra de progresso com 3 passos. O advogado pode pular os passos 2 e 3 e voltar depois.
 
+A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na lista, o passo 1 avisa que os calendários locais cobrem só o DF.
+
 ### 8. Dados profissionais (`/onboarding/perfil`) — MVP
 - Número da OAB e UF
 - Áreas de atuação (seleção múltipla, áreas "em breve" desabilitadas). No plano Start, só uma.
