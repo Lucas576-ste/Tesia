@@ -32,7 +32,7 @@ Prevalecem sobre os textos abaixo:
 
 - **Fundador:** 6 vagas só para advogados do DF, com lista de espera para os demais, 15 dias grátis com até 15 peças, depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa.
 - **Lia:** assistente de IA apresentada no hero, na seção "Conheça a Lia", nos passos e nas perguntas. Sempre identificada como inteligência artificial.
-- **Planos:** recursos detalhados, itens futuros em bloco separado e novo plano Empresas, sem preço, "em breve".
+- **Planos:** recursos detalhados, itens futuros em bloco separado e plano Sociedade no lugar de Empresas, "em breve" com lista de espera até ser lançado.
 - **Tom:** sem ameaça sobre a OAB na seção de custo, perguntas com enunciado positivo. Ficam os avisos de responsabilidade do advogado, processamento fora do Brasil e "Exemplo ilustrativo".
 
 ## Tema (2026-11-05)
@@ -117,7 +117,7 @@ A peça sai com a sua estrutura, o seu jeito de argumentar e os fatos do process
 *Imagem: editor com pendências destacadas.*
 
 **4. Nunca perca o controle**
-Todos os prazos num painel, com aviso por e-mail antes do vencimento.
+Todos os prazos e audiências num painel, com aviso por e-mail antes do vencimento e direto na agenda do seu celular. `[CONFIRMAR: agenda só depois de lançada]`
 *Imagem: painel de prazos.*
 
 ---
@@ -138,6 +138,9 @@ Todos os prazos num painel, com aviso por e-mail antes do vencimento.
 | Escreve no seu estilo, a partir das suas peças | Sim | Não | Usa modelos prontos |
 | Usa os documentos do processo | Sim | Só se você colar | Varia |
 | Destaca o que precisa ser conferido | Sim | Não | Não |
+| Prazos na agenda do celular (Google, Apple, Outlook) | Sim, em todos os planos | Não | Em planos mais caros |
+| Plano para sociedade de 2 advogados | Sim | — | A partir dos planos de equipe |
+| Taxa de ativação | Não | — | Em alguns |
 | Pensada para o advogado solo | Sim | — | Pensados para escritórios |
 
 `[CONFIRMAR: revisar a coluna "sistemas de gestão" antes de publicar; não citar nomes de concorrentes]`
@@ -204,14 +207,18 @@ Linha abaixo:
 
 Alternância: Mensal | Anual (2 meses grátis)
 
-| | Start | Pro (destaque: "Mais escolhido") | Plus |
+| | Start | Pro (destaque: "Mais escolhido") | Sociedade |
 |---|---|---|---|
-| Preço | R$ 79/mês | R$ 129/mês | + R$ 49/mês |
-| Para quem | Quem atua em uma área | Quem quer tudo, sem limite apertado | Complemento para quem quer presença no Instagram |
-| Inclui | 15 peças por mês · 1 área · análise de intimações ilimitada · prazos e alertas por e-mail · rascunho no seu estilo · .docx com timbrado | 50 peças por mês · todas as áreas · tudo do Start · alertas no WhatsApp (em breve) · busca automática de intimações (em breve) | 20 posts por mês · calendário de conteúdo · textos dentro das regras de publicidade da OAB |
-| Botão | Começar | Começar | Adicionar ao meu plano |
+| Preço | R$ 79/mês | R$ 129/mês | R$ 219/mês |
+| Para quem | Quem atua em uma área | Quem quer tudo, sem limite apertado | Dois advogados que dividem o escritório |
+| Inclui | 15 peças por mês · 1 área · análise de intimações ilimitada · prazos, audiências e alertas por e-mail · agenda no celular · rascunho no seu estilo · .docx com timbrado | 50 peças por mês · todas as áreas · tudo do Start · busca automática de intimações (em breve) · alertas no WhatsApp (em breve) | 2 advogados · 100 peças por mês compartilhadas · tudo do Pro · estilo próprio para cada um · responsável por prazo e "Meus prazos" |
+| Botão | Começar | Começar | Começar com meu sócio |
 
-Linha abaixo: Cancele quando quiser. Exporte seus dados a qualquer momento.
+**Complemento Plus (+ R$ 49/mês):** 20 posts por mês para o Instagram, calendário de conteúdo e textos dentro das regras de publicidade da OAB. Fica abaixo dos planos, em faixa própria.
+
+Linha abaixo: **Sem taxa de ativação.** Cancele quando quiser. Exporte seus dados a qualquer momento.
+
+`[CONFIRMAR: mostrar o Sociedade só depois de lançado; até lá, "em breve" com lista de espera]`
 
 No lançamento, os botões levam ao formulário de cliente fundador.
 
@@ -239,6 +246,15 @@ Ainda não. Por enquanto, você envia o PDF. A busca automática pela sua OAB es
 
 **Onde ficam os meus dados?**
 Arquivos e banco de dados ficam no Brasil, com criptografia. Para gerar a análise e o rascunho, o texto é processado pelo provedor de IA. `[CONFIRMAR: termos de retenção e não uso para treino]`
+
+**Tenho um sócio. Como funciona?**
+No plano Sociedade, dois advogados dividem a mesma conta: cada um com o seu estilo, cada prazo com um responsável e 100 peças por mês para os dois.
+
+**Os prazos vão para a minha agenda?**
+Sim. Você assina um link no Google Agenda, Apple Calendário ou Outlook, e os prazos confirmados e as audiências aparecem lá sozinhos.
+
+**Tem taxa de ativação?**
+Não. Você paga só a mensalidade.
 
 **Posso cancelar e levar meus dados?**
 Sim. Você cancela quando quiser e pode exportar todas as peças e prazos.

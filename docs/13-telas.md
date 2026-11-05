@@ -8,9 +8,10 @@ Protótipo visual das telas principais: canvas "Protótipo Agente Jurídico" (Me
 
 | Fase | Quantidade de telas |
 |---|---|
-| MVP | 19 telas + 3 modais |
+| MVP | 20 telas + 4 modais |
+| Logo após o MVP | 3 telas + 1 aba (Sociedade, relatório do mês, honorários) |
 | Plus | 2 telas |
-| Fase 2 (intermediário) | 6 telas |
+| Fase 2 (intermediário) | 4 telas |
 | Fase 3 (avançado) | 6 telas |
 | Backoffice interno | 5 telas (fase 2; no MVP usar o Supabase Studio) |
 
@@ -24,6 +25,7 @@ Site público
 ├── Cadastro (/cadastro) ──► Onboarding
 ├── Login (/login)
 ├── Recuperar senha (/recuperar-senha)
+├── Aceitar convite (/convite/:token)                       [Sociedade]
 └── Termos e privacidade (/termos, /privacidade)
 
 Onboarding (primeiro acesso)
@@ -42,6 +44,9 @@ Aplicativo (menu lateral)
 ├── Meu estilo (/app/estilo)
 ├── Conteúdo [Plus] (/app/conteudo)
 │     └── Calendário (/app/conteudo/calendario)
+├── Relatório do mês (/app/relatorio)                      [logo após o MVP]
+├── Honorários (/app/honorarios)                           [logo após o MVP]
+├── Indicar a Tesia (/app/indicar)
 └── Conta
       ├── Configurações (/app/configuracoes)
       └── Plano e uso (/app/plano)
@@ -49,8 +54,9 @@ Aplicativo (menu lateral)
 
 ## Elementos comuns a todas as telas do aplicativo
 
-- **Menu lateral:** Painel, Nova intimação, Processos, Peças, Meu estilo, Conteúdo (com selo Plus, só quando o plano Plus entrar, depois do dia 35), e no rodapé o nome do advogado, OAB e acesso à Conta. No celular, vira menu inferior ou menu recolhido.
-- **Barra superior:** botão "+ Nova intimação", busca de processos por número ou parte (atalho Ctrl+K), indicador de uso do mês (ex.: "32 de 50 peças", com barra de progresso), sino de notificações e ajuda.
+- **Menu lateral:** Painel, Nova intimação, Processos, Peças, Meu estilo, Conteúdo (com selo Plus, só quando o plano Plus entrar, depois do dia 35), Indicar a Tesia, e no rodapé o nome do advogado, OAB e acesso à Conta. Item ativo com barra fina dourada. No celular, vira menu inferior ou menu recolhido.
+- **Barra superior:** botão "+ Adicionar" com menu (Nova intimação, Novo prazo manual, Novo processo), busca (`Ctrl+K`), uso do mês em barra de progresso (ex.: "32 de 50 peças"), sino de notificações e ajuda.
+- **Ajuda flutuante:** botão no canto inferior direito, com perguntas frequentes e contato pelo WhatsApp.
 - **Aviso de prazo crítico** (enquanto os dados são de exemplo, aparece só no painel; volta a todas as telas quando houver dados reais)**:** faixa branca quando houver prazo confirmado vencendo em até 3 dias úteis, com ícone e filete lateral coloridos: âmbar, ou vermelho quando vencer no dia.
 - **Mensagens rápidas (toasts):** sucesso, erro e processamento concluído.
 - **Estados de toda tela:** carregando, vazio (com orientação do que fazer) e erro (com opção de tentar de novo).
@@ -132,10 +138,14 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 **Objetivo:** mostrar o que vence e o que fazer primeiro.
 - Saudação e resumo do dia ("4 prazos em aberto")
 - Faixa de alerta para prazo crítico, com botão "Começar agora"
-- Indicadores: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
-- Tabela de prazos: processo, peça, vencimento, dias restantes, status (não iniciado, rascunho pronto, protocolado)
+- Contadores compactos e clicáveis, que filtram a lista: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
+- Alternância **Lista | Quadro** (a escolha fica salva)
+- **Lista:** partes em destaque e número CNJ menor, peça, vencimento, dias restantes em texto ("Hoje", "2 dias úteis"), status (não iniciado, rascunho pronto, protocolado)
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo
+- Prazos manuais, audiências e compromissos aparecem junto, com selo do tipo
+- Filtro "Meus prazos / Todos" (plano Sociedade)
 - Filtros: status, área, período
-- Ações por linha: abrir análise, abrir peça, marcar como protocolado
+- Ações por linha: abrir análise, abrir peça, marcar como cumprido
 - Estado vazio: "Envie sua primeira intimação"
 
 ### 12. Nova intimação (`/app/intimacoes/nova`) — MVP (protótipo)
@@ -190,6 +200,8 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 Abas:
 - **Perfil:** nome, OAB, UF, áreas, tribunais
 - **Alertas:** canais (e-mail, WhatsApp) e dias de antecedência
+- **Agenda:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
+- **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso
 - **Modelo de documento:** trocar o .docx timbrado
 - **Calendário:** feriados e suspensões próprios do escritório
 - **Segurança:** senha, sessões ativas
@@ -202,10 +214,16 @@ Abas:
 - Histórico de faturas e notas fiscais
 - Cancelar assinatura (com opção de exportar os dados antes)
 
+### 20.1 Indicar a Tesia (`/app/indicar`) — MVP (simples)
+- Link de indicação com botão de copiar e de compartilhar no WhatsApp
+- Regra: quando o indicado vira pagante, os dois ganham 1 mês grátis
+- Lista de indicações e meses grátis ganhos
+
 ### Modais do MVP
 - **M1. Limite atingido:** aviso aos 80% e bloqueio aos 100%, com opções de pacote extra ou upgrade
 - **M2. Fim do teste grátis:** escolha do plano e pagamento
 - **M3. Confirmação de prazo editado:** registra a data sugerida e a data escolhida
+- **M4. Novo prazo manual:** tipo (prazo, audiência, compromisso), descrição, data, hora, processo (opcional), responsável; opção "calcular a partir da disponibilização"
 
 ---
 
@@ -226,16 +244,24 @@ Abas:
 
 ---
 
-## Fase 2 (intermediário)
+## Logo após o MVP
 
 | Tela | Rota | Conteúdo |
 |---|---|---|
 | Caixa de intimações | `/app/intimacoes` | Intimações que chegam sozinhas pela OAB, com status (nova, analisada, peça gerada) |
-| Agenda | `/app/agenda` | Calendário com prazos e audiências |
+| Aceitar convite | `/convite/:token` | Cadastro do sócio já ligado ao escritório |
+| Aba Equipe | `/app/configuracoes` | Convidar o sócio, membros, remover acesso |
+| Relatório do mês | `/app/relatorio` | Prazos cumpridos e perdidos, intimações, peças, horas economizadas (estimativa), honorários recebidos; meses anteriores |
+| Honorários | `/app/honorarios` | Por cliente: combinado, previsto, recebido e em aberto; total em aberto e vencidos |
+
+## Fase 2 (intermediário)
+
+| Tela | Rota | Conteúdo |
+|---|---|---|
+| Agenda | `/app/agenda` | Calendário com prazos e audiências dentro da Tesia |
 | Clientes | `/app/clientes` | Lista de clientes |
 | Detalhe do cliente | `/app/clientes/:id` | Dados, processos e honorários |
 | Biblioteca de teses | `/app/teses` | Argumentações salvas, por área e assunto, para reaproveitar |
-| Honorários | `/app/honorarios` | Valores combinados, recebidos e em aberto por cliente |
 
 ## Fase 3 (avançado)
 

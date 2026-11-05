@@ -13,6 +13,7 @@ A estratégia muda com o tamanho:
 
 - Oferecer o produto primeiro aos advogados entrevistados, que já confirmaram a dor.
 - **Plano Cliente Fundador:** 6 vagas para advogados do DF, 15 dias grátis e depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa. Em troca: feedback semanal, depoimento e autorização para usar o caso como exemplo (sem dados de cliente).
+- Cada vaga de fundador vale para 1 advogado. O plano Sociedade só existe depois do MVP.
 - Canais: grupos de WhatsApp de advogados, ESA e eventos da OAB-DF, indicações dos primeiros usuários.
 - **Onboarding feito pelo fundador:** ajudar a enviar as peças e gerar a primeira. Ninguém sai sem ver o rascunho no próprio estilo.
 
@@ -54,7 +55,8 @@ Referência: 1.000 clientes com ticket médio de R$ 110 ≈ R$ 110 mil por mês.
 - Planos Start, Pro e Plus (ver `05-regras-de-negocio.md`).
 - **Plano anual** com 2 meses grátis: dinheiro adiantado e cancelamento menor.
 - Pacotes de peças extras.
-- Plano Escritório, cobrado por usuário.
+- Plano Sociedade (2 advogados, R$ 219) e, na fase 3, plano Escritório (R$ 99 por advogado, a partir de 3).
+- Argumento de venda: sem taxa de ativação e agenda no celular em todos os planos.
 - Add-ons futuros: cálculos previdenciários e trabalhistas, busca de intimações em mais tribunais, conferência de jurisprudência.
 
 ## Retenção
@@ -67,6 +69,9 @@ A retenção vem do valor que o advogado perderia ao sair, não de prender os da
 4. **Histórico acumulado:** processos, peças e teses.
 5. **Alertas diários** por e-mail e WhatsApp, que criam hábito.
 6. **Plus:** o calendário de conteúdo também fica na plataforma.
+7. **Agenda no celular:** os prazos aparecem na agenda que o advogado já usa.
+8. **Relatório do mês:** mostra em horas economizadas quanto a Tesia vale.
+9. **Plano Sociedade:** com dois advogados usando, a troca de sistema fica mais difícil.
 
 ## Métricas
 

@@ -16,6 +16,11 @@ processos   1─N pecas  N─1 tipos_peca N─1 areas
 intimacoes  1─N pecas
 usuarios    1─N estilo_documentos 1─N estilo_trechos
 usuarios    1─1 perfis_estilo
+usuarios    1─N prazos (responsável) / 1─N pecas (responsável)
+escritorios 1─N convites
+escritorios 1─N indicacoes
+clientes    1─N honorarios 1─N honorarios_pagamentos
+escritorios 1─N relatorios_mensais
 escritorios 1─1 assinaturas N─1 planos
 escritorios 1─N uso_mensal
 feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escritorio_id)
@@ -43,6 +48,7 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | papel | enum | `dono`, `advogado`, `estagiario` (multiusuário futuro) |
 | whatsapp | text | para alertas |
 | modelo_docx_path | text | modelo .docx com timbrado do advogado |
+| calendario_token | text | token secreto do link de agenda (iCal); pode ser renovado |
 
 ### clientes
 | Campo | Tipo | Observação |
@@ -88,9 +94,13 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | Campo | Tipo | Observação |
 |---|---|---|
 | escritorio_id | uuid | |
-| processo_id | uuid | |
-| intimacao_id | uuid | |
-| regra_prazo_id | uuid | regra usada no cálculo |
+| processo_id | uuid | opcional em compromissos manuais |
+| intimacao_id | uuid | opcional; vazio quando o prazo é manual |
+| origem | enum | `intimacao`, `manual` |
+| tipo | enum | `prazo`, `audiencia`, `compromisso` |
+| hora | time | opcional, para audiências e compromissos |
+| responsavel_id | uuid | usuário responsável (plano Sociedade) |
+| regra_prazo_id | uuid | regra usada no cálculo; vazio quando manual |
 | descricao | text | ex.: "Recurso inominado" |
 | dias | int | |
 | contagem | enum | `uteis`, `corridos` |
@@ -109,6 +119,7 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | intimacao_id | uuid | opcional |
 | prazo_id | uuid | opcional |
 | tipo_peca_id | uuid | |
+| responsavel_id | uuid | usuário responsável (plano Sociedade) |
 | titulo | text | |
 | conteudo | jsonb | documento em blocos/seções |
 | versao | int | |
@@ -163,6 +174,7 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 | nome | text | |
 | estrutura | jsonb | seções esperadas da peça |
 | instrucoes | text | orientações específicas para a IA |
+| minutos_economizados | int | estimativa de tempo poupado por peça, usada no relatório do mês |
 | ativa | bool | |
 
 ### regras_prazo
@@ -205,6 +217,27 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 
 ### uso_ia
 Uma linha por chamada: `escritorio_id`, `job_id`, `etapa`, `modelo`, `tokens_entrada`, `tokens_cache`, `tokens_saida`, `custo_estimado`, `duracao_ms`.
+
+## Equipe e indicação
+
+### convites (plano Sociedade)
+`escritorio_id`, `email`, `papel`, `token`, `convidado_por`, `expira_em`, `aceito_em`.
+
+### indicacoes
+`escritorio_indicador_id`, `codigo` (único por escritório), `escritorio_indicado_id`, `status` (`cadastrado`, `pagante`, `recompensado`), `recompensa_aplicada_em`.
+
+## Honorários simples (fase 1.5)
+
+### honorarios
+`escritorio_id`, `cliente_id`, `processo_id` (opcional), `descricao`, `tipo` (`fixo`, `exito`, `parcelado`, `mensal`), `valor_combinado`, `observacao`.
+
+### honorarios_pagamentos
+`honorario_id`, `escritorio_id`, `valor`, `vencimento`, `pago_em` (vazio = em aberto).
+
+## Relatório do mês (fase 1.5)
+
+### relatorios_mensais
+Foto do mês fechado, gerada por job no dia 1: `escritorio_id`, `competencia`, `prazos_cumpridos`, `prazos_perdidos`, `pecas_geradas`, `intimacoes_analisadas`, `minutos_economizados` (soma de `tipos_peca.minutos_economizados`, exibida como estimativa), `honorarios_recebidos`.
 
 ## Plano Plus
 

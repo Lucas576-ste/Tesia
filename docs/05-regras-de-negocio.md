@@ -22,10 +22,11 @@
 
 | Plano | Preço/mês | Peças/mês | Áreas | Usuários | Recursos |
 |---|---|---|---|---|---|
-| Start | R$ 79 | 15 | 1 | 1 | Intimação por upload, prazos, rascunho no estilo, alerta por e-mail |
+| Start | R$ 79 | 15 | 1 | 1 | Intimação por upload, prazos e audiências, rascunho no estilo, alerta por e-mail, agenda no celular (iCal) |
 | Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + alertas por WhatsApp + busca automática de intimações (quando existir) |
 | Plus (add-on) | + R$ 49 | — | — | — | Conteúdo para Instagram: 20 posts/mês e calendário |
-| Empresas (futuro; valor interno, sem preço público) | R$ 299 | 150 | Todas | 3 | Tudo do Pro + distribuição de tarefas |
+| Sociedade (logo após o MVP) | R$ 219 | 100 compartilhadas | Todas | 2 | Tudo do Pro + convite do sócio, responsável por prazo e peça, estilo próprio para cada advogado |
+| Escritório (fase 3) | R$ 99 por advogado (mín. 3) | 50 por advogado | Todas | 3 ou mais | Tudo do Sociedade + perfis e permissões |
 | Cliente Fundador (6 vagas, só DF) | R$ 79 | 50 | Todas | 1 | Recursos do Pro; 15 dias grátis com até 15 peças, sem cartão; preço mantido enquanto a assinatura estiver ativa |
 
 Regras:
@@ -77,6 +78,57 @@ Regras:
 - Toda sugestão passa por uma checagem das regras de publicidade da advocacia: tom informativo, sem promessa de resultado, sem captação de clientela, sem preço.
 - O advogado aprova cada post antes de agendar.
 - No plano Pro sem Plus, o sistema oferece 2 posts grátis por mês para mostrar o recurso.
+
+## Botão "+ Adicionar"
+
+Um único botão na barra superior para criar: nova intimação, novo prazo manual e novo processo.
+
+## Prazos manuais
+
+- Nem todo prazo nasce de uma intimação enviada. O advogado cadastra prazos, audiências e compromissos manualmente.
+- Campos: tipo (prazo, audiência, compromisso), descrição, data, hora (opcional), processo (opcional), responsável.
+- Prazos manuais entram como `confirmado` (o próprio advogado informou a data) e aparecem no painel, nos alertas e na agenda.
+- Opcional: o advogado pode pedir ao motor de prazos para calcular a data a partir de uma data de disponibilização e de uma regra.
+
+## Painel em Lista ou Quadro
+
+- **Lista:** tabela ordenada por vencimento.
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo.
+- A escolha fica salva por usuário.
+
+## Agenda sincronizada (iCal)
+
+- Todo usuário tem um link secreto de agenda, que pode ser assinado no Google Agenda, Apple Calendário ou Outlook.
+- O link traz prazos confirmados, audiências e compromissos, com título "[Peça] Partes" e o link para abrir na Tesia. Nenhum dado sensível além do necessário.
+- O advogado pode gerar um link novo a qualquer momento, o que desativa o anterior.
+- Disponível em todos os planos.
+
+## Plano Sociedade
+
+- Dois advogados no mesmo escritório. O dono convida o sócio por e-mail.
+- Os dois veem todos os processos, prazos e peças e têm as mesmas permissões.
+- Cada prazo e cada peça tem um responsável. O painel tem o filtro "Meus prazos" e "Todos".
+- Cada advogado tem o seu próprio perfil de estilo.
+- As 100 peças do mês são compartilhadas.
+- O programa Cliente Fundador é individual: 1 advogado por vaga. O plano Sociedade não entra no beta.
+
+## Indicar a Tesia
+
+- Item fixo no menu, com o link de indicação do escritório.
+- Quando o indicado vira pagante, os dois ganham 1 mês grátis.
+- A tela mostra quantas indicações foram feitas e quantos meses grátis foram ganhos.
+
+## Relatório do mês (logo após o MVP)
+
+- Gerado no dia 1 de cada mês, com o resumo do mês anterior: prazos cumpridos, prazos perdidos, intimações analisadas, peças geradas e **horas economizadas** (estimativa a partir do tempo médio de cada tipo de peça).
+- Enviado por e-mail e disponível no aplicativo.
+- As horas economizadas sempre aparecem como estimativa.
+
+## Honorários simples (logo após o MVP)
+
+- Por cliente: o que foi combinado (fixo, êxito, parcelado ou mensal), os pagamentos previstos e os recebidos.
+- Painel com o total em aberto e os pagamentos vencidos.
+- Não emite boleto nem cobra o cliente. É só controle.
 
 ## Responsabilidade
 

@@ -45,6 +45,7 @@ Processos longos aumentam o custo. Embeddings custam centavos por mês.
 |---|---|---|---|---|
 | Start (15 peças) | R$ 79 | ~R$ 15 | ~R$ 2 | ~R$ 62 |
 | Pro (50 peças, uso médio de 35) | R$ 129 | ~R$ 40 | ~R$ 2 | ~R$ 87 |
+| Sociedade (100 peças, uso médio de 70) | R$ 219 | ~R$ 80 | ~R$ 2 | ~R$ 137 |
 | Plus (20 posts) | + R$ 49 | ~R$ 5 | — | ~R$ 44 |
 
 ## Margem do Cliente Fundador (estimativa, sem impostos)

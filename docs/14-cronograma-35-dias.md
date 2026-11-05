@@ -47,7 +47,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 **Pronto quando:** a página inicial abre no link da Vercel.
 
 ### Dia 2 — Layout do aplicativo e componentes
-- Menu lateral, barra superior, faixa de alerta de prazo
+- Menu lateral (com Indicar a Tesia), barra superior com botão "+ Adicionar" e menu, faixa de alerta de prazo, botão de ajuda flutuante
 - Componentes: botão, card, tabela, selo de status, área de upload, modal, toast
 - Estados de carregando, vazio e erro
 
@@ -65,7 +65,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 **Pronto quando:** o fluxo de primeiro acesso é navegável do início ao fim.
 
 ### Dia 5 — Painel de prazos
-- Indicadores, tabela de prazos, filtros, estado vazio, faixa de prazo crítico
+- Contadores compactos e clicáveis, alternância Lista | Quadro, tabela de prazos, filtros, estado vazio, faixa de prazo crítico
 
 **Pronto quando:** o painel fica igual ao protótipo, com dados de exemplo.
 
@@ -91,9 +91,10 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ### Dia 9 — Conta
 - Meu estilo, configurações (abas), plano e uso
-- Modais: limite atingido, fim do teste grátis, prazo editado
+- Modais: limite atingido, fim do teste grátis, prazo editado, novo prazo manual
+- Tela Indicar a Tesia (simples)
 
-**Pronto quando:** todas as 19 telas do MVP estão navegáveis com dados de exemplo.
+**Pronto quando:** todas as 20 telas do MVP estão navegáveis com dados de exemplo.
 
 ### Dia 10 — Teste manual do prompt (validação da IA)
 - Com as peças e intimações reais separadas no dia 0, testar no Claude os prompts de perfil de estilo, extração e geração (ver `07-ia-e-prompts.md`)
@@ -110,6 +111,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Projeto Supabase (São Paulo)
 - Migrations das tabelas principais (ver `04-modelo-de-dados.md`): escritórios, usuários, processos, intimações, prazos, peças, estilo, referências, uso
 - RLS em todas as tabelas com `escritorio_id`
+- Já incluir os campos de prazo manual (`origem`, `tipo`, `hora`), `responsavel_id` em prazos e peças e `calendario_token` em usuários, para não precisar migrar depois
 
 ### Dia 13 — Autenticação
 - Cadastro, login e recuperação com Supabase Auth
@@ -194,6 +196,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Aviso de pendências antes de baixar
 
 ### Dia 28 — Folga para atrasos
+- Se não houver atraso: agenda sincronizada (link iCal com prazos confirmados, audiências e compromissos) e aba Agenda nas configurações
 
 ---
 
@@ -202,6 +205,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 ### Dia 29 — Telas com dados reais
 - Processos, detalhe do processo e peças
 - Marcar como protocolado conclui o prazo
+- Novo prazo manual salvando de verdade e aparecendo no painel e nos alertas
 
 ### Dia 30 — Alertas e limites
 - Alertas de prazo por e-mail (job agendado diário)
@@ -215,7 +219,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ### Dia 32 — Produção
 - Termos de uso e política de privacidade (rascunho, enviar para revisão)
-- Landing final com o vídeo do fluxo
+- Landing final conforme `15-landing.md`, com as capturas reais das telas
 - Deploy de produção: Vercel Pro (web) e Railway ou Render (worker)
 
 ### Dia 33 — Teste de ponta a ponta
@@ -238,10 +242,14 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 Em ordem de prioridade:
 1. Onboarding dos demais clientes fundadores (até 6)
 2. Cobrança pelo Asaas (antes do fim dos 15 dias grátis do primeiro fundador)
-3. Mais peças por área e revisão das regras de prazo
-4. Calculadora de prazos pública
-5. Plano Plus (conteúdo para Instagram)
-6. Busca automática de intimações (fase 2 do roadmap)
+3. Busca automática de intimações pela OAB
+4. Agenda sincronizada (iCal), se não entrou no dia 28
+5. Plano Sociedade (convite, responsável, "Meus prazos")
+6. Relatório do mês e honorários simples
+7. Mais peças por área e revisão das regras de prazo
+8. Plano Plus e calculadora de prazos pública
+
+Detalhes de cada item em `08-roadmap.md` (fase 1.5).
 
 ## Acompanhamento
 
