@@ -44,10 +44,16 @@ export function ExemploToast() {
       <Button variant="outline" onClick={() => toast.success("Prazo confirmado.")}>
         Sucesso
       </Button>
-      <Button variant="outline" onClick={() => toast.error("Não foi possível salvar.")}>
+      <Button
+        variant="outline"
+        onClick={() => toast.error("Não foi possível salvar. Tente de novo.")}
+      >
         Erro
       </Button>
-      <Button variant="outline" onClick={() => toast("Análise da intimação concluída.")}>
+      <Button variant="outline" onClick={() => toast.warning("Você usou 80% das peças do mês.")}>
+        Aviso
+      </Button>
+      <Button variant="outline" onClick={() => toast.info("Análise da intimação concluída.")}>
         Processamento concluído
       </Button>
     </div>

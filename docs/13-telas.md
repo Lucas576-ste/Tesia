@@ -51,7 +51,7 @@ Aplicativo (menu lateral)
 
 - **Menu lateral:** Painel, Nova intimação, Processos, Peças, Meu estilo, Conteúdo (com selo Plus, só quando o plano Plus entrar, depois do dia 35), e no rodapé o nome do advogado, OAB e acesso à Conta. No celular, vira menu inferior ou menu recolhido.
 - **Barra superior:** botão "+ Nova intimação", busca de processos por número ou parte (atalho Ctrl+K), indicador de uso do mês (ex.: "32 de 50 peças", com barra de progresso), sino de notificações e ajuda.
-- **Aviso de prazo crítico:** faixa quando houver prazo confirmado vencendo em até 3 dias úteis, em vermelho claro; em vermelho forte quando vencer no dia.
+- **Aviso de prazo crítico:** faixa branca quando houver prazo confirmado vencendo em até 3 dias úteis, com ícone e filete lateral coloridos: âmbar, ou vermelho quando vencer no dia.
 - **Mensagens rápidas (toasts):** sucesso, erro e processamento concluído.
 - **Estados de toda tela:** carregando, vazio (com orientação do que fazer) e erro (com opção de tentar de novo).
 
