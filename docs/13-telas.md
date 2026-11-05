@@ -60,7 +60,7 @@ Aplicativo (menu lateral)
 ## Site público
 
 ### 1. Landing (`/`) — MVP
-**Objetivo:** explicar o produto e levar ao cadastro.
+**Objetivo:** explicar o produto e levar à ação. Textos, ordem e CTAs seguem `15-landing.md`, que prevalece sobre a lista abaixo.
 - Título com a promessa principal: intimação → prazo → peça no seu estilo
 - Demonstração em vídeo curto ou GIF do fluxo
 - Como funciona em 3 passos

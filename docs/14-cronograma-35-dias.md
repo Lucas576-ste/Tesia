@@ -13,7 +13,7 @@
 
 | Item | Por que pode esperar |
 |---|---|
-| Cobrança pelo Asaas | Os clientes fundadores têm 3 meses grátis. A cobrança precisa estar pronta só antes disso |
+| Cobrança pelo Asaas | Os clientes fundadores têm 15 dias grátis. A cobrança precisa estar pronta até o fim desse período |
 | Calculadora de prazos pública | É ferramenta de marketing da fase 20 → 50 clientes |
 | Plano Plus (conteúdo) | Reaproveita o projeto atual depois do lançamento |
 | NestJS | No MVP, a API fica nas rotas do Next.js + worker separado. NestJS entra quando escalar |
@@ -236,8 +236,8 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 ## Próximo ciclo (depois do dia 35)
 
 Em ordem de prioridade:
-1. Onboarding dos demais clientes fundadores (até 10)
-2. Cobrança pelo Asaas (antes do fim dos 3 meses grátis)
+1. Onboarding dos demais clientes fundadores (até 6)
+2. Cobrança pelo Asaas (antes do fim dos 15 dias grátis do primeiro fundador)
 3. Mais peças por área e revisão das regras de prazo
 4. Calculadora de prazos pública
 5. Plano Plus (conteúdo para Instagram)

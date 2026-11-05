@@ -12,7 +12,7 @@ A estratégia muda com o tamanho:
 ## Fase 1: 0 → 10 clientes (1 a 2 meses)
 
 - Oferecer o produto primeiro aos advogados entrevistados, que já confirmaram a dor.
-- **Plano Cliente Fundador:** 3 meses grátis e depois R$ 59/mês para sempre. Em troca: feedback semanal, depoimento e autorização para usar o caso como exemplo (sem dados de cliente).
+- **Plano Cliente Fundador:** 6 vagas, 15 dias grátis e depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa. Em troca: feedback semanal, depoimento e autorização para usar o caso como exemplo (sem dados de cliente).
 - Canais: grupos de WhatsApp de advogados, ESA e eventos da OAB-DF, indicações dos primeiros usuários.
 - **Onboarding feito pelo fundador:** ajudar a enviar as peças e gerar a primeira. Ninguém sai sem ver o rascunho no próprio estilo.
 

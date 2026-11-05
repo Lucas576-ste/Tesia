@@ -25,7 +25,8 @@
 | Start | R$ 79 | 15 | 1 | 1 | Intimação por upload, prazos, rascunho no estilo, alerta por e-mail |
 | Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + alertas por WhatsApp + busca automática de intimações (quando existir) |
 | Plus (add-on) | + R$ 49 | — | — | — | Conteúdo para Instagram: 20 posts/mês e calendário |
-| Escritório (futuro) | R$ 299 | 150 | Todas | 3 | Tudo do Pro + distribuição de tarefas |
+| Empresas (futuro; valor interno, sem preço público) | R$ 299 | 150 | Todas | 3 | Tudo do Pro + distribuição de tarefas |
+| Cliente Fundador (6 vagas) | R$ 79 | 50 | Todas | 1 | Recursos do Pro; 15 dias grátis com até 15 peças, sem cartão; preço mantido enquanto a assinatura estiver ativa |
 
 Regras:
 - **Teste grátis:** 7 dias, com limite de 5 peças, sem cartão.

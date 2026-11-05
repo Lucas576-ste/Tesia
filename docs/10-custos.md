@@ -19,7 +19,7 @@ Preços da API do Claude (por milhão de tokens):
 
 | Modelo | Entrada | Saída | Leitura de cache |
 |---|---|---|---|
-| Sonnet 5.5 | US$ 2 | US$ 10 | US$ 0,10 |
+| Sonnet 5.5 | US$ 2 | US$ 10 | US$ 0,20 |
 | Haiku 5.5 (prompts até 100 mil tokens) | US$ 0,10 | US$ 0,50 | US$ 0,01 |
 
 Estimativa por peça:
@@ -46,6 +46,18 @@ Processos longos aumentam o custo. Embeddings custam centavos por mês.
 | Start (15 peças) | R$ 79 | ~R$ 15 | ~R$ 2 | ~R$ 62 |
 | Pro (50 peças, uso médio de 35) | R$ 129 | ~R$ 40 | ~R$ 2 | ~R$ 87 |
 | Plus (20 posts) | + R$ 49 | ~R$ 5 | — | ~R$ 44 |
+
+## Margem do Cliente Fundador (estimativa, sem impostos)
+
+Oferta: R$ 79/mês com 50 peças e 15 dias grátis com até 15 peças.
+
+| Cenário | Uso de IA | Pagamento | Margem por cliente |
+|---|---|---|---|
+| Uso médio (35 peças) | ~R$ 40 | ~R$ 2 | ~R$ 37 |
+| Pior caso (50 peças a R$ 1,40) | R$ 70 | ~R$ 2 | ~R$ 7 |
+
+- **6 fundadores:** de R$ 42 a R$ 222 por mês, abaixo dos custos fixos de R$ 300 a R$ 400. O programa é investimento em validação até haver clientes a preço normal.
+- **Período grátis:** no máximo R$ 21 por fundador, R$ 126 no total.
 
 ## Simulação com 50 clientes Pro
 

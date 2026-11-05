@@ -20,5 +20,6 @@ Esta pasta reúne todas as decisões de produto, técnicas e de negócio. Cada a
 | [12-go-to-market.md](12-go-to-market.md) | Marketing, aquisição de clientes por fase, monetização e retenção |
 | [13-telas.md](13-telas.md) | Todas as telas, rotas, fases e conteúdo de cada uma |
 | [14-cronograma-35-dias.md](14-cronograma-35-dias.md) | Plano dia a dia do MVP (35 dias, 2 h por dia) |
+| [15-landing.md](15-landing.md) | Textos, ordem das seções e regras da landing |
 
 Protótipo das telas: canvas "Protótipo Agente Jurídico" no Claude (5 telas: estilo, painel, intimação, rascunho, conteúdo).
