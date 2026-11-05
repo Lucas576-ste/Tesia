@@ -12,15 +12,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { normalizarBusca } from "@/lib/busca";
 import { processosExemplo } from "./dados-exemplo";
-
-function normalizarBusca(texto: string) {
-  return texto
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .replace(/[.-]/g, "")
-    .toLowerCase();
-}
 
 function filtrarProcessos(valor: string, busca: string) {
   return normalizarBusca(valor).includes(normalizarBusca(busca)) ? 1 : 0;

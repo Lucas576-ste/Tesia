@@ -35,22 +35,24 @@ function textoPendencias(quantidade: number) {
   return quantidade === 1 ? "1 pendência" : `${quantidade} pendências`;
 }
 
-function falaLia(quantidade: number) {
+function falaLia(quantidade: number, protocolada: boolean) {
+  if (protocolada) return "Esta peça já foi protocolada. Reabra se precisar alterar o texto.";
   if (quantidade === 0) return "Não há pontos marcados no texto. Faça sua revisão final.";
   if (quantidade === 1) return "Escrevi no seu estilo e marquei 1 ponto para você conferir.";
   return `Escrevi no seu estilo e marquei ${quantidade} pontos para você conferir.`;
 }
 
-export function TelaEditor({ peca }: { peca: PecaExemplo }) {
+export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise: boolean }) {
   const [aba, setAba] = useState("peca");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
-  const [protocolada, setProtocolada] = useState(false);
+  const [protocolada, setProtocolada] = useState(peca.status === "protocolado");
   const [modal, setModal] = useState<"baixar" | "protocolar" | null>(null);
   const [versoes, setVersoes] = useState<VersaoPeca[]>([]);
   const conteudos = useRef(new Map<number, JSONContent>());
 
   const editor = useEditor({
     immediatelyRender: false,
+    editable: peca.status !== "protocolado",
     extensions: [StarterKit.configure({ heading: { levels: [2, 3] } }), ExtensaoPendencias],
     content: peca.conteudo,
     editorProps: {
@@ -108,9 +110,9 @@ export function TelaEditor({ peca }: { peca: PecaExemplo }) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link href={`/app/intimacoes/${peca.id}`}>
+        <Link href={temAnalise ? `/app/intimacoes/${peca.id}` : "/app/pecas"}>
           <ArrowLeft aria-hidden />
-          Voltar à análise
+          {temAnalise ? "Voltar à análise" : "Voltar às peças"}
         </Link>
       </Button>
       <header className="flex flex-col gap-1">
@@ -127,11 +129,16 @@ export function TelaEditor({ peca }: { peca: PecaExemplo }) {
           {peca.partes} · <span className="whitespace-nowrap tabular-nums">{peca.cnj}</span>
         </p>
         <p className="text-sm">
-          Vence em <span className="font-medium tabular-nums">{peca.vencimento}</span>
-          <span className="text-texto-secundario"> · Demonstração: as edições não são salvas.</span>
+          {peca.vencimento && (
+            <>
+              Vence em <span className="font-medium tabular-nums">{peca.vencimento}</span>
+              <span className="text-texto-secundario"> · </span>
+            </>
+          )}
+          <span className="text-texto-secundario">Demonstração: as edições não são salvas.</span>
         </p>
       </header>
-      <BalaoLia className="text-sm">{falaLia(pendencias.length)}</BalaoLia>
+      <BalaoLia className="text-sm">{falaLia(pendencias.length, protocolada)}</BalaoLia>
       <p className="flex items-center gap-2 text-sm text-texto-secundario">
         <ShieldAlert aria-hidden className="size-4 shrink-0" />
         Rascunho gerado por IA. Revise antes de protocolar.
@@ -170,7 +177,7 @@ export function TelaEditor({ peca }: { peca: PecaExemplo }) {
           <TabsContent value="painel" forceMount className={conteudoAba}>
             <div className="flex flex-col gap-4">
               <PainelPendencias pendencias={pendencias} aoEscolher={irParaPendencia} />
-              <PainelFontes peca={peca} />
+              <PainelFontes peca={peca} temAnalise={temAnalise} />
               <PainelAjuste desativado={protocolada} />
               <PainelVersoes
                 versoes={versoes}

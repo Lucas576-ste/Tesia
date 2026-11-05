@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = { title: "Tela em construção · Tesia" };
 
 const telasPendentes = new Map([
-  ["processos", "Processos"],
-  ["pecas", "Peças"],
   ["estilo", "Meu estilo"],
   ["configuracoes", "Configurações"],
 ]);

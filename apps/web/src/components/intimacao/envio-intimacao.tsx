@@ -14,7 +14,7 @@ const DURACAO_ETAPA = 900;
 
 type Arquivo = { id: number; nome: string };
 
-export function EnvioIntimacao() {
+export function EnvioIntimacao({ processoInicial = "" }: { processoInicial?: string }) {
   const router = useRouter();
   const [arquivos, setArquivos] = useState<Arquivo[]>([]);
   const [recusados, setRecusados] = useState(0);
@@ -86,7 +86,7 @@ export function EnvioIntimacao() {
       )}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="processo">Vincular a um processo (opcional)</Label>
-        <SelectNativo id="processo" defaultValue="">
+        <SelectNativo id="processo" defaultValue={processoInicial}>
           <option value="">Identificar pelo documento</option>
           {processosExemplo.map(({ id, partes }) => (
             <option key={id} value={id}>

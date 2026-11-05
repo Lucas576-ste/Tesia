@@ -43,7 +43,7 @@ export function prazoCritico(prazos: LinhaPrazo[]) {
   };
 }
 
-function chaveData(data: string) {
+export function chaveData(data: string) {
   return data.split("/").reverse().join("");
 }
 
