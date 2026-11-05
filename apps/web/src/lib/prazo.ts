@@ -5,6 +5,7 @@ export type LinhaPrazo = {
   partes: string;
   cnj: string;
   peca: string;
+  area: string;
   vencimento: string;
   diasUteis: number;
   status: StatusPrazo;
@@ -39,5 +40,28 @@ export function prazoCritico(prazos: LinhaPrazo[]) {
     partes: maisUrgente.partes,
     prazo: textoVencimento(maisUrgente),
     href: destinoPrazo(maisUrgente),
+  };
+}
+
+function chaveData(data: string) {
+  return data.split("/").reverse().join("");
+}
+
+export function ordenarPrazos(prazos: LinhaPrazo[]) {
+  return [...prazos].sort((a, b) => {
+    const protocoladoA = a.status === "protocolado" ? 1 : 0;
+    const protocoladoB = b.status === "protocolado" ? 1 : 0;
+    if (protocoladoA !== protocoladoB) return protocoladoA - protocoladoB;
+    return chaveData(a.vencimento).localeCompare(chaveData(b.vencimento));
+  });
+}
+
+export function contarIndicadores(prazos: LinhaPrazo[]) {
+  const abertos = prazos.filter(({ status }) => status !== "protocolado");
+  return {
+    abertos: abertos.length,
+    vencendo: abertos.filter(({ diasUteis }) => diasUteis <= LIMITE_DIAS_CRITICOS).length,
+    rascunhos: prazos.filter(({ status }) => status === "rascunho_pronto").length,
+    protocolados: prazos.length - abertos.length,
   };
 }

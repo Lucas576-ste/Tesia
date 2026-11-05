@@ -94,7 +94,7 @@ export function EscolhaModelo() {
           <Button disabled>Concluir e ir ao painel</Button>
         ) : (
           <Button asChild>
-            <Link href="/app/componentes">Concluir e ir ao painel</Link>
+            <Link href="/app">Concluir e ir ao painel</Link>
           </Button>
         )}
       </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { SeloStatus } from "@/components/selo-status";
 import {
   Table,
@@ -19,15 +20,21 @@ function diasRestantes(diasUteis: number, status: StatusPrazo) {
   return { texto: `${diasUteis} dias úteis`, cor: "text-texto" };
 }
 
-function ListaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
+type TabelaPrazosProps = {
+  prazos: LinhaPrazo[];
+  acoes?: (prazo: LinhaPrazo) => ReactNode;
+};
+
+function ListaPrazos({ prazos, acoes }: TabelaPrazosProps) {
   return (
     <ul className="flex flex-col md:hidden">
-      {prazos.map(({ id, partes, cnj, peca, vencimento, diasUteis, status }) => {
+      {prazos.map((prazo) => {
+        const { id, partes, cnj, peca, vencimento, diasUteis, status } = prazo;
         const dias = diasRestantes(diasUteis, status);
         return (
           <li
             key={id}
-            className="relative flex flex-col gap-1 border-b p-3 text-sm transition-colors last:border-b-0 hover:bg-muted/50"
+            className="relative flex flex-col gap-1 border-b p-3 pr-12 text-sm transition-colors last:border-b-0 hover:bg-muted/50"
           >
             <Link
               href={destinoPrazo({ id, status })}
@@ -43,6 +50,7 @@ function ListaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
               <span className={cn("tabular-nums", dias.cor)}>{dias.texto}</span>
               <SeloStatus status={status} />
             </div>
+            {acoes && <div className="absolute top-2 right-2 z-10">{acoes(prazo)}</div>}
           </li>
         );
       })}
@@ -50,10 +58,10 @@ function ListaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
   );
 }
 
-export function TabelaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
+export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
   return (
     <>
-      <ListaPrazos prazos={prazos} />
+      <ListaPrazos prazos={prazos} acoes={acoes} />
       <div className="hidden md:block">
         <Table>
           <TableHeader>
@@ -63,10 +71,16 @@ export function TabelaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
               <TableHead>Vencimento</TableHead>
               <TableHead>Dias restantes</TableHead>
               <TableHead>Status</TableHead>
+              {acoes && (
+                <TableHead>
+                  <span className="sr-only">Ações</span>
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {prazos.map(({ id, partes, cnj, peca, vencimento, diasUteis, status }) => {
+            {prazos.map((prazo) => {
+              const { id, partes, cnj, peca, vencimento, diasUteis, status } = prazo;
               const dias = diasRestantes(diasUteis, status);
               return (
                 <TableRow key={id} className="relative">
@@ -85,6 +99,7 @@ export function TabelaPrazos({ prazos }: { prazos: LinhaPrazo[] }) {
                   <TableCell>
                     <SeloStatus status={status} />
                   </TableCell>
+                  {acoes && <TableCell className="relative z-10 w-px">{acoes(prazo)}</TableCell>}
                 </TableRow>
               );
             })}

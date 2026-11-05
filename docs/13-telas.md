@@ -51,7 +51,7 @@ Aplicativo (menu lateral)
 
 - **Menu lateral:** Painel, Nova intimação, Processos, Peças, Meu estilo, Conteúdo (com selo Plus, só quando o plano Plus entrar, depois do dia 35), e no rodapé o nome do advogado, OAB e acesso à Conta. No celular, vira menu inferior ou menu recolhido.
 - **Barra superior:** botão "+ Nova intimação", busca de processos por número ou parte (atalho Ctrl+K), indicador de uso do mês (ex.: "32 de 50 peças", com barra de progresso), sino de notificações e ajuda.
-- **Aviso de prazo crítico:** faixa branca quando houver prazo confirmado vencendo em até 3 dias úteis, com ícone e filete lateral coloridos: âmbar, ou vermelho quando vencer no dia.
+- **Aviso de prazo crítico** (enquanto os dados são de exemplo, aparece só no painel; volta a todas as telas quando houver dados reais)**:** faixa branca quando houver prazo confirmado vencendo em até 3 dias úteis, com ícone e filete lateral coloridos: âmbar, ou vermelho quando vencer no dia.
 - **Mensagens rápidas (toasts):** sucesso, erro e processamento concluído.
 - **Estados de toda tela:** carregando, vazio (com orientação do que fazer) e erro (com opção de tentar de novo).
 
@@ -135,7 +135,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Indicadores: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
 - Tabela de prazos: processo, peça, vencimento, dias restantes, status (não iniciado, rascunho pronto, protocolado)
 - Filtros: status, área, período
-- Ações por linha: abrir análise, abrir peça, marcar como cumprido
+- Ações por linha: abrir análise, abrir peça, marcar como protocolado
 - Estado vazio: "Envie sua primeira intimação"
 
 ### 12. Nova intimação (`/app/intimacoes/nova`) — MVP (protótipo)

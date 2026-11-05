@@ -36,7 +36,7 @@ export default function ComponentesPage() {
           />
           <FaixaAlertaPrazo
             variante="hoje"
-            peca="Réplica"
+            peca="Manifestação sobre cálculos"
             partes="João Lima x Construtora Y"
             prazo="hoje (04/11)"
             href="/app/intimacoes/2"
