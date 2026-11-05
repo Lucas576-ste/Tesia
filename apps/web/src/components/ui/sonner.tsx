@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
+import { useTheme } from "next-themes";
 import type { CSSProperties } from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
@@ -18,8 +19,16 @@ const icones = {
 };
 
 function Toaster(props: ToasterProps) {
+  const { resolvedTheme } = useTheme();
+
   return (
-    <Sonner theme="light" icons={icones} mobileOffset={{ bottom: 80 }} style={cores} {...props} />
+    <Sonner
+      theme={resolvedTheme === "dark" ? "dark" : "light"}
+      icons={icones}
+      mobileOffset={{ bottom: 80 }}
+      style={cores}
+      {...props}
+    />
   );
 }
 

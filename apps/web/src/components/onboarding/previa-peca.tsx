@@ -9,7 +9,7 @@ export function PreviaPeca({ timbrado }: { timbrado: boolean }) {
       </div>
       <div
         aria-hidden
-        className="flex flex-col gap-3 rounded-md border bg-card p-5 text-xs shadow-xs"
+        className="tema-claro flex flex-col gap-3 rounded-md border bg-card p-5 text-xs shadow-xs"
       >
         {timbrado ? (
           <p className="rounded-sm bg-primaria-fundo py-3 text-center font-medium text-primaria">

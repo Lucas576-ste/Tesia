@@ -35,6 +35,10 @@ Prevalecem sobre os textos abaixo:
 - **Planos:** recursos detalhados, itens futuros em bloco separado e novo plano Empresas, sem preço, "em breve".
 - **Tom:** sem ameaça sobre a OAB na seção de custo, perguntas com enunciado positivo. Ficam os avisos de responsabilidade do advogado, processamento fora do Brasil e "Exemplo ilustrativo".
 
+## Tema (2026-11-05)
+
+A landing segue o tema escolhido (Claro, Escuro ou Sistema). O ritmo de fundos abaixo vale para o tema claro, com fundo `#EEEDE7` e seções "branco" em `#F7F6F1`.
+
 ## Regras
 
 - **Nunca inventar** depoimentos, números de clientes, avaliações ou estatísticas.

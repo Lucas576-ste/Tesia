@@ -86,18 +86,21 @@ export function MiniRascunho() {
   return (
     <TelaMini titulo="Rascunho da peça">
       <BalaoLia>Escrevi no seu estilo e marquei 2 pontos para você conferir.</BalaoLia>
-      <p className="text-center font-serif text-sm font-semibold">CONTESTAÇÃO</p>
-      <p>
-        Maria Souza, já qualificada nos autos, vem apresentar contestação à ação movida por Banco X.
-      </p>
-      <p>
-        O autor não juntou o contrato que fundamenta a cobrança, ônus que lhe cabe (CPC, art. 373,
-        I). <Pendencia>[CONFIRMAR] Citação a conferir</Pendencia>
-      </p>
-      <p>
-        A última fatura em aberto venceu em <Pendencia>[CONFIRMAR] data da fatura</Pendencia>.
-      </p>
-      <span className="self-end rounded-md bg-primaria px-2 py-1 font-medium text-white">
+      <div className="tema-claro flex flex-col gap-2 rounded-md border bg-card p-2">
+        <p className="text-center font-serif text-sm font-semibold">CONTESTAÇÃO</p>
+        <p>
+          Maria Souza, já qualificada nos autos, vem apresentar contestação à ação movida por Banco
+          X.
+        </p>
+        <p>
+          O autor não juntou o contrato que fundamenta a cobrança, ônus que lhe cabe (CPC, art. 373,
+          I). <Pendencia>[CONFIRMAR] Citação a conferir</Pendencia>
+        </p>
+        <p>
+          A última fatura em aberto venceu em <Pendencia>[CONFIRMAR] data da fatura</Pendencia>.
+        </p>
+      </div>
+      <span className="self-end rounded-md bg-primary px-2 py-1 font-medium text-primary-foreground">
         Baixar .docx
       </span>
     </TelaMini>

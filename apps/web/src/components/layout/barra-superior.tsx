@@ -1,5 +1,6 @@
 import { Bell, CircleHelp, Plus, UserRound } from "lucide-react";
 import Link from "next/link";
+import { SeletorTema } from "@/components/tema/seletor-tema";
 import { Button } from "@/components/ui/button";
 import { BuscaGlobal } from "./busca-global";
 import { usoExemplo } from "./dados-exemplo";
@@ -16,7 +17,8 @@ export function BarraSuperior() {
       </Button>
       <BuscaGlobal />
       <div className="ml-auto flex items-center gap-1">
-        <UsoMes {...usoExemplo} className="mr-2" />
+        <UsoMes {...usoExemplo} className="mr-1" />
+        <SeletorTema />
         <Button variant="ghost" size="icon" aria-label="Notificações">
           <Bell aria-hidden />
         </Button>

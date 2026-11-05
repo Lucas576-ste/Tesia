@@ -12,7 +12,7 @@ export function Confirmar({ motivo, alternativa = null, children }: ConfirmarPro
   if (!mostrarConfirmar) return <>{alternativa}</>;
 
   return (
-    <span data-confirmar className="rounded-sm bg-amber-200 px-1 text-texto">
+    <span data-confirmar className="rounded-sm bg-amber-200 px-1 text-menu">
       {children} <span className="text-xs font-normal">[CONFIRMAR: {motivo}]</span>
     </span>
   );

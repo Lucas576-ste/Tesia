@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SimboloTesia } from "@/components/layout/simbolo-tesia";
+import { SeletorTema } from "@/components/tema/seletor-tema";
 import { Button } from "@/components/ui/button";
 
 const links = [
@@ -26,6 +27,7 @@ export function CabecalhoLanding() {
             </Button>
           ))}
         </nav>
+        <SeletorTema />
         <Button asChild variant="ghost" size="sm">
           <Link href="/login">Entrar</Link>
         </Button>

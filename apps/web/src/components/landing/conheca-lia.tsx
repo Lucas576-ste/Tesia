@@ -30,7 +30,9 @@ export function ConhecaLia() {
     <SecaoLanding fundo="branco">
       <div className="flex items-center gap-4">
         <AvatarLia className="size-14 text-2xl" />
-        <h2 className="text-3xl font-semibold md:text-4xl">Conheça a Lia, sua assistente de IA.</h2>
+        <h2 className="text-3xl font-semibold text-titulo md:text-4xl">
+          Conheça a Lia, sua assistente de IA.
+        </h2>
       </div>
       <p className="max-w-3xl text-lg text-texto-secundario">
         A Lia acompanha cada intimação com você, do PDF ao rascunho. Ela cuida do trabalho pesado e

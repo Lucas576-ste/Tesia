@@ -9,7 +9,7 @@ export function Heroi() {
     <section className="bg-fundo">
       <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
         <div className="flex flex-col gap-5">
-          <h1 className="text-4xl font-semibold md:text-5xl">
+          <h1 className="text-4xl font-semibold text-titulo md:text-5xl">
             Da intimação à peça, no seu estilo.
           </h1>
           <p className="text-lg text-texto-secundario">

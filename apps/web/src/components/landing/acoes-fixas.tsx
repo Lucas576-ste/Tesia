@@ -17,7 +17,7 @@ export function WhatsappFlutuante() {
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"
       onClick={() => track("whatsapp_click")}
-      className="fixed right-4 bottom-20 z-40 flex size-12 items-center justify-center rounded-full bg-sucesso text-white shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 md:bottom-4"
+      className="fixed right-4 bottom-20 z-40 flex size-12 items-center justify-center rounded-full bg-sucesso-forte text-white shadow-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 md:bottom-4"
     >
       <MessageCircle aria-hidden className="size-6" />
     </a>

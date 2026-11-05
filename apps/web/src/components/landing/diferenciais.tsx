@@ -39,7 +39,7 @@ const destaques = [
   },
 ];
 
-const colunaConfirmar = "bg-amber-200";
+const colunaConfirmar = "bg-amber-200 text-menu";
 
 export function Diferenciais() {
   return (
@@ -80,7 +80,7 @@ export function Diferenciais() {
               <TableHead>Tesia</TableHead>
               <TableHead>IA genérica</TableHead>
               {mostrarConfirmar && (
-                <TableHead data-confirmar className={cn(colunaConfirmar, "text-texto")}>
+                <TableHead data-confirmar className={colunaConfirmar}>
                   Sistemas de gestão completos
                 </TableHead>
               )}
@@ -92,9 +92,7 @@ export function Diferenciais() {
                 <TableCell className="font-medium">{recurso}</TableCell>
                 <TableCell className="font-medium text-sucesso">{tesia}</TableCell>
                 <TableCell className="text-texto-secundario">{ia}</TableCell>
-                {mostrarConfirmar && (
-                  <TableCell className={cn(colunaConfirmar, "text-texto")}>{gestao}</TableCell>
-                )}
+                {mostrarConfirmar && <TableCell className={colunaConfirmar}>{gestao}</TableCell>}
               </TableRow>
             ))}
           </TableBody>
