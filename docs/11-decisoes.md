@@ -42,7 +42,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Escolher o provedor de embeddings (Voyage ou OpenAI) | Lucas | |
 | Confirmar os termos do provedor de IA sobre retenção e treino | Lucas | Antes do lançamento |
 | Pesquisar a consulta de comunicações do DJEN e APIs pagas de intimações | Lucas | Antes da fase 2 |
-| Levantar calendários de feriados e suspensões dos tribunais do DF | Lucas | Antes do lançamento |
+| Levantar calendários de feriados e suspensões dos tribunais do DF | Lucas | Antes do dia 15 |
 | Revisão dos textos legais por advogado | Lucas | Antes do lançamento |
-| Validar com advogados as regras especiais de prazo (prazo em dobro, intimação pelo sistema) | Lucas | Antes do lançamento |
+| Validar com advogados as regras especiais de prazo (prazo em dobro, intimação pelo sistema) | Lucas | Antes do dia 15 |
 | Falar com contador sobre a saída do MEI | Lucas | Ao chegar a ~30 clientes |
