@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -38,6 +38,9 @@ export function FormularioFundador() {
     defaultValues: { nome: "", email: "", oab: "", whatsapp: "" },
   });
 
+  const uf = useWatch({ control: form.control, name: "uf" });
+  const foraDoDf = Boolean(uf && uf !== "DF");
+
   function aoAlterar() {
     if (iniciou.current) return;
     iniciou.current = true;
@@ -62,7 +65,9 @@ export function FormularioFundador() {
   if (situacao === "sucesso") {
     return (
       <p role="status" className="font-medium">
-        Recebemos. Vamos falar com você pelo WhatsApp em até 1 dia útil.
+        {foraDoDf
+          ? "Você está na lista de espera. Avisamos quando chegarmos ao seu estado."
+          : "Recebemos. Vamos falar com você pelo WhatsApp em até 1 dia útil."}
       </p>
     );
   }
@@ -181,8 +186,14 @@ export function FormularioFundador() {
             </FormItem>
           )}
         />
+        {foraDoDf && (
+          <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
+            As vagas de fundador são para advogados do DF, por causa dos calendários locais de
+            prazo. Entre na lista de espera e avisamos quando chegarmos ao seu estado.
+          </p>
+        )}
         <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
-          Quero minha vaga
+          {foraDoDf ? "Entrar na lista de espera" : "Quero minha vaga"}
         </Button>
         {situacao === "erro" && (
           <p role="alert" className="text-sm text-erro">

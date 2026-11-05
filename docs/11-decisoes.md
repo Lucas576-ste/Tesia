@@ -35,6 +35,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-05 | Assistente de IA chamada Lia como rosto da Tesia, usando as funções já previstas, sem chat no MVP | Dar proximidade ao advogado sem aumentar as 70 h; sempre apresentada como IA |
 | 2026-11-05 | Plano futuro para equipes anunciado como "Empresas", sem preço público | Validar antes de fixar valor; referência interna em `05-regras-de-negocio.md` |
 | 2026-11-05 | Tema claro menos branco e modo escuro como opção (Claro, Escuro, Sistema), com Sistema como padrão; a folha da peça segue branca | Conforto visual; a folha branca reflete como o .docx sai |
+| 2026-11-05 | As 6 vagas de fundador ficam limitadas a advogados do DF; os demais entram em lista de espera | O calendário local só cobre o DF, e prazo sem feriado local é risco grave |
 
 ## Pendências
 
@@ -56,4 +57,3 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Definir WhatsApp, e-mail de contato, CNPJ e razão social | Lucas | Antes de divulgar a landing |
 | Consultar o nome Lia no INPI junto com Tesia | Lucas | Antes do dia 32 |
 | Deixar a cobrança pelo Asaas pronta antes do fim dos 15 dias grátis do primeiro fundador | Lucas | Até 15 dias após o dia 34 |
-| Decidir como tratar advogados fora do DF no lançamento: o calendário local só cobre o DF, e a landing aceita qualquer UF | Lucas | Antes de divulgar a landing |

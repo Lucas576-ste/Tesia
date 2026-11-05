@@ -37,7 +37,7 @@ export function Heroi() {
             </BotaoRastreado>
           </div>
           <p className="text-sm text-texto-secundario">
-            6 vagas com 15 dias grátis. Sem cartão de crédito.
+            6 vagas para advogados do DF, com 15 dias grátis. Sem cartão de crédito.
           </p>
         </div>
         <div className="flex flex-col gap-3 md:gap-0">

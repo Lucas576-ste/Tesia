@@ -54,6 +54,11 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
       "Você envia o PDF e ela cuida do resto. Os avisos valem para os prazos que você enviou e confirmou. A busca automática pela sua OAB está em desenvolvimento.",
   },
   {
+    pergunta: "Atende fora do DF?",
+    resposta:
+      "Por enquanto, as vagas de fundador são para advogados do DF, onde os calendários locais de prazo já estão prontos. Se você atua em outro estado, entre na lista de espera e avisamos quando chegarmos até você.",
+  },
+  {
     pergunta: "Onde ficam os meus dados?",
     resposta: (
       <>

@@ -30,7 +30,7 @@ Estes ajustes prevalecem sobre os textos abaixo:
 
 Prevalecem sobre os textos abaixo:
 
-- **Fundador:** 6 vagas, 15 dias grátis com até 15 peças, depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa.
+- **Fundador:** 6 vagas só para advogados do DF, com lista de espera para os demais, 15 dias grátis com até 15 peças, depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa.
 - **Lia:** assistente de IA apresentada no hero, na seção "Conheça a Lia", nos passos e nas perguntas. Sempre identificada como inteligência artificial.
 - **Planos:** recursos detalhados, itens futuros em bloco separado e novo plano Empresas, sem preço, "em breve".
 - **Tom:** sem ameaça sobre a OAB na seção de custo, perguntas com enunciado positivo. Ficam os avisos de responsabilidade do advogado, processamento fora do Brasil e "Exemplo ilustrativo".
