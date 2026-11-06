@@ -33,6 +33,7 @@ Prevalecem sobre os textos abaixo:
 - **Fundador:** 6 vagas só para advogados do DF, com lista de espera para os demais, 15 dias grátis com até 15 peças, depois R$ 79/mês com 50 peças, enquanto a assinatura estiver ativa.
 - **Lia:** assistente de IA apresentada no hero, na seção "Conheça a Lia", nos passos e nas perguntas. Sempre identificada como inteligência artificial.
 - **Planos:** recursos detalhados, itens futuros em bloco separado e plano Sociedade no lugar de Empresas, "em breve" com lista de espera até ser lançado.
+- **Planos (2026-11-06):** Start só com o essencial; Pro com "Tudo do Start, mais:" (Quadro, prazos manuais e audiências, ajustes pela Lia) e os itens futuros; Sociedade com "Tudo do Pro, para 2 advogados:". São 3 cartões largos, com o Plus em faixa própria abaixo.
 - **Tom:** sem ameaça sobre a OAB na seção de custo, perguntas com enunciado positivo. Ficam os avisos de responsabilidade do advogado, processamento fora do Brasil e "Exemplo ilustrativo".
 
 ## Tema (2026-11-05)

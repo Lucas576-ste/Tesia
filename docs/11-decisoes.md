@@ -33,7 +33,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-05 | Fora do escopo: CRM com funil, financeiro completo, BI avançado, kanban de tarefas, equipe com perfis | Uso baixo pelo público e escopo grande |
 | 2026-11-05 | Prazos manuais (prazo, audiência, compromisso) entram no MVP, pelo botão "+ Adicionar" | Sem eles, o painel não vira o controle oficial do advogado |
 | 2026-11-05 | Plano Sociedade: 2 advogados, R$ 219, 100 peças compartilhadas; Escritório passa a R$ 99 por advogado (mín. 3) | Público real de sociedades pequenas; substitui o plano Empresas (R$ 299, valor interno) e o Escritório de R$ 299 |
-| 2026-11-05 | Agenda sincronizada por link iCal em todos os planos | Barata de construir; concorrente cobra a partir de R$ 450 |
+| 2026-11-05 | Agenda sincronizada por link iCal em todos os planos. **Substituída em 2026-11-06:** do plano Pro em diante | Barata de construir; concorrente cobra a partir de R$ 450 |
 | 2026-11-05 | Item "Indicar a Tesia" no menu e ajuda flutuante | Indicação dentro do produto; suporte sempre à mão |
 | 2026-11-05 | Depois do MVP, a primeira prioridade de produto é a busca automática de intimações; a cobrança pelo Asaas vem antes, por causa dos 15 dias grátis | É a maior lacuna em relação à concorrência |
 | 2026-11-05 | Landing em formato de funil (dor → custo → solução → confiança → oferta → objeções → ação), textos em `15-landing.md` | A versão anterior era só lista de funcionalidades |
@@ -45,6 +45,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-05 | Plano futuro para equipes anunciado como "Empresas", sem preço público. **Substituída em 2026-11-05:** plano Sociedade | Validar antes de fixar valor |
 | 2026-11-05 | Tema claro menos branco e modo escuro como opção (Claro, Escuro, Sistema), com Sistema como padrão; a folha da peça segue branca | Conforto visual; a folha branca reflete como o .docx sai |
 | 2026-11-05 | As 6 vagas de fundador ficam limitadas a advogados do DF; os demais entram em lista de espera | O calendário local só cobre o DF, e prazo sem feriado local é risco grave |
+| 2026-11-05 | Quadro do painel com a coluna "Depois", visível só quando tiver itens | Sem ela, um prazo não iniciado com mais de 3 dias úteis sumiria do Quadro |
+| 2026-11-06 | Start só com o essencial. Quadro, prazos manuais e audiências, ajustes pela IA e agenda ficam do Pro em diante; Sociedade soma o necessário para 2 advogados | O Start parecia o plano mais completo e induzia a escolha errada |
 | 2026-11-05 | Cada vaga de fundador vale para 1 advogado | O plano é de 1 usuário e 50 peças, e o Sociedade só existe depois do MVP |
 
 ## Pendências

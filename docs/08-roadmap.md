@@ -64,7 +64,7 @@ A Tesia não tenta igualar um sistema de gestão completo. Entram só versões l
 | Função | Versão Tesia | Fase |
 |---|---|---|
 | Kanban | Painel de prazos em Lista ou Quadro | 1 |
-| Agenda Google/Apple/Outlook | Link iCal com prazos e audiências, em todos os planos | 1 (se couber) ou 1.5 |
+| Agenda Google/Apple/Outlook | Link iCal com prazos e audiências, do plano Pro em diante | 1 (se couber) ou 1.5 |
 | Equipe | Plano Sociedade (2 advogados) | 1.5 |
 | BI | Relatório do mês com horas economizadas | 1.5 |
 | Financeiro | Honorários simples por cliente | 1.5 |

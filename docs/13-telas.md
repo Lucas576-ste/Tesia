@@ -139,9 +139,9 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Saudação e resumo do dia ("4 prazos em aberto")
 - Faixa de alerta para prazo crítico, com botão "Começar agora"
 - Contadores compactos e clicáveis, que filtram a lista: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
-- Alternância **Lista | Quadro** (a escolha fica salva)
+- Alternância **Lista | Quadro** (a escolha fica salva; no Start, só Lista)
 - **Lista:** partes em destaque e número CNJ menor, peça, vencimento, dias restantes em texto ("Hoje", "2 dias úteis"), status (não iniciado, rascunho pronto, protocolado)
-- **Quadro:** colunas Vence hoje, Próximos 3 dias, Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo
 - Prazos manuais, audiências e compromissos aparecem junto, com selo do tipo
 - Filtro "Meus prazos / Todos" (plano Sociedade)
 - Filtros: status, área, período
@@ -200,7 +200,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 Abas:
 - **Perfil:** nome, OAB, UF, áreas, tribunais
 - **Alertas:** canais (e-mail, WhatsApp) e dias de antecedência
-- **Agenda:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
+- **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso
 - **Modelo de documento:** trocar o .docx timbrado
 - **Calendário:** feriados e suspensões próprios do escritório

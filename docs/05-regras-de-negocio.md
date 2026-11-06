@@ -22,8 +22,8 @@
 
 | Plano | Preço/mês | Peças/mês | Áreas | Usuários | Recursos |
 |---|---|---|---|---|---|
-| Start | R$ 79 | 15 | 1 | 1 | Intimação por upload, prazos e audiências, rascunho no estilo, alerta por e-mail, agenda no celular (iCal) |
-| Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + alertas por WhatsApp + busca automática de intimações (quando existir) |
+| Start | R$ 79 | 15 | 1 | 1 | Só o essencial: intimação por upload, prazos vindos de intimações, painel em lista, alerta por e-mail, rascunho no estilo, .docx com timbrado |
+| Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + Quadro, prazos manuais e audiências, ajustes pela IA; quando existirem: busca automática de intimações, alertas por WhatsApp, agenda (iCal), relatório do mês, honorários simples |
 | Plus (add-on) | + R$ 49 | — | — | — | Conteúdo para Instagram: 20 posts/mês e calendário |
 | Sociedade (logo após o MVP) | R$ 219 | 100 compartilhadas | Todas | 2 | Tudo do Pro + convite do sócio, responsável por prazo e peça, estilo próprio para cada advogado |
 | Escritório (fase 3) | R$ 99 por advogado (mín. 3) | 50 por advogado | Todas | 3 ou mais | Tudo do Sociedade + perfis e permissões |
@@ -85,6 +85,7 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 
 ## Prazos manuais
 
+- Disponíveis do plano Pro em diante.
 - Nem todo prazo nasce de uma intimação enviada. O advogado cadastra prazos, audiências e compromissos manualmente.
 - Campos: tipo (prazo, audiência, compromisso), descrição, data, hora (opcional), processo (opcional), responsável.
 - Prazos manuais entram como `confirmado` (o próprio advogado informou a data) e aparecem no painel, nos alertas e na agenda.
@@ -92,8 +93,9 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 
 ## Painel em Lista ou Quadro
 
+- O Quadro está disponível do plano Pro em diante. No Start, o painel é só em lista.
 - **Lista:** tabela ordenada por vencimento.
-- **Quadro:** colunas Vence hoje, Próximos 3 dias, Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo.
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo.
 - A escolha fica salva por usuário.
 
 ## Agenda sincronizada (iCal)
@@ -101,7 +103,7 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 - Todo usuário tem um link secreto de agenda, que pode ser assinado no Google Agenda, Apple Calendário ou Outlook.
 - O link traz prazos confirmados, audiências e compromissos, com título "[Peça] Partes" e o link para abrir na Tesia. Nenhum dado sensível além do necessário.
 - O advogado pode gerar um link novo a qualquer momento, o que desativa o anterior.
-- Disponível em todos os planos.
+- Disponível do plano Pro em diante.
 
 ## Plano Sociedade
 

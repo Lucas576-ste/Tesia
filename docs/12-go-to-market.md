@@ -56,7 +56,7 @@ Referência: 1.000 clientes com ticket médio de R$ 110 ≈ R$ 110 mil por mês.
 - **Plano anual** com 2 meses grátis: dinheiro adiantado e cancelamento menor.
 - Pacotes de peças extras.
 - Plano Sociedade (2 advogados, R$ 219) e, na fase 3, plano Escritório (R$ 99 por advogado, a partir de 3).
-- Argumento de venda: sem taxa de ativação e agenda no celular em todos os planos.
+- Argumento de venda: sem taxa de ativação e agenda no celular a partir do Pro.
 - Add-ons futuros: cálculos previdenciários e trabalhistas, busca de intimações em mais tribunais, conferência de jurisprudência.
 
 ## Retenção
