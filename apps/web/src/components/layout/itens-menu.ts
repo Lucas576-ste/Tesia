@@ -2,6 +2,7 @@ import {
   FilePlus2,
   FileText,
   FolderOpen,
+  Gift,
   LayoutDashboard,
   PenLine,
   type LucideIcon,
@@ -26,6 +27,13 @@ export const itensMenu: ItemMenu[] = [
   { rotulo: "Peças", rotuloCurto: "Peças", href: "/app/pecas", icone: FileText },
   { rotulo: "Meu estilo", rotuloCurto: "Estilo", href: "/app/estilo", icone: PenLine },
 ];
+
+export const itemIndicar: ItemMenu = {
+  rotulo: "Indicar a Tesia",
+  rotuloCurto: "Indicar",
+  href: "/app/indicar",
+  icone: Gift,
+};
 
 export function itemEstaAtivo(href: string, caminho: string) {
   if (href === "/app") return caminho === href;

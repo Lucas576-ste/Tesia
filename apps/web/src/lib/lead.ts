@@ -36,7 +36,7 @@ export const AREAS = [
   "Previdenciário",
   "Família",
   "Outra",
-  "Plano Empresas (lista de espera)",
+  "Plano Sociedade (lista de espera)",
 ] as const;
 
 export const REGEX_WHATSAPP = /^\(?\d{2}\)?[\s-]?9?\d{4}[\s-]?\d{4}$/;

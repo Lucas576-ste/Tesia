@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PecaExemplo } from "@/lib/pecas-exemplo";
+import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { BarraFormatacao } from "./barra-formatacao";
 import { ExtensaoPendencias, encontrarPendencias, type Pendencia } from "./extensao-pendencias";
 import { PainelAjuste } from "./painel-ajuste";
@@ -43,6 +44,7 @@ function falaLia(quantidade: number, protocolada: boolean) {
 }
 
 export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise: boolean }) {
+  const { recursosPro } = usePlanoDemo().plano;
   const [aba, setAba] = useState("peca");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
   const [protocolada, setProtocolada] = useState(peca.status === "protocolado");
@@ -178,7 +180,7 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
             <div className="flex flex-col gap-4">
               <PainelPendencias pendencias={pendencias} aoEscolher={irParaPendencia} />
               <PainelFontes peca={peca} temAnalise={temAnalise} />
-              <PainelAjuste desativado={protocolada} />
+              {recursosPro && <PainelAjuste desativado={protocolada} />}
               <PainelVersoes
                 versoes={versoes}
                 desativado={protocolada}

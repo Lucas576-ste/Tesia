@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { advogadoExemplo } from "./dados-exemplo";
-import { itemEstaAtivo, itensMenu } from "./itens-menu";
+import { itemEstaAtivo, itemIndicar, itensMenu } from "./itens-menu";
 import { SimboloTesia } from "./simbolo-tesia";
 
 export function MenuLateral() {
@@ -21,7 +21,7 @@ export function MenuLateral() {
         Tesia
       </Link>
       <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1 px-3">
-        {itensMenu.map(({ rotulo, href, icone: Icone }) => {
+        {[...itensMenu, itemIndicar].map(({ rotulo, href, icone: Icone }) => {
           const ativo = itemEstaAtivo(href, caminho);
           return (
             <Link

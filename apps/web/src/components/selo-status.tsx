@@ -8,7 +8,22 @@ const selos: Record<StatusPrazo, { rotulo: string; cor: string }> = {
   protocolado: { rotulo: "Protocolado", cor: "bg-sucesso-fundo text-sucesso" },
 };
 
-export function SeloStatus({ status }: { status: StatusPrazo }) {
+const rotulosManuais: Record<StatusPrazo, string> = {
+  nao_iniciado: "Confirmado",
+  rascunho_pronto: "Rascunho pronto",
+  protocolado: "Cumprido",
+};
+
+type SeloStatusProps = {
+  status: StatusPrazo;
+  manual?: boolean;
+};
+
+export function SeloStatus({ status, manual = false }: SeloStatusProps) {
   const { rotulo, cor } = selos[status];
-  return <Badge className={cn("border-transparent", cor)}>{rotulo}</Badge>;
+  return (
+    <Badge className={cn("border-transparent", cor)}>
+      {manual ? rotulosManuais[status] : rotulo}
+    </Badge>
+  );
 }

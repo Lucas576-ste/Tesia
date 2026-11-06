@@ -2,9 +2,12 @@
 
 import { ArrowLeft, Quote, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { usoExemplo } from "@/components/layout/dados-exemplo";
+import { toast } from "sonner";
 import { BalaoLia } from "@/components/lia/balao-lia";
+import { ModalLimite } from "@/components/plano/modal-limite";
+import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +22,10 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
   const [aba, setAba] = useState("analise");
   const [destaque, setDestaque] = useState<string | null>(null);
   const [confirmado, setConfirmado] = useState(false);
-  const restantes = usoExemplo.limite - usoExemplo.usadas;
+  const router = useRouter();
+  const { uso } = usePlanoDemo();
+  const [limiteAberto, setLimiteAberto] = useState(false);
+  const restantes = uso.limite - uso.usadas;
 
   useEffect(() => {
     if (!destaque) return;
@@ -97,7 +103,11 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
               />
               <EscolhaPeca pecas={analise.pecas} />
               <section className="flex flex-col gap-2 rounded-xl bg-primaria-fundo p-4">
-                {confirmado ? (
+                {confirmado && restantes <= 0 ? (
+                  <Button size="lg" onClick={() => setLimiteAberto(true)}>
+                    Gerar rascunho no meu estilo
+                  </Button>
+                ) : confirmado ? (
                   <Button asChild size="lg">
                     <Link href={`/app/pecas/${analise.id}`}>Gerar rascunho no meu estilo</Link>
                   </Button>
@@ -108,7 +118,7 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 )}
                 <p className="text-center text-sm">
                   {confirmado
-                    ? `${restantes} de ${usoExemplo.limite} peças restantes neste mês`
+                    ? `${restantes} de ${uso.limite} peças restantes neste mês`
                     : "Confirme o prazo para gerar o rascunho"}
                 </p>
               </section>
@@ -123,6 +133,17 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
           </TabsContent>
         </div>
       </Tabs>
+      <ModalLimite
+        aberto={limiteAberto}
+        bloqueio
+        limite={uso.limite}
+        aoMudar={setLimiteAberto}
+        aoComprar={() => {
+          setLimiteAberto(false);
+          toast.info("A cobrança ainda não está ligada. Nenhum valor foi cobrado.");
+        }}
+        aoMudarPlano={() => router.push("/app/plano")}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { AreaUpload } from "@/components/area-upload";
 import { CardIndicador } from "@/components/card-indicador";
@@ -105,6 +106,20 @@ export default function ComponentesPage() {
 
       <Secao titulo="Área de upload">
         <AreaUpload />
+      </Secao>
+
+      <Secao titulo="Modais de plano">
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link href="/app/plano?exemplo=limite-80">Aviso de 80%</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/app/plano?exemplo=limite-100">Limite atingido</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/app/plano?exemplo=fim-teste">Fim do teste grátis</Link>
+          </Button>
+        </div>
       </Secao>
 
       <Secao titulo="Modal">

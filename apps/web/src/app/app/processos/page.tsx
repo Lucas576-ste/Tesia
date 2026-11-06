@@ -5,7 +5,13 @@ import { listarProcessos } from "@/lib/processos-exemplo";
 
 export const metadata: Metadata = { title: "Processos · Tesia" };
 
-export default function ProcessosPage() {
+type ProcessosPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ProcessosPage({ searchParams }: ProcessosPageProps) {
+  const { novo } = await searchParams;
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       <header className="flex flex-col gap-1">
@@ -17,7 +23,7 @@ export default function ProcessosPage() {
           A lista é criada a partir das intimações que você envia.
         </p>
       </header>
-      <ListaProcessos processos={listarProcessos()} />
+      <ListaProcessos processosIniciais={listarProcessos()} novoProcesso={novo === "1"} />
     </div>
   );
 }

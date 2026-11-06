@@ -4,6 +4,15 @@ import { CheckCircle2, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Analise } from "@/lib/analises-exemplo";
@@ -21,13 +30,19 @@ type BlocoPrazoProps = {
 export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazoProps) {
   const [data, setData] = useState(prazo.vencimentoIso);
   const [editando, setEditando] = useState(false);
+  const [conferindo, setConferindo] = useState(false);
   const editada = data !== prazo.vencimentoIso;
   const depoisDaSugerida = data > prazo.vencimentoIso;
 
   function confirmar() {
     aoMudarConfirmacao(true);
     setEditando(false);
-    toast.success("Prazo confirmado.");
+    setConferindo(false);
+    toast.success(
+      editada
+        ? "Prazo confirmado. A data sugerida e a escolhida foram registradas."
+        : "Prazo confirmado.",
+    );
   }
 
   return (
@@ -83,7 +98,11 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
         </div>
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button disabled={!data} onClick={confirmar} className="sm:flex-1">
+          <Button
+            disabled={!data}
+            onClick={editada ? () => setConferindo(true) : confirmar}
+            className="sm:flex-1"
+          >
             Confirmo o prazo
           </Button>
           <Button variant="outline" onClick={() => setEditando((atual) => !atual)}>
@@ -91,6 +110,37 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
           </Button>
         </div>
       )}
+      <Dialog open={conferindo} onOpenChange={setConferindo}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar a data escolhida?</DialogTitle>
+            <DialogDescription>
+              A data sugerida e a escolhida ficam registradas. A responsabilidade pela data é sua.
+            </DialogDescription>
+          </DialogHeader>
+          <dl className="grid grid-cols-2 gap-3 text-sm tabular-nums">
+            <div>
+              <dt className="text-xs text-texto-secundario">Data sugerida</dt>
+              <dd className="font-medium">{formatarData(prazo.vencimentoIso)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-texto-secundario">Data escolhida</dt>
+              <dd className="font-medium">{formatarData(data)}</dd>
+            </div>
+          </dl>
+          {depoisDaSugerida && (
+            <p role="alert" className="rounded-md bg-atencao-fundo p-2 text-sm text-atencao">
+              Essa data é depois da sugerida. Confira a contagem antes de confirmar.
+            </p>
+          )}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Voltar</Button>
+            </DialogClose>
+            <Button onClick={confirmar}>Confirmar data</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

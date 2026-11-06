@@ -8,7 +8,8 @@ type FaixaAlertaPrazoProps = {
   peca: string;
   partes: string;
   prazo: string;
-  href: string;
+  href: string | null;
+  verbo?: string;
 };
 
 const estilos = {
@@ -22,6 +23,7 @@ export function FaixaAlertaPrazo({
   partes,
   prazo,
   href,
+  verbo = "vence",
 }: FaixaAlertaPrazoProps) {
   const estilo = estilos[variante];
 
@@ -39,12 +41,14 @@ export function FaixaAlertaPrazo({
           <span className="font-medium">
             {peca} · {partes}
           </span>{" "}
-          vence {prazo}
+          {verbo} {prazo}
         </span>
       </p>
-      <Button asChild size="sm" variant="outline">
-        <Link href={href}>Começar agora</Link>
-      </Button>
+      {href && (
+        <Button asChild size="sm" variant="outline">
+          <Link href={href}>Começar agora</Link>
+        </Button>
+      )}
     </div>
   );
 }

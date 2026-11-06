@@ -5,11 +5,6 @@ export const advogadoExemplo = {
   oab: "OAB/DF 00.000",
 };
 
-export const usoExemplo = {
-  usadas: 32,
-  limite: 50,
-};
-
 export const processosExemplo = [
   { id: "1", cnj: "0000000-00.2026.8.07.0001", partes: "Banco X x Maria Souza" },
   { id: "2", cnj: "0000001-00.2026.5.10.0002", partes: "João Lima x Construtora Y" },

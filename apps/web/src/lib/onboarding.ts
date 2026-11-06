@@ -15,6 +15,7 @@ export const OUTRO_TRIBUNAL = "Outro tribunal";
 export const TRIBUNAIS = ["TJDFT", "TRF1 / SJDF", "TRT10", OUTRO_TRIBUNAL] as const;
 
 export const perfilSchema = z.object({
+  nome: z.string().trim().max(120).optional(),
   oab: z.string().trim().min(1, "Informe o número da OAB.").max(12),
   uf: z.enum(UFS, { error: "Escolha a UF." }),
   areas: z.array(z.enum(AREAS_ATUACAO)).min(1, "Escolha pelo menos uma área."),

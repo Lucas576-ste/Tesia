@@ -14,6 +14,7 @@ type Plano = {
   mensal: string;
   anual: string;
   publico: string;
+  inclui?: string;
   itens: string[];
   chegando?: string[];
   botao?: string;
@@ -21,24 +22,29 @@ type Plano = {
   emBreve?: boolean;
 };
 
+const recursosChegando = [
+  "Busca automática de intimações",
+  "Alertas no WhatsApp",
+  "Agenda no Google, Apple e Outlook",
+  "Relatório do mês",
+  "Honorários simples",
+];
+
 const planos: Plano[] = [
   {
     nome: "Start",
     mensal: "R$ 79/mês",
     anual: "R$ 790/ano",
-    publico: "Para quem atua em uma área",
+    publico: "O essencial para começar",
     itens: [
       "15 peças por mês",
       "1 área de atuação",
       "1 usuário",
-      "Análise de intimações ilimitada",
-      "Resumo e pontos que podem ser atacados",
+      "Leitura da intimação, com resumo e pontos que podem ser atacados",
       "Prazo com a conta e o fundamento legal",
-      "Painel de prazos e alertas por e-mail",
-      "Rascunho no seu estilo, aprendido das suas peças",
-      "Pendências destacadas para conferir",
+      "Painel em lista e alerta por e-mail",
+      "Rascunho no seu estilo, com pendências destacadas",
       ".docx com o seu timbrado",
-      "Exportação dos seus dados",
     ],
     botao: "Começar",
   },
@@ -47,34 +53,34 @@ const planos: Plano[] = [
     mensal: "R$ 129/mês",
     anual: "R$ 1.290/ano",
     publico: "Para quem quer tudo, sem limite apertado",
-    itens: ["50 peças por mês", "Todas as áreas de atuação", "1 usuário", "Tudo do Start"],
-    chegando: ["Alertas no WhatsApp", "Busca automática de intimações"],
+    inclui: "Tudo do Start, mais:",
+    itens: [
+      "50 peças por mês",
+      "Todas as áreas de atuação",
+      "Quadro de prazos (kanban)",
+      "Audiências, compromissos e prazos manuais",
+      "Ajustes do rascunho pela Lia",
+    ],
+    chegando: recursosChegando,
     botao: "Começar",
     destaque: true,
   },
   {
-    nome: "Plus",
-    mensal: "+ R$ 49/mês",
-    anual: "+ R$ 490/ano",
-    publico: "Complemento para quem quer presença no Instagram",
+    nome: "Sociedade",
+    mensal: "R$ 219/mês",
+    anual: "R$ 2.190/ano",
+    publico: "Para dois advogados que dividem o escritório",
+    inclui: "Tudo do Pro, para 2 advogados:",
     itens: [
-      "20 posts por mês",
-      "Calendário de conteúdo",
-      "Textos dentro das regras de publicidade da OAB",
+      "2 advogados na mesma conta, com convite do sócio",
+      "100 peças por mês, compartilhadas",
+      "Todas as áreas de atuação",
+      "Quadro e painel de prazos compartilhados",
+      "Estilo próprio para cada advogado",
+      "Responsável por prazo e por peça",
+      'Filtro "Meus prazos", com todos os processos e prazos à vista dos dois',
     ],
-    emBreve: true,
-  },
-  {
-    nome: "Empresas",
-    mensal: "Valor em breve",
-    anual: "Valor em breve",
-    publico: "Para escritórios e equipes",
-    itens: [
-      "Vários usuários no mesmo escritório",
-      "Mais peças por mês",
-      "Tudo do Pro",
-      "Distribuição de tarefas",
-    ],
+    chegando: recursosChegando,
     botao: "Entrar na lista",
     emBreve: true,
   },
@@ -82,9 +88,10 @@ const planos: Plano[] = [
 
 type Periodo = "mensal" | "anual";
 
-function ListaRecursos({ itens, chegando }: Pick<Plano, "itens" | "chegando">) {
+function ListaRecursos({ inclui, itens, chegando }: Pick<Plano, "inclui" | "itens" | "chegando">) {
   return (
     <div className="flex flex-1 flex-col gap-3 text-sm">
+      {inclui && <p className="font-semibold">{inclui}</p>}
       <ul className="flex flex-col gap-1.5">
         {itens.map((item) => (
           <li key={item} className="flex gap-2">
@@ -112,7 +119,7 @@ function ListaRecursos({ itens, chegando }: Pick<Plano, "itens" | "chegando">) {
 
 function GradePlanos({ periodo }: { periodo: Periodo }) {
   return (
-    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 lg:grid-cols-3">
       {planos.map((plano) => (
         <Card key={plano.nome} className={cn(plano.destaque && "border-2 border-primaria")}>
           <CardHeader>
@@ -127,7 +134,7 @@ function GradePlanos({ periodo }: { periodo: Periodo }) {
           </CardHeader>
           <CardContent className="flex flex-1 flex-col gap-4">
             <p className="font-serif text-2xl font-semibold tabular-nums">{plano[periodo]}</p>
-            <ListaRecursos itens={plano.itens} chegando={plano.chegando} />
+            <ListaRecursos inclui={plano.inclui} itens={plano.itens} chegando={plano.chegando} />
             {plano.botao ? (
               <Button asChild variant={plano.destaque ? "default" : "outline"} className="w-full">
                 <a href="#fundador">{plano.botao}</a>

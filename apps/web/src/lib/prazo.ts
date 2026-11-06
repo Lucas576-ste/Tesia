@@ -1,5 +1,7 @@
 export type StatusPrazo = "nao_iniciado" | "rascunho_pronto" | "protocolado";
 
+export type TipoManual = "prazo" | "audiencia" | "compromisso";
+
 export type LinhaPrazo = {
   id: string;
   partes: string;
@@ -9,11 +11,17 @@ export type LinhaPrazo = {
   vencimento: string;
   diasUteis: number;
   status: StatusPrazo;
+  tipo?: TipoManual;
+  hora?: string;
+  responsavel?: string;
 };
+
+export type ColunaQuadro = "hoje" | "proximos" | "depois" | "rascunho" | "protocolado";
 
 const LIMITE_DIAS_CRITICOS = 3;
 
-export function destinoPrazo({ id, status }: Pick<LinhaPrazo, "id" | "status">) {
+export function destinoPrazo({ id, status, tipo }: Pick<LinhaPrazo, "id" | "status" | "tipo">) {
+  if (tipo) return null;
   return status === "nao_iniciado" ? `/app/intimacoes/${id}` : `/app/pecas/${id}`;
 }
 
@@ -39,8 +47,16 @@ export function prazoCritico(prazos: LinhaPrazo[]) {
     peca: maisUrgente.peca,
     partes: maisUrgente.partes,
     prazo: textoVencimento(maisUrgente),
+    verbo: maisUrgente.tipo && maisUrgente.tipo !== "prazo" ? "é" : "vence",
     href: destinoPrazo(maisUrgente),
   };
+}
+
+export function colunaPrazo({ status, diasUteis }: LinhaPrazo): ColunaQuadro {
+  if (status === "protocolado") return "protocolado";
+  if (status === "rascunho_pronto") return "rascunho";
+  if (diasUteis === 0) return "hoje";
+  return diasUteis <= LIMITE_DIAS_CRITICOS ? "proximos" : "depois";
 }
 
 export function chaveData(data: string) {

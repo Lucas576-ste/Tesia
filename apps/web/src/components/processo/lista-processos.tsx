@@ -2,11 +2,20 @@
 
 import { Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { SeloStatus } from "@/components/selo-status";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -18,10 +27,30 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { normalizarBusca } from "@/lib/busca";
-import type { Processo } from "@/lib/processos-exemplo";
+import type { DadosProcesso, Processo } from "@/lib/processos-exemplo";
+import { FormularioProcesso } from "./formulario-processo";
 
 const linkLinha =
   "font-medium outline-none after:absolute after:inset-0 focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-inset";
+
+const PREFIXO_NOVO = "novo-";
+
+const processoEmBranco: DadosProcesso = {
+  cnj: "",
+  partes: "",
+  area: "Cível e consumidor",
+  tribunal: "",
+  vara: "",
+};
+
+function LinkProcesso({ id, children }: { id: string; children: string }) {
+  if (id.startsWith(PREFIXO_NOVO)) return <span className="font-medium">{children}</span>;
+  return (
+    <Link href={`/app/processos/${id}`} className={linkLinha}>
+      {children}
+    </Link>
+  );
+}
 
 function CartoesProcessos({ processos }: { processos: Processo[] }) {
   return (
@@ -31,9 +60,7 @@ function CartoesProcessos({ processos }: { processos: Processo[] }) {
           key={id}
           className="relative flex flex-col gap-1 border-b p-3 text-sm transition-colors last:border-b-0 hover:bg-muted/50"
         >
-          <Link href={`/app/processos/${id}`} className={linkLinha}>
-            {partes}
-          </Link>
+          <LinkProcesso id={id}>{partes}</LinkProcesso>
           <span className="text-xs break-all text-texto-secundario tabular-nums">{cnj}</span>
           <span>
             {area} · {tribunal}
@@ -68,9 +95,7 @@ function TabelaProcessos({ processos }: { processos: Processo[] }) {
           {processos.map(({ id, cnj, partes, area, tribunal, proximoPrazo, status }) => (
             <TableRow key={id} className="relative">
               <TableCell className="tabular-nums">
-                <Link href={`/app/processos/${id}`} className={linkLinha}>
-                  {cnj}
-                </Link>
+                <LinkProcesso id={id}>{cnj}</LinkProcesso>
               </TableCell>
               <TableCell>{partes}</TableCell>
               <TableCell>{area}</TableCell>
@@ -87,15 +112,53 @@ function TabelaProcessos({ processos }: { processos: Processo[] }) {
   );
 }
 
-export function ListaProcessos({ processos }: { processos: Processo[] }) {
+type ListaProcessosProps = {
+  processosIniciais: Processo[];
+  novoProcesso: boolean;
+};
+
+export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcessosProps) {
+  const router = useRouter();
+  const [processos, setProcessos] = useState(processosIniciais);
   const [busca, setBusca] = useState("");
   const termo = normalizarBusca(busca.trim());
   const visiveis = processos.filter(({ cnj, partes }) =>
     normalizarBusca(`${cnj} ${partes}`).includes(termo),
   );
 
+  function fecharNovo() {
+    router.replace("/app/processos", { scroll: false });
+  }
+
+  function salvarNovo(dados: DadosProcesso) {
+    const novo: Processo = {
+      ...dados,
+      id: `${PREFIXO_NOVO}${crypto.randomUUID()}`,
+      proximoPrazo: null,
+      status: "nao_iniciado",
+      eventos: [],
+    };
+    setProcessos((atuais) => [novo, ...atuais]);
+    fecharNovo();
+    toast.success("Processo adicionado neste exemplo. Nada foi enviado.");
+  }
+
   return (
     <div className="flex flex-col gap-4">
+      <Dialog
+        open={novoProcesso}
+        onOpenChange={(aberto) => {
+          if (!aberto) fecharNovo();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo processo</DialogTitle>
+            <DialogDescription>Informe os dados principais do processo.</DialogDescription>
+          </DialogHeader>
+          <FormularioProcesso dados={processoEmBranco} aoSalvar={salvarNovo} />
+        </DialogContent>
+      </Dialog>
       <div className="flex flex-col gap-1 sm:max-w-md">
         <Label htmlFor="busca-processos">Buscar por número ou parte</Label>
         <div className="relative">

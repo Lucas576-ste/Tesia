@@ -71,6 +71,15 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
     ),
   },
   {
+    pergunta: "Tenho um sócio. Como funciona?",
+    resposta:
+      "O plano Sociedade está chegando. Nele, dois advogados dividem a mesma conta: cada um com o seu estilo, cada prazo com um responsável e 100 peças por mês para os dois. As vagas de fundador valem para 1 advogado cada. Se tiver interesse, entre na lista de espera.",
+  },
+  {
+    pergunta: "Tem taxa de ativação?",
+    resposta: "Não. Você paga só a mensalidade.",
+  },
+  {
     pergunta: "Posso cancelar e levar meus dados?",
     resposta: "Sim. Você cancela quando quiser e pode exportar todas as peças e prazos.",
   },

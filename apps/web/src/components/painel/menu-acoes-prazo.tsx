@@ -14,10 +14,16 @@ import type { LinhaPrazo } from "@/lib/prazo";
 
 type MenuAcoesPrazoProps = {
   prazo: LinhaPrazo;
+  temAnalise: boolean;
   aoMarcar: (prazo: LinhaPrazo) => void;
 };
 
-export function MenuAcoesPrazo({ prazo, aoMarcar }: MenuAcoesPrazoProps) {
+export function MenuAcoesPrazo({ prazo, temAnalise, aoMarcar }: MenuAcoesPrazoProps) {
+  const temPeca = !prazo.tipo && prazo.status !== "nao_iniciado";
+  const temLinks = temAnalise || temPeca;
+
+  if (!temLinks && prazo.status === "protocolado") return null;
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -26,13 +32,15 @@ export function MenuAcoesPrazo({ prazo, aoMarcar }: MenuAcoesPrazoProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link href={`/app/intimacoes/${prazo.id}`}>
-            <FileSearch aria-hidden />
-            Abrir análise
-          </Link>
-        </DropdownMenuItem>
-        {prazo.status !== "nao_iniciado" && (
+        {temAnalise && (
+          <DropdownMenuItem asChild>
+            <Link href={`/app/intimacoes/${prazo.id}`}>
+              <FileSearch aria-hidden />
+              Abrir análise
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {temPeca && (
           <DropdownMenuItem asChild>
             <Link href={`/app/pecas/${prazo.id}`}>
               <FileText aria-hidden />
@@ -42,10 +50,10 @@ export function MenuAcoesPrazo({ prazo, aoMarcar }: MenuAcoesPrazoProps) {
         )}
         {prazo.status !== "protocolado" && (
           <>
-            <DropdownMenuSeparator />
+            {temLinks && <DropdownMenuSeparator />}
             <DropdownMenuItem onSelect={() => aoMarcar(prazo)}>
               <CircleCheck aria-hidden />
-              Marcar como protocolado
+              {prazo.tipo ? "Marcar como cumprido" : "Marcar como protocolado"}
             </DropdownMenuItem>
           </>
         )}

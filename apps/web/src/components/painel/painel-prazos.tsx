@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CardIndicador } from "@/components/card-indicador";
 import { EstadoVazio } from "@/components/estado-vazio";
+import { advogadoExemplo } from "@/components/layout/dados-exemplo";
 import { FaixaAlertaPrazo } from "@/components/layout/faixa-alerta-prazo";
 import { BalaoLia } from "@/components/lia/balao-lia";
+import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { TabelaPrazos } from "@/components/tabela-prazos";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,13 +25,23 @@ import {
 } from "@/components/ui/dialog";
 import { filtrarPrazos, type FiltroPrazos } from "@/lib/filtros-prazos";
 import { contarIndicadores, ordenarPrazos, prazoCritico, type LinhaPrazo } from "@/lib/prazo";
+import { criarPrazoManual, type PrazoManual, type ProcessoResumo } from "@/lib/prazo-manual";
+import { responsaveisExemplo } from "@/lib/planos-exemplo";
+import { AlternarVisao } from "./alternar-visao";
 import { FiltrosPrazos } from "./filtros-prazos";
 import { MenuAcoesPrazo } from "./menu-acoes-prazo";
+import { ModalPrazoManual } from "./modal-prazo-manual";
+import { QuadroPrazos } from "./quadro-prazos";
+import { useVisaoPainel } from "./usar-visao-painel";
 
 type PainelPrazosProps = {
   nome: string;
   prazosIniciais: LinhaPrazo[];
   filtro: FiltroPrazos;
+  idsComAnalise: string[];
+  processos: ProcessoResumo[];
+  novoPrazo: boolean;
+  urlSemNovo: string;
 };
 
 function resumoAbertos(quantidade: number) {
@@ -36,24 +49,66 @@ function resumoAbertos(quantidade: number) {
   return quantidade === 1 ? "1 prazo em aberto" : `${quantidade} prazos em aberto`;
 }
 
-export function PainelPrazos({ nome, prazosIniciais, filtro }: PainelPrazosProps) {
+export function PainelPrazos({
+  nome,
+  prazosIniciais,
+  filtro,
+  idsComAnalise,
+  processos,
+  novoPrazo,
+  urlSemNovo,
+}: PainelPrazosProps) {
+  const router = useRouter();
+  const [visaoSalva, trocarVisao] = useVisaoPainel();
+  const { plano } = usePlanoDemo();
+  const visao = plano.recursosPro ? visaoSalva : "lista";
+  const [soMeus, setSoMeus] = useState(false);
   const [prazos, setPrazos] = useState(prazosIniciais);
   const [aConfirmar, setAConfirmar] = useState<LinhaPrazo | null>(null);
 
   const indicadores = contarIndicadores(prazos);
   const critico = prazoCritico(prazos);
-  const visiveis = ordenarPrazos(filtrarPrazos(prazos, filtro));
+  const comResponsavel = plano.equipe
+    ? prazos.map((prazo) => ({
+        ...prazo,
+        responsavel: responsaveisExemplo[prazo.id] ?? advogadoExemplo.nome,
+      }))
+    : prazos;
+  const doEscopo =
+    plano.equipe && soMeus
+      ? comResponsavel.filter(({ responsavel }) => responsavel === advogadoExemplo.nome)
+      : comResponsavel;
+  const visiveis = ordenarPrazos(filtrarPrazos(doEscopo, filtro));
 
   function trocarStatus(id: string, status: LinhaPrazo["status"]) {
     setPrazos((atuais) => atuais.map((prazo) => (prazo.id === id ? { ...prazo, status } : prazo)));
   }
 
+  function fecharNovoPrazo() {
+    router.replace(urlSemNovo, { scroll: false });
+  }
+
+  function salvarPrazoManual(dados: PrazoManual) {
+    const novo = criarPrazoManual(crypto.randomUUID(), dados, processos);
+    setPrazos((atuais) => [...atuais, novo]);
+    fecharNovoPrazo();
+    toast.success("Adicionado ao painel neste exemplo. Nada foi enviado.");
+  }
+
+  const acoes = (prazo: LinhaPrazo) => (
+    <MenuAcoesPrazo
+      prazo={prazo}
+      temAnalise={idsComAnalise.includes(prazo.id)}
+      aoMarcar={setAConfirmar}
+    />
+  );
+
   function confirmarProtocolo() {
     if (!aConfirmar) return;
-    const { id, status } = aConfirmar;
+    const { id, status, tipo } = aConfirmar;
     trocarStatus(id, "protocolado");
     setAConfirmar(null);
-    toast.success("Prazo marcado como protocolado.", {
+    toast.success(tipo ? "Marcado como cumprido." : "Prazo marcado como protocolado.", {
       action: { label: "Desfazer", onClick: () => trocarStatus(id, status) },
     });
   }
@@ -110,7 +165,30 @@ export function PainelPrazos({ nome, prazosIniciais, filtro }: PainelPrazosProps
           />
         ) : (
           <>
-            <FiltrosPrazos filtro={filtro} />
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                {plano.recursosPro && <AlternarVisao visao={visao} aoTrocar={trocarVisao} />}
+                {plano.equipe && (
+                  <div role="group" aria-label="De quem são os prazos" className="flex gap-1">
+                    {[
+                      { rotulo: "Meus prazos", valor: true },
+                      { rotulo: "Todos", valor: false },
+                    ].map(({ rotulo, valor }) => (
+                      <Button
+                        key={rotulo}
+                        size="sm"
+                        variant={soMeus === valor ? "secondary" : "ghost"}
+                        aria-pressed={soMeus === valor}
+                        onClick={() => setSoMeus(valor)}
+                      >
+                        {rotulo}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <FiltrosPrazos filtro={filtro} />
+            </div>
             {visiveis.length === 0 ? (
               <EstadoVazio
                 titulo="Nenhum prazo com esses filtros"
@@ -121,12 +199,11 @@ export function PainelPrazos({ nome, prazosIniciais, filtro }: PainelPrazosProps
                   </Button>
                 }
               />
+            ) : visao === "quadro" ? (
+              <QuadroPrazos prazos={visiveis} acoes={acoes} aoConcluir={setAConfirmar} />
             ) : (
               <Card className="gap-0 py-0">
-                <TabelaPrazos
-                  prazos={visiveis}
-                  acoes={(prazo) => <MenuAcoesPrazo prazo={prazo} aoMarcar={setAConfirmar} />}
-                />
+                <TabelaPrazos prazos={visiveis} acoes={acoes} />
               </Card>
             )}
           </>
@@ -140,10 +217,14 @@ export function PainelPrazos({ nome, prazosIniciais, filtro }: PainelPrazosProps
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Marcar como protocolado?</DialogTitle>
+            <DialogTitle>
+              {aConfirmar?.tipo ? "Marcar como cumprido?" : "Marcar como protocolado?"}
+            </DialogTitle>
             <DialogDescription>
-              {aConfirmar?.peca} · {aConfirmar?.partes}. Confirme só depois de protocolar no sistema
-              do tribunal. O prazo sai da lista de abertos.
+              {aConfirmar?.peca} · {aConfirmar?.partes}.{" "}
+              {aConfirmar?.tipo
+                ? "O item sai da lista de abertos."
+                : "Confirme só depois de protocolar no sistema do tribunal. O prazo sai da lista de abertos."}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -154,6 +235,12 @@ export function PainelPrazos({ nome, prazosIniciais, filtro }: PainelPrazosProps
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ModalPrazoManual
+        aberto={novoPrazo && plano.recursosPro}
+        processos={processos}
+        aoFechar={fecharNovoPrazo}
+        aoSalvar={salvarPrazoManual}
+      />
     </div>
   );
 }
