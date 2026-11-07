@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,6 +28,7 @@ import {
   type PrazoManual,
   type ProcessoResumo,
 } from "@/lib/prazo-manual";
+import { DIAS_PRAZO_INTERNO } from "@/lib/prazo-interno";
 
 const valoresIniciais: PrazoManual = {
   tipo: "prazo",
@@ -35,6 +36,8 @@ const valoresIniciais: PrazoManual = {
   data: "",
   hora: "",
   processoId: "",
+  prazoInterno: "",
+  inicio: "",
 };
 
 type ModalPrazoManualProps = {
@@ -52,6 +55,7 @@ function FormularioPrazoManual({
     resolver: zodResolver(prazoManualSchema),
     defaultValues: valoresIniciais,
   });
+  const ehPrazo = useWatch({ control: form.control, name: "tipo" }) === "prazo";
 
   return (
     <Form {...form}>
@@ -94,7 +98,7 @@ function FormularioPrazoManual({
             name="data"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Data</FormLabel>
+                <FormLabel>{ehPrazo ? "Prazo fatal" : "Data"}</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -116,6 +120,39 @@ function FormularioPrazoManual({
             )}
           />
         </div>
+        {ehPrazo && (
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              control={form.control}
+              name="prazoInterno"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Prazo interno (opcional)</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="inicio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Início da contagem (opcional)</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <p className="col-span-2 text-xs text-texto-secundario">
+              Em branco, o prazo interno fica {DIAS_PRAZO_INTERNO} dias úteis antes do fatal.
+            </p>
+          </div>
+        )}
         <FormField
           control={form.control}
           name="processoId"

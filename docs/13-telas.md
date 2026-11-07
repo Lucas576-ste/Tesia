@@ -140,12 +140,12 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Faixa de alerta para prazo crítico, com botão "Começar agora"
 - Contadores compactos e clicáveis, que filtram a lista: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
 - Alternância **Lista | Quadro** (a escolha fica salva; no Start, só Lista)
-- **Lista:** partes em destaque e número CNJ menor, peça, vencimento, dias restantes em texto ("Hoje", "2 dias úteis"), status (não iniciado, rascunho pronto, protocolado)
-- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo
+- **Lista:** partes em destaque e número CNJ menor, peça, prazo fatal, prazo interno, dias restantes em texto ("Hoje", "2 dias úteis"), status (não iniciado, rascunho pronto, protocolado)
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo; o card mostra as datas fatal e interna
 - Prazos manuais, audiências e compromissos aparecem junto, com selo do tipo
 - Filtro "Meus prazos / Todos" (plano Sociedade)
 - Filtros: status, área, período
-- Ações por linha: abrir análise, abrir peça, marcar como cumprido
+- Ações por linha: abrir análise, abrir peça, editar prazo interno, marcar como cumprido
 - Estado vazio: "Envie sua primeira intimação"
 
 ### 12. Nova intimação (`/app/intimacoes/nova`) — MVP (protótipo)
@@ -158,7 +158,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Cabeçalho: número do processo, órgão, partes
 - **O que aconteceu:** resumo em até 4 frases
 - **Pontos que podem ser atacados:** tópicos com link para o trecho da decisão
-- **Prazo sugerido:** data, dias, tipo de contagem, fundamento legal e memória de cálculo expansível; botão "Confirmo o prazo" e opção de editar a data
+- **Prazo sugerido:** prazo fatal, início da contagem, prazo interno, dias, tipo de contagem, fundamento legal e memória de cálculo expansível; botão "Confirmo o prazo" e opção de editar as datas
 - **Peça sugerida:** recomendada e alternativas (seleção única)
 - Visualizador do PDF original ao lado (ou em aba no celular)
 - Botão "Gerar rascunho no meu estilo" (mostra quantas peças restam no mês)
@@ -182,6 +182,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 
 ### 16. Detalhe do processo (`/app/processos/:id`) — MVP (simples)
 - Dados do processo (editáveis)
+- Datas de cada prazo: início da contagem, prazo interno e prazo fatal
 - Linha do tempo: intimações, prazos e peças
 - Botão "Nova intimação neste processo"
 
@@ -199,7 +200,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 ### 19. Configurações (`/app/configuracoes`) — MVP
 Abas:
 - **Perfil:** nome, OAB, UF, áreas, tribunais
-- **Alertas:** canais (e-mail, WhatsApp) e dias de antecedência
+- **Alertas:** canais (e-mail, WhatsApp), dias de antecedência e aviso no dia do prazo interno
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso
 - **Modelo de documento:** trocar o .docx timbrado
@@ -223,7 +224,7 @@ Abas:
 - **M1. Limite atingido:** aviso aos 80% e bloqueio aos 100%, com opções de pacote extra ou upgrade
 - **M2. Fim do teste grátis:** escolha do plano e pagamento
 - **M3. Confirmação de prazo editado:** registra a data sugerida e a data escolhida
-- **M4. Novo prazo manual:** tipo (prazo, audiência, compromisso), descrição, data, hora, processo (opcional), responsável; opção "calcular a partir da disponibilização"
+- **M4. Novo prazo manual:** tipo (prazo, audiência, compromisso), descrição, data (prazo fatal, quando o tipo é prazo), hora, processo (opcional), responsável; com o tipo prazo, prazo interno e início da contagem (opcionais); opção "calcular a partir da disponibilização"
 
 ---
 
@@ -248,7 +249,7 @@ Abas:
 
 | Tela | Rota | Conteúdo |
 |---|---|---|
-| Caixa de intimações | `/app/intimacoes` | Intimações que chegam sozinhas pela OAB, com status (nova, analisada, peça gerada) |
+| Caixa de intimações | `/app/intimacoes` | Intimações que chegam sozinhas pela OAB, com status (nova, analisada, peça gerada); cada uma gera um card sugerido no Quadro |
 | Aceitar convite | `/convite/:token` | Cadastro do sócio já ligado ao escritório |
 | Aba Equipe | `/app/configuracoes` | Convidar o sócio, membros, remover acesso |
 | Relatório do mês | `/app/relatorio` | Prazos cumpridos e perdidos, intimações, peças, horas economizadas (estimativa), honorários recebidos; meses anteriores |
@@ -258,9 +259,9 @@ Abas:
 
 | Tela | Rota | Conteúdo |
 |---|---|---|
-| Agenda | `/app/agenda` | Calendário com prazos e audiências dentro da Tesia |
+| Agenda | `/app/agenda` | Calendário com prazos internos, prazos fatais e audiências dentro da Tesia, com filtro por área |
 | Clientes | `/app/clientes` | Lista de clientes |
-| Detalhe do cliente | `/app/clientes/:id` | Dados, processos e honorários |
+| Detalhe do cliente | `/app/clientes/:id` | Dados, processos (com tribunal, sistema e fase) e honorários |
 | Biblioteca de teses | `/app/teses` | Argumentações salvas, por área e assunto, para reaproveitar |
 
 ## Fase 3 (avançado)

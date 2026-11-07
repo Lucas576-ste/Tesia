@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { processosExemplo, prazosExemplo } from "@/components/layout/dados-exemplo";
 import { AREAS_ATUACAO } from "@/lib/onboarding";
-import { chaveData, ordenarPrazos, type StatusPrazo } from "@/lib/prazo";
+import { chaveData, ordenarPrazos, type LinhaPrazo, type StatusPrazo } from "@/lib/prazo";
 
 export const dadosProcessoSchema = z.object({
   cnj: z
@@ -28,6 +28,7 @@ export type Processo = DadosProcesso & {
   id: string;
   proximoPrazo: string | null;
   status: StatusPrazo;
+  prazos: LinhaPrazo[];
   eventos: EventoProcesso[];
 };
 
@@ -83,7 +84,7 @@ const complementos: Record<string, { tribunal: string; vara: string; eventos: Ev
           link: { href: "/app/pecas/6", rotulo: "Abrir peça" },
         },
         {
-          data: "26/10/2026",
+          data: "30/10/2026",
           tipo: "intimacao",
           titulo: "Intimação recebida",
           descricao: "Sentença publicada.",
@@ -115,7 +116,7 @@ const complementos: Record<string, { tribunal: string; vara: string; eventos: Ev
           link: { href: "/app/pecas/7", rotulo: "Abrir peça" },
         },
         {
-          data: "15/10/2026",
+          data: "14/10/2026",
           tipo: "intimacao",
           titulo: "Intimação recebida",
           descricao: "Sentença publicada.",
@@ -140,7 +141,7 @@ const complementos: Record<string, { tribunal: string; vara: string; eventos: Ev
       vara: "3ª Vara do Trabalho de Brasília",
       eventos: [
         {
-          data: "14/10/2026",
+          data: "21/10/2026",
           tipo: "intimacao",
           titulo: "Intimação recebida",
           descricao: "Sentença publicada.",
@@ -181,6 +182,7 @@ function montarProcessos(): Processo[] {
       vara: complemento.vara,
       proximoPrazo: prazo.status === "protocolado" ? null : prazo.vencimento,
       status: prazo.status,
+      prazos: prazosExemplo.filter(({ id }) => id === processo.id),
       eventos: eventosRecentes(complemento.eventos),
     };
   });

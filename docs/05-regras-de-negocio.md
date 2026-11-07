@@ -68,7 +68,7 @@ Regras:
 
 ## Alertas de prazo
 
-- E-mail (todos os planos) e WhatsApp (Pro): 5 dias úteis antes, 2 dias úteis antes e no dia do vencimento.
+- E-mail (todos os planos) e WhatsApp (Pro): 5 dias úteis antes, 2 dias úteis antes e no dia do prazo fatal, além de um aviso no dia do prazo interno.
 - Alerta só para prazos confirmados e não cumpridos.
 - O advogado pode ajustar os dias de antecedência.
 
@@ -79,6 +79,17 @@ Regras:
 - O advogado aprova cada post antes de agendar.
 - No plano Pro sem Plus, o sistema oferece 2 posts grátis por mês para mostrar o recurso.
 
+## Prazo interno
+
+- Cada prazo tem três datas: início da contagem, prazo interno e prazo fatal. O prazo fatal é o vencimento calculado pelo motor.
+- O prazo interno é uma data de organização, sem efeito legal. Disponível em todos os planos.
+- Vale só para `tipo = prazo`. Audiências e compromissos não têm prazo interno.
+- O padrão é 2 dias úteis antes do fatal, usando o mesmo calendário do motor. O advogado pode editar a data em cada prazo.
+- Se o cálculo cair antes de hoje, o prazo interno passa a ser hoje.
+- O prazo interno nunca pode ser depois do fatal. Se o fatal for antecipado e ficar antes do interno, o interno é recalculado.
+- Passar do prazo interno mostra o aviso "Interno vencido", sem mudar o status do prazo nem marcá-lo como `perdido`.
+- A ordenação do painel, as colunas do Quadro e a faixa de prazo crítico continuam guiadas pelo fatal.
+
 ## Botão "+ Adicionar"
 
 Um único botão na barra superior para criar: nova intimação, novo prazo manual e novo processo.
@@ -87,15 +98,16 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 
 - Disponíveis do plano Pro em diante.
 - Nem todo prazo nasce de uma intimação enviada. O advogado cadastra prazos, audiências e compromissos manualmente.
-- Campos: tipo (prazo, audiência, compromisso), descrição, data, hora (opcional), processo (opcional), responsável.
+- Campos: tipo (prazo, audiência, compromisso), descrição, data, hora (opcional), processo (opcional), responsável. Com o tipo prazo, também prazo interno e início da contagem (opcionais).
 - Prazos manuais entram como `confirmado` (o próprio advogado informou a data) e aparecem no painel, nos alertas e na agenda.
 - Opcional: o advogado pode pedir ao motor de prazos para calcular a data a partir de uma data de disponibilização e de uma regra.
 
 ## Painel em Lista ou Quadro
 
 - O Quadro está disponível do plano Pro em diante. No Start, o painel é só em lista.
-- **Lista:** tabela ordenada por vencimento.
-- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo.
+- **Lista:** tabela ordenada pelo prazo fatal, com coluna de prazo interno.
+- **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo. O card mostra as datas fatal e interna.
+- Na fase 1.5, a coluna "Sugeridos" (só quando tiver itens) mostra prazos `sugerido` vindos da busca automática. Arrastar ou abrir o card leva à análise, e arrastar sozinho nunca confirma. Não existe tabela de tarefas: o card continua sendo um prazo, e Processos lê o status direto dele. Intimação nova sem conferência tem aviso próprio no painel e por e-mail, sem apresentar a data como confirmada.
 - A escolha fica salva por usuário.
 
 ## Agenda sincronizada (iCal)

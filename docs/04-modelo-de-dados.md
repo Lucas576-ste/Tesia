@@ -73,6 +73,10 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | polo | enum | `ativo`, `passivo` |
 | parte_contraria | text | |
 | status | enum | `ativo`, `arquivado` |
+| sistema | text | fase 2; ex.: PJe, eproc |
+| fase | text | fase 2; estimada pela última intimação ou corrigida pelo advogado |
+| fase_origem | enum | fase 2; `intimacao`, `manual` |
+| fase_atualizada_em | timestamptz | fase 2 |
 
 ### intimacoes
 | Campo | Tipo | Observação |
@@ -105,7 +109,8 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | dias | int | |
 | contagem | enum | `uteis`, `corridos` |
 | data_inicio | date | |
-| data_vencimento | date | |
+| data_vencimento | date | prazo fatal |
+| data_prazo_interno | date | opcional; vazio em audiências e compromissos |
 | memoria_calculo | jsonb | passo a passo exibido ao advogado |
 | confirmado_por | uuid | usuário que confirmou |
 | confirmado_em | timestamptz | |
@@ -247,4 +252,4 @@ Foto do mês fechado, gerada por job no dia 1: `escritorio_id`, `competencia`, `
 ## Auditoria
 
 ### auditoria
-`escritorio_id`, `usuario_id`, `acao` (ex.: `peca.download`, `prazo.confirmado`), `entidade`, `entidade_id`, `ip`, `criado_em`.
+`escritorio_id`, `usuario_id`, `acao` (ex.: `peca.download`, `prazo.confirmado`, `prazo.interno_alterado`), `entidade`, `entidade_id`, `ip`, `criado_em`.

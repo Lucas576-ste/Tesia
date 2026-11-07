@@ -16,10 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Analise } from "@/lib/analises-exemplo";
-
-function formatarData(iso: string) {
-  return iso.split("-").reverse().join("/");
-}
+import {
+  calcularPrazoInterno,
+  DIAS_PRAZO_INTERNO,
+  isoParaData as formatarData,
+  prazoInternoSchema,
+} from "@/lib/prazo-interno";
 
 type BlocoPrazoProps = {
   prazo: Analise["prazo"];
@@ -31,8 +33,18 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
   const [data, setData] = useState(prazo.vencimentoIso);
   const [editando, setEditando] = useState(false);
   const [conferindo, setConferindo] = useState(false);
+  const [internoEscolhido, setInternoEscolhido] = useState<string | null>(null);
+  const interno = internoEscolhido ?? (data ? calcularPrazoInterno(data) : "");
+  const erroInterno = data
+    ? prazoInternoSchema(data).safeParse(interno).error?.issues[0]?.message
+    : undefined;
   const editada = data !== prazo.vencimentoIso;
   const depoisDaSugerida = data > prazo.vencimentoIso;
+
+  function mudarFatal(novaData: string) {
+    setData(novaData);
+    if (internoEscolhido && novaData && internoEscolhido > novaData) setInternoEscolhido(null);
+  }
 
   function confirmar() {
     aoMudarConfirmacao(true);
@@ -49,6 +61,7 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
     <section className="flex flex-col gap-3 rounded-xl border-l-4 border-destaque bg-card p-4 shadow-xs">
       <h2 className="text-lg font-semibold">Prazo sugerido</h2>
       <div>
+        <p className="text-xs text-texto-secundario">Prazo fatal</p>
         <p className="font-serif text-3xl font-semibold tabular-nums">
           {data ? formatarData(data) : "Sem data"}
         </p>
@@ -61,6 +74,21 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
           </p>
         )}
       </div>
+      <dl className="grid grid-cols-2 gap-3 text-sm tabular-nums">
+        <div>
+          <dt className="text-xs text-texto-secundario">Início da contagem</dt>
+          <dd>{formatarData(prazo.inicioIso)}</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-texto-secundario">Prazo interno</dt>
+          <dd>{interno ? formatarData(interno) : "Sem data"}</dd>
+        </div>
+      </dl>
+      <p className="text-xs text-texto-secundario">
+        O prazo interno é a sua data de organização, sem efeito legal.
+        {internoEscolhido === null &&
+          ` Por padrão, fica ${DIAS_PRAZO_INTERNO} dias úteis antes do fatal.`}
+      </p>
       <details className="rounded-md border p-3 text-sm">
         <summary className="cursor-pointer font-medium">Ver a conta do prazo</summary>
         <ul className="mt-2 flex flex-col gap-1 text-texto-secundario">
@@ -70,14 +98,33 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
         </ul>
       </details>
       {editando && !confirmado && (
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="data-prazo">Data do prazo</Label>
-          <Input
-            id="data-prazo"
-            type="date"
-            value={data}
-            onChange={(evento) => setData(evento.target.value)}
-          />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="data-prazo">Prazo fatal</Label>
+            <Input
+              id="data-prazo"
+              type="date"
+              value={data}
+              onChange={(evento) => mudarFatal(evento.target.value)}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="data-prazo-interno">Prazo interno</Label>
+            <Input
+              id="data-prazo-interno"
+              type="date"
+              value={interno}
+              max={data || undefined}
+              aria-invalid={Boolean(erroInterno)}
+              aria-describedby={erroInterno ? "erro-prazo-interno" : undefined}
+              onChange={(evento) => setInternoEscolhido(evento.target.value)}
+            />
+            {erroInterno && (
+              <p id="erro-prazo-interno" role="alert" className="text-sm text-erro">
+                {erroInterno}
+              </p>
+            )}
+          </div>
         </div>
       )}
       {depoisDaSugerida && (
@@ -99,14 +146,14 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
-            disabled={!data}
+            disabled={!data || Boolean(erroInterno)}
             onClick={editada ? () => setConferindo(true) : confirmar}
             className="sm:flex-1"
           >
             Confirmo o prazo
           </Button>
           <Button variant="outline" onClick={() => setEditando((atual) => !atual)}>
-            {editando ? "Fechar edição" : "Editar data"}
+            {editando ? "Fechar edição" : "Editar datas"}
           </Button>
         </div>
       )}

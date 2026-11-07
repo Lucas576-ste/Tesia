@@ -74,6 +74,11 @@ Vencimento: 18/11/2026
 - Só vira `confirmado` quando o advogado confirma. Só prazos confirmados geram alertas.
 - O advogado pode editar a data. O sistema registra a data sugerida e a data final.
 
+### 7. Prazo interno
+- Sai do prazo fatal por código, sem IA: 2 dias úteis antes, no mesmo calendário do motor. Regras em `05-regras-de-negocio.md`.
+- É uma função pura em `packages/prazos`, separada do cálculo do fatal e com testes próprios.
+- Não muda o fatal nem entra na memória de cálculo. O registro de data sugerida e data final vale só para o fatal.
+
 ## Pacote `packages/prazos`
 
 - Código puro, sem acesso a banco. Recebe regra, data e calendário e devolve vencimento e memória de cálculo.

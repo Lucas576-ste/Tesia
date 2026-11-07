@@ -48,6 +48,10 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-05 | Quadro do painel com a coluna "Depois", visível só quando tiver itens | Sem ela, um prazo não iniciado com mais de 3 dias úteis sumiria do Quadro |
 | 2026-11-06 | Start só com o essencial. Quadro, prazos manuais e audiências, ajustes pela IA e agenda ficam do Pro em diante; Sociedade soma o necessário para 2 advogados | O Start parecia o plano mais completo e induzia a escolha errada |
 | 2026-11-05 | Cada vaga de fundador vale para 1 advogado | O plano é de 1 usuário e 50 peças, e o Sociedade só existe depois do MVP |
+| 2026-11-07 | Prazo interno no MVP, em todos os planos, com início da contagem e prazo fatal nas telas | Pedido de um advogado; ajuda a evitar perda de prazo e o banco ainda não existe |
+| 2026-11-07 | Prazo interno padrão: 2 dias úteis antes do fatal, editável em cada prazo | Valor inicial, ainda sem validação de advogados |
+| 2026-11-07 | Cards sugeridos no Quadro são prazos `sugerido`, sem tabela de tarefas | Atende ao pedido e mantém fora o kanban de tarefas |
+| 2026-11-07 | Fase do processo começa estimada pela última intimação; consulta ao tribunal só depois de pesquisar a fonte | Entrega valor sem integração nova; a consulta muda custo e prazo |
 
 ## Pendências
 
@@ -59,7 +63,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Confirmar o nome Tesia: domínio no registro.br, marca no INPI (classes 9, 42 e 45) e @ no Instagram | Lucas | Antes do dia 32 |
 | Escolher o provedor de embeddings (Voyage ou OpenAI) | Lucas | |
 | Confirmar os termos do provedor de IA sobre retenção e treino | Lucas | Antes do lançamento |
-| Pesquisar a consulta de comunicações do DJEN e APIs pagas de intimações | Lucas | Antes da fase 2 |
+| Pesquisar DJEN, Diários Oficiais e APIs pagas de intimações (cobertura, custo, atraso, termos e LGPD) | Lucas | Durante o beta |
+| Validar com advogados o padrão do prazo interno e as perguntas de `16-plano-sugestoes-advogado.md` | Lucas | Ao mostrar as telas |
 | Levantar calendários de feriados e suspensões dos tribunais do DF | Lucas | Antes do dia 15 |
 | Revisão dos textos legais por advogado | Lucas | Antes do lançamento |
 | Validar com advogados as regras especiais de prazo (prazo em dobro, intimação pelo sistema) | Lucas | Antes do dia 15 |

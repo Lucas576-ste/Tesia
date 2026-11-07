@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SeloStatus } from "@/components/selo-status";
+import { PrazoInterno } from "@/components/tabela-prazos";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -62,7 +63,7 @@ export function TelaProcesso({ processo }: { processo: Processo }) {
             <SeloStatus status={processo.status} />
             <span className="tabular-nums">
               {processo.proximoPrazo
-                ? `Próximo prazo: ${processo.proximoPrazo}`
+                ? `Próximo prazo fatal: ${processo.proximoPrazo}`
                 : "Sem prazo em aberto"}
             </span>
           </div>
@@ -91,6 +92,31 @@ export function TelaProcesso({ processo }: { processo: Processo }) {
         </dl>
         <p className="text-xs text-texto-secundario">Demonstração: as edições não são salvas.</p>
       </Card>
+      {processo.prazos.length > 0 && (
+        <Card className="gap-3 p-4">
+          <h2 className="text-lg font-semibold">Datas dos prazos</h2>
+          <ul className="flex flex-col gap-4">
+            {processo.prazos.map((prazo) => (
+              <li key={prazo.id} className="flex flex-col gap-2">
+                <p className="text-sm font-medium">{prazo.peca}</p>
+                <dl className="grid gap-3 sm:grid-cols-3">
+                  <Dado rotulo="Início da contagem" valor={prazo.inicio ?? "—"} />
+                  <div className="flex min-w-0 flex-col">
+                    <dt className="text-xs text-texto-secundario">Prazo interno</dt>
+                    <dd className="text-sm">
+                      <PrazoInterno prazo={prazo} />
+                    </dd>
+                  </div>
+                  <div className="flex min-w-0 flex-col">
+                    <dt className="text-xs text-texto-secundario">Prazo fatal</dt>
+                    <dd className="text-sm font-semibold tabular-nums">{prazo.vencimento}</dd>
+                  </div>
+                </dl>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
       <Card className="gap-3 p-4">
         <h2 className="text-lg font-semibold">Linha do tempo</h2>
         <LinhaTempo eventos={processo.eventos} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, FileSearch, FileText, MoreHorizontal } from "lucide-react";
+import { CalendarClock, CircleCheck, FileSearch, FileText, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +16,15 @@ type MenuAcoesPrazoProps = {
   prazo: LinhaPrazo;
   temAnalise: boolean;
   aoMarcar: (prazo: LinhaPrazo) => void;
+  aoEditarInterno: (prazo: LinhaPrazo) => void;
 };
 
-export function MenuAcoesPrazo({ prazo, temAnalise, aoMarcar }: MenuAcoesPrazoProps) {
+export function MenuAcoesPrazo({
+  prazo,
+  temAnalise,
+  aoMarcar,
+  aoEditarInterno,
+}: MenuAcoesPrazoProps) {
   const temPeca = !prazo.tipo && prazo.status !== "nao_iniciado";
   const temLinks = temAnalise || temPeca;
 
@@ -51,6 +57,12 @@ export function MenuAcoesPrazo({ prazo, temAnalise, aoMarcar }: MenuAcoesPrazoPr
         {prazo.status !== "protocolado" && (
           <>
             {temLinks && <DropdownMenuSeparator />}
+            {prazo.prazoInterno && (
+              <DropdownMenuItem onSelect={() => aoEditarInterno(prazo)}>
+                <CalendarClock aria-hidden />
+                Editar prazo interno
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onSelect={() => aoMarcar(prazo)}>
               <CircleCheck aria-hidden />
               {prazo.tipo ? "Marcar como cumprido" : "Marcar como protocolado"}

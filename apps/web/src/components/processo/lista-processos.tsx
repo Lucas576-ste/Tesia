@@ -135,6 +135,7 @@ export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcess
       ...dados,
       id: `${PREFIXO_NOVO}${crypto.randomUUID()}`,
       proximoPrazo: null,
+      prazos: [],
       status: "nao_iniciado",
       eventos: [],
     };

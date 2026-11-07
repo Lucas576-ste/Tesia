@@ -30,6 +30,7 @@ import { responsaveisExemplo } from "@/lib/planos-exemplo";
 import { AlternarVisao } from "./alternar-visao";
 import { FiltrosPrazos } from "./filtros-prazos";
 import { MenuAcoesPrazo } from "./menu-acoes-prazo";
+import { ModalPrazoInterno } from "./modal-prazo-interno";
 import { ModalPrazoManual } from "./modal-prazo-manual";
 import { QuadroPrazos } from "./quadro-prazos";
 import { useVisaoPainel } from "./usar-visao-painel";
@@ -65,6 +66,7 @@ export function PainelPrazos({
   const [soMeus, setSoMeus] = useState(false);
   const [prazos, setPrazos] = useState(prazosIniciais);
   const [aConfirmar, setAConfirmar] = useState<LinhaPrazo | null>(null);
+  const [aEditarInterno, setAEditarInterno] = useState<LinhaPrazo | null>(null);
 
   const indicadores = contarIndicadores(prazos);
   const critico = prazoCritico(prazos);
@@ -84,6 +86,14 @@ export function PainelPrazos({
     setPrazos((atuais) => atuais.map((prazo) => (prazo.id === id ? { ...prazo, status } : prazo)));
   }
 
+  function salvarPrazoInterno(id: string, prazoInterno: string) {
+    setPrazos((atuais) =>
+      atuais.map((prazo) => (prazo.id === id ? { ...prazo, prazoInterno } : prazo)),
+    );
+    setAEditarInterno(null);
+    toast.success("Prazo interno alterado neste exemplo. Nada foi enviado.");
+  }
+
   function fecharNovoPrazo() {
     router.replace(urlSemNovo, { scroll: false });
   }
@@ -100,6 +110,7 @@ export function PainelPrazos({
       prazo={prazo}
       temAnalise={idsComAnalise.includes(prazo.id)}
       aoMarcar={setAConfirmar}
+      aoEditarInterno={setAEditarInterno}
     />
   );
 
@@ -235,6 +246,11 @@ export function PainelPrazos({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <ModalPrazoInterno
+        prazo={aEditarInterno}
+        aoFechar={() => setAEditarInterno(null)}
+        aoSalvar={salvarPrazoInterno}
+      />
       <ModalPrazoManual
         aberto={novoPrazo && plano.recursosPro}
         processos={processos}

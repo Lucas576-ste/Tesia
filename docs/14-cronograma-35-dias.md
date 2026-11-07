@@ -111,7 +111,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Projeto Supabase (São Paulo)
 - Migrations das tabelas principais (ver `04-modelo-de-dados.md`): escritórios, usuários, processos, intimações, prazos, peças, estilo, referências, uso
 - RLS em todas as tabelas com `escritorio_id`
-- Já incluir os campos de prazo manual (`origem`, `tipo`, `hora`), `responsavel_id` em prazos e peças e `calendario_token` em usuários, para não precisar migrar depois
+- Já incluir os campos de prazo manual (`origem`, `tipo`, `hora`), `data_prazo_interno` e `responsavel_id` em prazos, `responsavel_id` em peças e `calendario_token` em usuários, para não precisar migrar depois
 
 ### Dia 13 — Autenticação
 - Cadastro, login e recuperação com Supabase Auth
@@ -135,6 +135,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Disponibilização → publicação → início da contagem
 - Dias úteis e corridos, suspensão de 20/12 a 20/01, feriados do tribunal e do escritório
 - Memória de cálculo
+- Cálculo do prazo interno (2 dias úteis antes do fatal)
 - Testes com casos reais (virada de ano, feriado móvel, fim de mês)
 
 **Pronto quando:** todos os testes passam.
@@ -208,7 +209,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Novo prazo manual salvando de verdade e aparecendo no painel e nos alertas
 
 ### Dia 30 — Alertas e limites
-- Alertas de prazo por e-mail (job agendado diário)
+- Alertas de prazo por e-mail (job agendado diário), incluindo o aviso no dia do prazo interno
 - Limites por plano, aviso aos 80% e bloqueio aos 100%
 - Tela Plano e uso com o consumo real
 

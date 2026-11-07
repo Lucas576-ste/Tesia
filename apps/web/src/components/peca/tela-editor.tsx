@@ -133,7 +133,7 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
         <p className="text-sm">
           {peca.vencimento && (
             <>
-              Vence em <span className="font-medium tabular-nums">{peca.vencimento}</span>
+              Prazo fatal: <span className="font-medium tabular-nums">{peca.vencimento}</span>
               <span className="text-texto-secundario"> · </span>
             </>
           )}

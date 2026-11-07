@@ -15,7 +15,8 @@ export function AbaAlertas() {
   const [dias, setDias] = useState<(typeof DIAS_ANTECEDENCIA)[number][]>([
     "5 dias úteis antes",
     "2 dias úteis antes",
-    "No dia do vencimento",
+    "No dia do prazo fatal",
+    "No dia do prazo interno",
   ]);
   const planoStart = usePlanoDemo().id === "start";
   const semAlerta = canais.length === 0 || dias.length === 0;

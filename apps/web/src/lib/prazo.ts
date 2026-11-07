@@ -9,6 +9,8 @@ export type LinhaPrazo = {
   peca: string;
   area: string;
   vencimento: string;
+  inicio?: string;
+  prazoInterno?: string;
   diasUteis: number;
   status: StatusPrazo;
   tipo?: TipoManual;

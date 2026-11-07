@@ -2,12 +2,7 @@
 
 import { useState, type DragEvent, type ReactNode } from "react";
 import { SeloStatus } from "@/components/selo-status";
-import {
-  DescricaoPrazo,
-  diasRestantes,
-  TituloPrazo,
-  VencimentoPrazo,
-} from "@/components/tabela-prazos";
+import { DatasPrazo, DescricaoPrazo, diasRestantes, TituloPrazo } from "@/components/tabela-prazos";
 import { colunaPrazo, type ColunaQuadro, type LinhaPrazo } from "@/lib/prazo";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +37,7 @@ function CartaoPrazo({ prazo, acoes }: Pick<QuadroPrazosProps, "acoes"> & { praz
       <TituloPrazo prazo={prazo} />
       {cnj && <span className="text-xs break-words text-texto-secundario tabular-nums">{cnj}</span>}
       <DescricaoPrazo prazo={prazo} />
-      <VencimentoPrazo prazo={prazo} />
+      <DatasPrazo prazo={prazo} />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className={cn("tabular-nums", dias.cor)}>{dias.texto}</span>
         <SeloStatus status={status} manual={Boolean(tipo)} />

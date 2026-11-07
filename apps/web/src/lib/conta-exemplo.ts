@@ -30,7 +30,8 @@ export const perfilContaExemplo: Perfil = {
 export const DIAS_ANTECEDENCIA = [
   "5 dias úteis antes",
   "2 dias úteis antes",
-  "No dia do vencimento",
+  "No dia do prazo fatal",
+  "No dia do prazo interno",
 ] as const;
 
 export const novoFeriadoSchema = z.object({

@@ -17,6 +17,7 @@ Objetivo: beta com os clientes fundadores.
 - [ ] Extração, resumo e escolha da peça
 - [ ] Motor de prazos com feriados nacionais e tribunais do DF
 - [ ] Prazos manuais (prazo, audiência, compromisso) pelo botão "+ Adicionar"
+- [ ] Prazo interno, com início da contagem e prazo fatal nas telas
 - [ ] Geração do rascunho com pendências destacadas
 - [ ] Editor simples e download em .docx com modelo do advogado
 - [ ] Painel de prazos em Lista ou Quadro, com contadores clicáveis
@@ -29,7 +30,7 @@ Objetivo: beta com os clientes fundadores.
 
 ## Fase 1.5 — Logo após o MVP (nesta ordem)
 1. [ ] Cobrança pelo Asaas (antes do fim dos 15 dias grátis do primeiro fundador)
-2. [ ] Busca automática de intimações pela OAB (DJEN ou API paga). É a maior lacuna em relação à concorrência.
+2. [ ] Busca automática de intimações pela OAB (DJEN ou API paga), com cards sugeridos no Quadro e status visível em Processos. É a maior lacuna em relação à concorrência.
 3. [ ] Agenda sincronizada por link iCal (Google, Apple, Outlook), se não entrou no MVP
 4. [ ] Plano Sociedade: 2 advogados, convite, responsável por prazo e peça, filtro "Meus prazos"
 5. [ ] Relatório do mês (prazos cumpridos, peças geradas, horas economizadas) e honorários simples
@@ -38,6 +39,8 @@ Objetivo: beta com os clientes fundadores.
 ## Fase 2 — Intermediário
 Objetivo: reduzir cancelamento e aumentar o ticket.
 - [ ] Cadastro de clientes com histórico
+- [ ] Campo `sistema` no processo e fase estimada pela última intimação
+- [ ] Agenda dentro da Tesia com prazos internos, prazos fatais e audiências, com filtro por área
 - [ ] Alertas por WhatsApp
 - [ ] Novas peças por área e áreas criminal e tributária
 - [ ] Biblioteca de teses do advogado

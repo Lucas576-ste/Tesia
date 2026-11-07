@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { destinoPrazo, type LinhaPrazo, type StatusPrazo } from "@/lib/prazo";
+import { prazoInternoVencido } from "@/lib/prazo-interno";
 import { TIPOS_MANUAIS } from "@/lib/prazo-manual";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +58,36 @@ export function VencimentoPrazo({ prazo: { vencimento, hora } }: { prazo: LinhaP
   );
 }
 
+export function PrazoInterno({ prazo, rotulo }: { prazo: LinhaPrazo; rotulo?: string }) {
+  if (!prazo.prazoInterno) return <span className="text-texto-secundario">—</span>;
+  return (
+    <span className="inline-flex flex-wrap items-center gap-x-2 text-texto-secundario tabular-nums">
+      <span>
+        {rotulo && `${rotulo}: `}
+        {prazo.prazoInterno}
+      </span>
+      {prazoInternoVencido(prazo) && (
+        <span className="text-xs font-medium text-atencao">Interno vencido</span>
+      )}
+    </span>
+  );
+}
+
+export function DatasPrazo({ prazo }: { prazo: LinhaPrazo }) {
+  const ehPrazo = !prazo.tipo || prazo.tipo === "prazo";
+  return (
+    <span className="flex flex-col gap-0.5">
+      <span>
+        <span className="text-texto-secundario">{ehPrazo ? "Fatal" : "Data"}: </span>
+        <span className="font-medium">
+          <VencimentoPrazo prazo={prazo} />
+        </span>
+      </span>
+      {prazo.prazoInterno && <PrazoInterno prazo={prazo} rotulo="Interno" />}
+    </span>
+  );
+}
+
 type TabelaPrazosProps = {
   prazos: LinhaPrazo[];
   acoes?: (prazo: LinhaPrazo) => ReactNode;
@@ -64,7 +95,7 @@ type TabelaPrazosProps = {
 
 function ListaPrazos({ prazos, acoes }: TabelaPrazosProps) {
   return (
-    <ul className="flex flex-col md:hidden">
+    <ul className="flex flex-col xl:hidden">
       {prazos.map((prazo) => {
         const { id, cnj, diasUteis, status, tipo } = prazo;
         const dias = diasRestantes(diasUteis, status);
@@ -77,9 +108,8 @@ function ListaPrazos({ prazos, acoes }: TabelaPrazosProps) {
             {cnj && (
               <span className="text-xs break-all text-texto-secundario tabular-nums">{cnj}</span>
             )}
-            <span className="flex flex-wrap items-center gap-x-1">
-              <DescricaoPrazo prazo={prazo} /> · <VencimentoPrazo prazo={prazo} />
-            </span>
+            <DescricaoPrazo prazo={prazo} />
+            <DatasPrazo prazo={prazo} />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className={cn("tabular-nums", dias.cor)}>{dias.texto}</span>
               <SeloStatus status={status} manual={Boolean(tipo)} />
@@ -96,13 +126,14 @@ export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
   return (
     <>
       <ListaPrazos prazos={prazos} acoes={acoes} />
-      <div className="hidden md:block">
+      <div className="hidden xl:block">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Processo</TableHead>
               <TableHead>Peça</TableHead>
-              <TableHead>Vencimento</TableHead>
+              <TableHead>Prazo fatal</TableHead>
+              <TableHead>Prazo interno</TableHead>
               <TableHead>Dias restantes</TableHead>
               <TableHead>Status</TableHead>
               {acoes && (
@@ -125,8 +156,11 @@ export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
                   <TableCell>
                     <DescricaoPrazo prazo={prazo} />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium">
                     <VencimentoPrazo prazo={prazo} />
+                  </TableCell>
+                  <TableCell>
+                    <PrazoInterno prazo={prazo} />
                   </TableCell>
                   <TableCell className={cn("tabular-nums", dias.cor)}>{dias.texto}</TableCell>
                   <TableCell>

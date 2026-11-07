@@ -9,6 +9,7 @@ export type Analise = {
   pontos: { titulo: string; trechoId: string }[];
   prazo: {
     vencimentoIso: string;
+    inicioIso: string;
     dias: number;
     contagem: string;
     fundamento: string;
@@ -32,6 +33,7 @@ const analises: Analise[] = [
     ],
     prazo: {
       vencimentoIso: "2026-11-06",
+      inicioIso: "2026-10-16",
       dias: 15,
       contagem: "úteis",
       fundamento: "CPC, art. 335",
@@ -41,7 +43,7 @@ const analises: Analise[] = [
         "Início da contagem: 16/10/2026",
         "Prazo: 15 dias úteis (CPC, art. 335)",
         "Dias não úteis no período: sábados, domingos e o feriado de 02/11",
-        "Vencimento: 06/11/2026 (sexta)",
+        "Prazo fatal: 06/11/2026 (sexta)",
       ],
     },
     pecas: [
@@ -85,6 +87,7 @@ const analises: Analise[] = [
     ],
     prazo: {
       vencimentoIso: "2026-11-04",
+      inicioIso: "2026-10-23",
       dias: 8,
       contagem: "úteis",
       fundamento: "CLT, art. 879, §2º",
@@ -94,7 +97,7 @@ const analises: Analise[] = [
         "Início da contagem: 23/10/2026",
         "Prazo: 8 dias úteis (CLT, art. 879, §2º)",
         "Dias não úteis no período: sábados, domingos e o feriado de 02/11",
-        "Vencimento: 04/11/2026 (quarta)",
+        "Prazo fatal: 04/11/2026 (quarta)",
       ],
     },
     pecas: [
