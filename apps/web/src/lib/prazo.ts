@@ -1,3 +1,5 @@
+import type { EtapaPrazo } from "@/lib/etapas-prazo";
+
 export type StatusPrazo = "nao_iniciado" | "rascunho_pronto" | "protocolado";
 
 export type TipoManual = "prazo" | "audiencia" | "compromisso";
@@ -16,6 +18,7 @@ export type LinhaPrazo = {
   tipo?: TipoManual;
   hora?: string;
   responsavel?: string;
+  etapa?: EtapaPrazo;
 };
 
 export type ColunaQuadro = "hoje" | "proximos" | "depois" | "rascunho" | "protocolado";

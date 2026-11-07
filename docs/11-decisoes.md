@@ -52,6 +52,12 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-07 | Prazo interno padrão: 2 dias úteis antes do fatal, editável em cada prazo | Valor inicial, ainda sem validação de advogados |
 | 2026-11-07 | Cards sugeridos no Quadro são prazos `sugerido`, sem tabela de tarefas | Atende ao pedido e mantém fora o kanban de tarefas |
 | 2026-11-07 | Fase do processo começa estimada pela última intimação; consulta ao tribunal só depois de pesquisar a fonte | Entrega valor sem integração nova; a consulta muda custo e prazo |
+| 2026-11-07 | Start com 10 peças e pacote extra de R$ 29; substitui as 15 peças e o pacote de R$ 19 nesse plano | Start com pacotes não pode sair mais barato que o Pro |
+| 2026-11-07 | Pontos atacáveis e peças alternativas só do Pro em diante | É o valor jurídico mais visível da análise |
+| 2026-11-07 | Funções do Pro aparecem no Start com selo, e o teste grátis tem recursos do Pro | O cliente precisa ver o que ganha ao assinar |
+| 2026-11-07 | Sem limite de estilo por plano | Poderia piorar a primeira impressão do rascunho |
+| 2026-11-07 | Máximo de 2 advogados por enquanto; plano Escritório suspenso | Foco no solo e em duplas |
+| 2026-11-07 | Sociedade com etapas por prazo, divisão por área e rede de segurança, sem kanban de tarefas | Uma dupla precisa combinar quem faz o quê sem deixar nada cair entre os dois |
 
 ## Pendências
 
@@ -68,6 +74,9 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Levantar calendários de feriados e suspensões dos tribunais do DF | Lucas | Antes do dia 15 |
 | Revisão dos textos legais por advogado | Lucas | Antes do lançamento |
 | Validar com advogados as regras especiais de prazo (prazo em dobro, intimação pelo sistema) | Lucas | Antes do dia 15 |
+| Validar com 2 ou 3 duplas o preço de R$ 219, as etapas e o alerta ao sócio | Lucas | Antes do plano Sociedade |
+| Validar com advogados os limites do Start (10 peças) | Lucas | Antes de abrir o Start |
+| Revisão jurídica da separação da dupla (sigilo e dados de clientes) | Lucas | Antes do plano Sociedade |
 | Falar com contador sobre a saída do MEI | Lucas | Ao chegar a ~30 clientes |
 | Gravar os leads do formulário de fundador e avisar por e-mail | Lucas | Dia 12 |
 | Confirmar os itens `[CONFIRMAR]` da landing (vagas, tempos, IA sem treino, OAB, comparação, feriado) | Lucas | Antes de divulgar a landing |

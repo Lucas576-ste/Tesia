@@ -21,7 +21,7 @@ const secoes = [
   {
     titulo: "Planos e limites",
     paragrafos: [
-      "Plano Start: 15 peças por mês. Plano Pro: 50 peças por mês. Os valores e condições vigentes são os exibidos na contratação.",
+      "Plano Start: 10 peças por mês. Plano Pro: 50 peças por mês. Os valores e condições vigentes são os exibidos na contratação.",
     ],
   },
   {

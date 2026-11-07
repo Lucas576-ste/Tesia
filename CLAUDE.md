@@ -1,7 +1,7 @@
 # Tesia
 
 ## Produto
-- Agente de IA para advogados solo e escritórios de 2 a 3 advogados.
+- Agente de IA para advogados solo e duplas de advogados.
 - Lê a intimação em PDF, resume o que aconteceu e aponta o que pode ser atacado.
 - A IA extrai os dados, o código calcula o prazo e o advogado confirma.
 - Sugere a peça cabível e gera um rascunho no estilo do advogado, com pontos `[CONFIRMAR]`.

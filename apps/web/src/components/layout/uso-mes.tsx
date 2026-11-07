@@ -19,7 +19,8 @@ export function UsoMes({ usadas, limite, className }: UsoMesProps) {
   return (
     <div className={cn("flex w-fit flex-col gap-1", className)}>
       <span className={cn("text-xs whitespace-nowrap tabular-nums", cores.texto)}>
-        {usadas} de {limite} peças
+        {usadas} de {limite}
+        <span className="max-[359px]:sr-only"> peças</span>
       </span>
       <div
         role="progressbar"

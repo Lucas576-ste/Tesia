@@ -139,11 +139,11 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Saudação e resumo do dia ("4 prazos em aberto")
 - Faixa de alerta para prazo crítico, com botão "Começar agora"
 - Contadores compactos e clicáveis, que filtram a lista: vencem em até 3 dias, rascunhos para revisar, protocolados no mês
-- Alternância **Lista | Quadro** (a escolha fica salva; no Start, só Lista)
+- Alternância **Lista | Quadro** (a escolha fica salva; no Start, Quadro aparece com selo "Pro" e leva ao plano)
 - **Lista:** partes em destaque e número CNJ menor, peça, prazo fatal, prazo interno, dias restantes em texto ("Hoje", "2 dias úteis"), status (não iniciado, rascunho pronto, protocolado)
 - **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto, Protocolado; arrastar para "Protocolado" conclui o prazo; o card mostra as datas fatal e interna
 - Prazos manuais, audiências e compromissos aparecem junto, com selo do tipo
-- Filtro "Meus prazos / Todos" (plano Sociedade)
+- Filtros "Meus", "Do sócio", "Sem responsável" e "Todos" (plano Sociedade); na lista e no Quadro, etapa atual e responsável
 - Filtros: status, área, período
 - Ações por linha: abrir análise, abrir peça, editar prazo interno, marcar como cumprido
 - Estado vazio: "Envie sua primeira intimação"
@@ -202,7 +202,7 @@ Abas:
 - **Perfil:** nome, OAB, UF, áreas, tribunais
 - **Alertas:** canais (e-mail, WhatsApp), dias de antecedência e aviso no dia do prazo interno
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
-- **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso
+- **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso, divisão por área
 - **Modelo de documento:** trocar o .docx timbrado
 - **Calendário:** feriados e suspensões próprios do escritório
 - **Segurança:** senha, sessões ativas
@@ -251,7 +251,7 @@ Abas:
 |---|---|---|
 | Caixa de intimações | `/app/intimacoes` | Intimações que chegam sozinhas pela OAB, com status (nova, analisada, peça gerada); cada uma gera um card sugerido no Quadro |
 | Aceitar convite | `/convite/:token` | Cadastro do sócio já ligado ao escritório |
-| Aba Equipe | `/app/configuracoes` | Convidar o sócio, membros, remover acesso |
+| Aba Equipe | `/app/configuracoes` | Convidar o sócio, membros, remover acesso, divisão por área |
 | Relatório do mês | `/app/relatorio` | Prazos cumpridos e perdidos, intimações, peças, horas economizadas (estimativa), honorários recebidos; meses anteriores |
 | Honorários | `/app/honorarios` | Por cliente: combinado, previsto, recebido e em aberto; total em aberto e vencidos |
 

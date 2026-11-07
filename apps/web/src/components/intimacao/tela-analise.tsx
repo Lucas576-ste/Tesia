@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BalaoLia } from "@/components/lia/balao-lia";
+import { AvisoPro } from "@/components/plano/aviso-pro";
 import { ModalLimite } from "@/components/plano/modal-limite";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,11 @@ import { BlocoPrazo } from "./bloco-prazo";
 import { DocumentoOriginal } from "./documento-original";
 import { EscolhaPeca } from "./escolha-peca";
 
+function textoPontos(quantidade: number) {
+  const pontos = quantidade === 1 ? "1 ponto" : `${quantidade} pontos`;
+  return `A Lia encontrou ${pontos} nesta intimação. Veja cada um com o trecho do documento no plano Pro.`;
+}
+
 const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block";
 
 export function TelaAnalise({ analise }: { analise: Analise }) {
@@ -23,7 +29,7 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
   const [destaque, setDestaque] = useState<string | null>(null);
   const [confirmado, setConfirmado] = useState(false);
   const router = useRouter();
-  const { uso } = usePlanoDemo();
+  const { plano, uso } = usePlanoDemo();
   const [limiteAberto, setLimiteAberto] = useState(false);
   const restantes = uso.limite - uso.usadas;
 
@@ -71,37 +77,44 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 <h2 className="text-lg font-semibold">O que aconteceu</h2>
                 <p className="mt-1 text-sm">{analise.resumo}</p>
               </section>
-              <section className="rounded-xl border bg-card p-4 shadow-xs">
-                <h2 className="text-lg font-semibold">Pontos que podem ser atacados</h2>
-                <ul className="mt-2 flex flex-col gap-2 text-sm">
-                  {analise.pontos.map(({ titulo, trechoId }) => (
-                    <li
-                      key={trechoId}
-                      className="flex flex-wrap items-center justify-between gap-2"
-                    >
-                      <span className="flex min-w-0 flex-1 basis-48 gap-2">
-                        <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-primaria" />
-                        {titulo}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        aria-pressed={destaque === trechoId}
-                        onClick={() => verTrecho(trechoId)}
+              {plano.recursosPro ? (
+                <section className="rounded-xl border bg-card p-4 shadow-xs">
+                  <h2 className="text-lg font-semibold">Pontos que podem ser atacados</h2>
+                  <ul className="mt-2 flex flex-col gap-2 text-sm">
+                    {analise.pontos.map(({ titulo, trechoId }) => (
+                      <li
+                        key={trechoId}
+                        className="flex flex-wrap items-center justify-between gap-2"
                       >
-                        <Quote aria-hidden />
-                        Ver trecho
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+                        <span className="flex min-w-0 flex-1 basis-48 gap-2">
+                          <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-primaria" />
+                          {titulo}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          aria-pressed={destaque === trechoId}
+                          onClick={() => verTrecho(trechoId)}
+                        >
+                          <Quote aria-hidden />
+                          Ver trecho
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                <AvisoPro
+                  titulo="Pontos que podem ser atacados"
+                  descricao={textoPontos(analise.pontos.length)}
+                />
+              )}
               <BlocoPrazo
                 prazo={analise.prazo}
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
               />
-              <EscolhaPeca pecas={analise.pecas} />
+              <EscolhaPeca pecas={plano.recursosPro ? analise.pecas : analise.pecas.slice(0, 1)} />
               <section className="flex flex-col gap-2 rounded-xl bg-primaria-fundo p-4">
                 {confirmado && restantes <= 0 ? (
                   <Button size="lg" onClick={() => setLimiteAberto(true)}>
@@ -137,6 +150,7 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
         aberto={limiteAberto}
         bloqueio
         limite={uso.limite}
+        pacote={plano.pacote}
         aoMudar={setLimiteAberto}
         aoComprar={() => {
           setLimiteAberto(false);

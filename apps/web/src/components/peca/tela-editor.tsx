@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PecaExemplo } from "@/lib/pecas-exemplo";
+import { AvisoPro } from "@/components/plano/aviso-pro";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { BarraFormatacao } from "./barra-formatacao";
 import { ExtensaoPendencias, encontrarPendencias, type Pendencia } from "./extensao-pendencias";
@@ -180,7 +181,14 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
             <div className="flex flex-col gap-4">
               <PainelPendencias pendencias={pendencias} aoEscolher={irParaPendencia} />
               <PainelFontes peca={peca} temAnalise={temAnalise} />
-              {recursosPro && <PainelAjuste desativado={protocolada} />}
+              {recursosPro ? (
+                <PainelAjuste desativado={protocolada} />
+              ) : (
+                <AvisoPro
+                  titulo="Ajustes pela Lia"
+                  descricao="Peça mudanças no rascunho em poucas palavras, sem reescrever à mão."
+                />
+              )}
               <PainelVersoes
                 versoes={versoes}
                 desativado={protocolada}

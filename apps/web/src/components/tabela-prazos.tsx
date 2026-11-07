@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ROTULOS_ETAPA } from "@/lib/etapas-prazo";
 import { destinoPrazo, type LinhaPrazo, type StatusPrazo } from "@/lib/prazo";
 import { prazoInternoVencido } from "@/lib/prazo-interno";
 import { TIPOS_MANUAIS } from "@/lib/prazo-manual";
@@ -37,13 +38,22 @@ export function TituloPrazo({ prazo }: { prazo: LinhaPrazo }) {
   );
 }
 
-export function DescricaoPrazo({ prazo: { peca, tipo, responsavel } }: { prazo: LinhaPrazo }) {
+export function DescricaoPrazo({
+  prazo: { peca, tipo, responsavel, etapa },
+}: {
+  prazo: LinhaPrazo;
+}) {
   return (
     <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
       {peca}
       {tipo && <Badge variant="secondary">{TIPOS_MANUAIS[tipo]}</Badge>}
+      {etapa && !responsavel && (
+        <span className="text-xs font-medium text-atencao">Sem responsável</span>
+      )}
       {responsavel && (
-        <span className="text-xs text-texto-secundario">Responsável: {responsavel}</span>
+        <span className="text-xs text-texto-secundario">
+          {etapa ? ROTULOS_ETAPA[etapa] : "Responsável"}: {responsavel}
+        </span>
       )}
     </span>
   );

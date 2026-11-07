@@ -1,6 +1,14 @@
 "use client";
 
-import { CalendarClock, CircleCheck, FileSearch, FileText, MoreHorizontal } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarClock,
+  CircleCheck,
+  FileSearch,
+  FileText,
+  MoreHorizontal,
+  UserCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ROTULOS_ETAPA } from "@/lib/etapas-prazo";
 import type { LinhaPrazo } from "@/lib/prazo";
 
 type MenuAcoesPrazoProps = {
@@ -17,6 +26,8 @@ type MenuAcoesPrazoProps = {
   temAnalise: boolean;
   aoMarcar: (prazo: LinhaPrazo) => void;
   aoEditarInterno: (prazo: LinhaPrazo) => void;
+  aoConcluirEtapa: (prazo: LinhaPrazo) => void;
+  aoAssumir: (prazo: LinhaPrazo) => void;
 };
 
 export function MenuAcoesPrazo({
@@ -24,6 +35,8 @@ export function MenuAcoesPrazo({
   temAnalise,
   aoMarcar,
   aoEditarInterno,
+  aoConcluirEtapa,
+  aoAssumir,
 }: MenuAcoesPrazoProps) {
   const temPeca = !prazo.tipo && prazo.status !== "nao_iniciado";
   const temLinks = temAnalise || temPeca;
@@ -57,6 +70,18 @@ export function MenuAcoesPrazo({
         {prazo.status !== "protocolado" && (
           <>
             {temLinks && <DropdownMenuSeparator />}
+            {prazo.etapa && !prazo.responsavel && (
+              <DropdownMenuItem onSelect={() => aoAssumir(prazo)}>
+                <UserCheck aria-hidden />
+                Assumir prazo
+              </DropdownMenuItem>
+            )}
+            {prazo.etapa && prazo.responsavel && prazo.etapa !== "protocolar" && (
+              <DropdownMenuItem onSelect={() => aoConcluirEtapa(prazo)}>
+                <ArrowRight aria-hidden />
+                Concluir etapa: {ROTULOS_ETAPA[prazo.etapa]}
+              </DropdownMenuItem>
+            )}
             {prazo.prazoInterno && (
               <DropdownMenuItem onSelect={() => aoEditarInterno(prazo)}>
                 <CalendarClock aria-hidden />

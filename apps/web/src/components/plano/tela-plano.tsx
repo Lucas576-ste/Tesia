@@ -60,7 +60,7 @@ export function TelaPlano({ exemploInicial }: TelaPlanoProps) {
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => setModal("mudar")}>Mudar de plano</Button>
           <Button variant="outline" onClick={comprarPacote}>
-            Comprar 10 peças por R$ 19
+            Comprar 10 peças por {plano.pacote}
           </Button>
           <Button variant="outline" disabled>
             Assinar o Plus (em breve)
@@ -97,6 +97,7 @@ export function TelaPlano({ exemploInicial }: TelaPlanoProps) {
         aberto={modal === "limite-80" || modal === "limite-100"}
         bloqueio={modal === "limite-100"}
         limite={uso.limite}
+        pacote={plano.pacote}
         aoMudar={fechar}
         aoComprar={comprarPacote}
         aoMudarPlano={() => setModal("mudar")}

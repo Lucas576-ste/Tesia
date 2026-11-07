@@ -211,8 +211,8 @@ Alternância: Mensal | Anual (2 meses grátis)
 | | Start | Pro (destaque: "Mais escolhido") | Sociedade |
 |---|---|---|---|
 | Preço | R$ 79/mês | R$ 129/mês | R$ 219/mês |
-| Para quem | Quem atua em uma área | Quem quer tudo, sem limite apertado | Dois advogados que dividem o escritório |
-| Inclui | 15 peças por mês · 1 área · análise de intimações ilimitada · prazos, audiências e alertas por e-mail · agenda no celular · rascunho no seu estilo · .docx com timbrado | 50 peças por mês · todas as áreas · tudo do Start · busca automática de intimações (em breve) · alertas no WhatsApp (em breve) | 2 advogados · 100 peças por mês compartilhadas · tudo do Pro · estilo próprio para cada um · responsável por prazo e "Meus prazos" |
+| Para quem | Quem atua em uma área | Quem quer tudo, sem limite apertado | Dois advogados que dividem o trabalho. R$ 109,50 por advogado |
+| Inclui | 10 peças por mês · 1 área · resumo da intimação e peça recomendada · prazo com a conta · prazo interno e fatal · painel em lista e alerta por e-mail · rascunho no seu estilo · .docx com timbrado | 50 peças por mês · todas as áreas · tudo do Start · busca automática de intimações (em breve) · alertas no WhatsApp (em breve) | 2 advogados · 100 peças por mês compartilhadas · tudo do Pro · estilo próprio para cada um · responsável por prazo e "Meus prazos" |
 | Botão | Começar | Começar | Começar com meu sócio |
 
 **Complemento Plus (+ R$ 49/mês):** 20 posts por mês para o Instagram, calendário de conteúdo e textos dentro das regras de publicidade da OAB. Fica abaixo dos planos, em faixa própria.

@@ -32,7 +32,7 @@ Objetivo: beta com os clientes fundadores.
 1. [ ] Cobrança pelo Asaas (antes do fim dos 15 dias grátis do primeiro fundador)
 2. [ ] Busca automática de intimações pela OAB (DJEN ou API paga), com cards sugeridos no Quadro e status visível em Processos. É a maior lacuna em relação à concorrência.
 3. [ ] Agenda sincronizada por link iCal (Google, Apple, Outlook), se não entrou no MVP
-4. [ ] Plano Sociedade: 2 advogados, convite, responsável por prazo e peça, filtro "Meus prazos"
+4. [ ] Plano Sociedade: 2 advogados, convite, etapas por prazo, divisão por área, rede de segurança, filtros da dupla e notas internas. Depois: pendências, carga de cada um, ausência e estilo comum (`17-planos-e-sociedade.md`)
 5. [ ] Relatório do mês (prazos cumpridos, peças geradas, horas economizadas) e honorários simples
 6. [ ] Plano Plus (conteúdo para Instagram) e calculadora de prazos pública
 
@@ -50,7 +50,7 @@ Objetivo: reduzir cancelamento e aumentar o ticket.
 
 ## Fase 3 — Avançado (escritórios)
 Só se houver demanda real de escritórios maiores.
-- [ ] Plano Escritório (3 ou mais advogados) com perfis e permissões
+- [ ] Plano para 3 ou mais advogados, com perfis e permissões. **Suspenso por enquanto:** o máximo é 2 advogados.
 - [ ] Distribuição de intimações e tarefas, com fluxo de aprovação
 - [ ] Estilo do escritório, além do estilo de cada advogado
 - [ ] Workflows configuráveis
@@ -84,7 +84,7 @@ Ficam de fora: CRM com funil de vendas, financeiro completo, BI avançado, kanba
 | Monitoramento de intimações via DJEN | 1.5 |
 | Gestão de tarefas e prazos | 1 (painel em Lista ou Quadro) |
 | Integração com agendas | 1 ou 1.5 (iCal) |
-| Controle de produtividade da equipe | 1.5 (Sociedade) e 3 (Escritório) |
+| Controle de produtividade da equipe | 1.5 (Sociedade) |
 | CRM e automações de atendimento | 2 (lista de clientes) e 3 |
 | Financeiro integrado | 1.5 (honorários simples) e 3 (completo) |
 | Workflow | 3 |

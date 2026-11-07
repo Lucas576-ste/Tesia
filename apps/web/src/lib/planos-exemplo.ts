@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { EtapasPrazo } from "@/lib/etapas-prazo";
 
 export const mostrarSeletorPlano = process.env.NODE_ENV === "development";
 
@@ -9,8 +10,9 @@ export const PLANOS_DEMO = {
   start: {
     nome: "Start",
     preco: "R$ 79/mês",
-    limite: 15,
-    usadas: 9,
+    limite: 10,
+    usadas: 6,
+    pacote: "R$ 29",
     maxAreas: 1,
     equipe: false,
     recursosPro: false,
@@ -20,6 +22,7 @@ export const PLANOS_DEMO = {
     preco: "R$ 129/mês",
     limite: 50,
     usadas: 32,
+    pacote: "R$ 19",
     maxAreas: null,
     equipe: false,
     recursosPro: true,
@@ -29,6 +32,7 @@ export const PLANOS_DEMO = {
     preco: "R$ 79/mês",
     limite: 50,
     usadas: 32,
+    pacote: "R$ 19",
     maxAreas: null,
     equipe: false,
     recursosPro: true,
@@ -38,6 +42,7 @@ export const PLANOS_DEMO = {
     preco: "R$ 219/mês",
     limite: 100,
     usadas: 64,
+    pacote: "R$ 19",
     maxAreas: null,
     equipe: true,
     recursosPro: true,
@@ -79,12 +84,32 @@ export function montarEstadoPlano(plano?: string, nivel?: string): EstadoPlanoDe
   };
 }
 
-export const responsaveisExemplo: Record<string, string> = {
-  "2": "Bruno Lima",
-  "4": "Bruno Lima",
+export const SOCIO_EXEMPLO = "Bruno Lima";
+
+export const etapasExemplo: Record<string, EtapasPrazo> = {
+  "1": { atual: "elaborar", responsaveis: { elaborar: null, revisar: null, protocolar: null } },
+  "2": {
+    atual: "elaborar",
+    responsaveis: { elaborar: SOCIO_EXEMPLO, revisar: "Ana Souza", protocolar: SOCIO_EXEMPLO },
+  },
+  "3": {
+    atual: "protocolar",
+    responsaveis: { elaborar: "Ana Souza", revisar: null, protocolar: "Ana Souza" },
+  },
+  "4": {
+    atual: "revisar",
+    responsaveis: { elaborar: SOCIO_EXEMPLO, revisar: "Ana Souza", protocolar: SOCIO_EXEMPLO },
+  },
+};
+
+export const divisaoAreasExemplo: Record<string, string> = {
+  "Cível e consumidor": "",
+  Trabalhista: SOCIO_EXEMPLO,
+  Previdenciário: "Ana Souza",
+  Família: "Ana Souza",
 };
 
 export const membrosEquipeExemplo = [
-  { id: "1", nome: "Ana Souza", papel: "Dono" },
-  { id: "2", nome: "Bruno Lima", papel: "Sócio" },
+  { id: "1", nome: "Ana Souza", papel: "Titular" },
+  { id: "2", nome: SOCIO_EXEMPLO, papel: "Sócio" },
 ];

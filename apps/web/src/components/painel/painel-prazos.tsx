@@ -26,7 +26,8 @@ import {
 import { filtrarPrazos, type FiltroPrazos } from "@/lib/filtros-prazos";
 import { contarIndicadores, ordenarPrazos, prazoCritico, type LinhaPrazo } from "@/lib/prazo";
 import { criarPrazoManual, type PrazoManual, type ProcessoResumo } from "@/lib/prazo-manual";
-import { responsaveisExemplo } from "@/lib/planos-exemplo";
+import { etapasExemplo } from "@/lib/planos-exemplo";
+import { assumirEtapas, etapasPadrao, proximaEtapa, ROTULOS_ETAPA } from "@/lib/etapas-prazo";
 import { AlternarVisao } from "./alternar-visao";
 import { FiltrosPrazos } from "./filtros-prazos";
 import { MenuAcoesPrazo } from "./menu-acoes-prazo";
@@ -44,6 +45,15 @@ type PainelPrazosProps = {
   novoPrazo: boolean;
   urlSemNovo: string;
 };
+
+const FILTROS_EQUIPE = {
+  meus: "Meus",
+  socio: "Do sócio",
+  sem: "Sem responsável",
+  todos: "Todos",
+} as const;
+
+type FiltroEquipe = keyof typeof FILTROS_EQUIPE;
 
 function resumoAbertos(quantidade: number) {
   if (quantidade === 0) return "Nenhum prazo em aberto";
@@ -63,23 +73,36 @@ export function PainelPrazos({
   const [visaoSalva, trocarVisao] = useVisaoPainel();
   const { plano } = usePlanoDemo();
   const visao = plano.recursosPro ? visaoSalva : "lista";
-  const [soMeus, setSoMeus] = useState(false);
+  const [filtroEquipe, setFiltroEquipe] = useState<FiltroEquipe>("todos");
+  const [etapas, setEtapas] = useState(etapasExemplo);
   const [prazos, setPrazos] = useState(prazosIniciais);
   const [aConfirmar, setAConfirmar] = useState<LinhaPrazo | null>(null);
   const [aEditarInterno, setAEditarInterno] = useState<LinhaPrazo | null>(null);
 
   const indicadores = contarIndicadores(prazos);
   const critico = prazoCritico(prazos);
+  const eu = advogadoExemplo.nome;
+
+  function etapasDoPrazo(id: string) {
+    return etapas[id] ?? etapasPadrao(eu);
+  }
+
   const comResponsavel = plano.equipe
-    ? prazos.map((prazo) => ({
-        ...prazo,
-        responsavel: responsaveisExemplo[prazo.id] ?? advogadoExemplo.nome,
-      }))
+    ? prazos.map((prazo) => {
+        const { atual, responsaveis } = etapasDoPrazo(prazo.id);
+        if (prazo.status === "protocolado") {
+          return { ...prazo, responsavel: responsaveis.protocolar ?? eu };
+        }
+        if (prazo.tipo && prazo.tipo !== "prazo") return { ...prazo, responsavel: eu };
+        return { ...prazo, etapa: atual, responsavel: responsaveis[atual] ?? undefined };
+      })
     : prazos;
-  const doEscopo =
-    plano.equipe && soMeus
-      ? comResponsavel.filter(({ responsavel }) => responsavel === advogadoExemplo.nome)
-      : comResponsavel;
+  const doEscopo = comResponsavel.filter(({ responsavel, etapa }) => {
+    if (!plano.equipe || filtroEquipe === "todos") return true;
+    if (filtroEquipe === "meus") return responsavel === eu;
+    if (filtroEquipe === "socio") return Boolean(responsavel) && responsavel !== eu;
+    return Boolean(etapa) && !responsavel;
+  });
   const visiveis = ordenarPrazos(filtrarPrazos(doEscopo, filtro));
 
   function trocarStatus(id: string, status: LinhaPrazo["status"]) {
@@ -92,6 +115,22 @@ export function PainelPrazos({
     );
     setAEditarInterno(null);
     toast.success("Prazo interno alterado neste exemplo. Nada foi enviado.");
+  }
+
+  function concluirEtapa({ id, etapa }: LinhaPrazo) {
+    const atuais = etapasDoPrazo(id);
+    const proxima = proximaEtapa(atuais);
+    if (!proxima) return;
+    setEtapas((todas) => ({ ...todas, [id]: { ...atuais, atual: proxima } }));
+    if (etapa === "elaborar") trocarStatus(id, "rascunho_pronto");
+    toast.success(
+      `${ROTULOS_ETAPA[proxima]} agora é com ${atuais.responsaveis[proxima] ?? eu}. Nada foi enviado.`,
+    );
+  }
+
+  function assumirPrazo({ id }: LinhaPrazo) {
+    setEtapas((todas) => ({ ...todas, [id]: assumirEtapas(etapasDoPrazo(id), eu) }));
+    toast.success("O prazo agora é seu neste exemplo.");
   }
 
   function fecharNovoPrazo() {
@@ -111,6 +150,8 @@ export function PainelPrazos({
       temAnalise={idsComAnalise.includes(prazo.id)}
       aoMarcar={setAConfirmar}
       aoEditarInterno={setAEditarInterno}
+      aoConcluirEtapa={concluirEtapa}
+      aoAssumir={assumirPrazo}
     />
   );
 
@@ -178,21 +219,26 @@ export function PainelPrazos({
           <>
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                {plano.recursosPro && <AlternarVisao visao={visao} aoTrocar={trocarVisao} />}
+                <AlternarVisao
+                  visao={visao}
+                  aoTrocar={trocarVisao}
+                  quadroBloqueado={!plano.recursosPro}
+                />
                 {plano.equipe && (
-                  <div role="group" aria-label="De quem são os prazos" className="flex gap-1">
-                    {[
-                      { rotulo: "Meus prazos", valor: true },
-                      { rotulo: "Todos", valor: false },
-                    ].map(({ rotulo, valor }) => (
+                  <div
+                    role="group"
+                    aria-label="De quem são os prazos"
+                    className="flex flex-wrap gap-1"
+                  >
+                    {(Object.keys(FILTROS_EQUIPE) as FiltroEquipe[]).map((valor) => (
                       <Button
-                        key={rotulo}
+                        key={valor}
                         size="sm"
-                        variant={soMeus === valor ? "secondary" : "ghost"}
-                        aria-pressed={soMeus === valor}
-                        onClick={() => setSoMeus(valor)}
+                        variant={filtroEquipe === valor ? "secondary" : "ghost"}
+                        aria-pressed={filtroEquipe === valor}
+                        onClick={() => setFiltroEquipe(valor)}
                       >
-                        {rotulo}
+                        {FILTROS_EQUIPE[valor]}
                       </Button>
                     ))}
                   </div>

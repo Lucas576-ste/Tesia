@@ -18,7 +18,8 @@ export function AbaAlertas() {
     "No dia do prazo fatal",
     "No dia do prazo interno",
   ]);
-  const planoStart = usePlanoDemo().id === "start";
+  const { id, plano } = usePlanoDemo();
+  const planoStart = id === "start";
   const semAlerta = canais.length === 0 || dias.length === 0;
 
   return (
@@ -41,6 +42,12 @@ export function AbaAlertas() {
         valor={dias}
         aoMudar={setDias}
       />
+      {plano.equipe && (
+        <p className="rounded-md bg-primaria-fundo px-3 py-2 text-sm">
+          Rede de segurança: se um prazo seguir aberto na véspera do prazo fatal, os dois advogados
+          são avisados.
+        </p>
+      )}
       {semAlerta && (
         <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
           Sem canal ou antecedência, você não recebe aviso de prazo.

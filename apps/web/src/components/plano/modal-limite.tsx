@@ -13,6 +13,7 @@ type ModalLimiteProps = {
   aberto: boolean;
   bloqueio: boolean;
   limite: number;
+  pacote: string;
   aoMudar: (aberto: boolean) => void;
   aoComprar: () => void;
   aoMudarPlano: () => void;
@@ -22,6 +23,7 @@ export function ModalLimite({
   aberto,
   bloqueio,
   limite,
+  pacote,
   aoMudar,
   aoComprar,
   aoMudarPlano,
@@ -46,7 +48,7 @@ export function ModalLimite({
           <Button variant="outline" onClick={aoMudarPlano}>
             Mudar de plano
           </Button>
-          <Button onClick={aoComprar}>Comprar 10 peças por R$ 19</Button>
+          <Button onClick={aoComprar}>Comprar 10 peças por {pacote}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

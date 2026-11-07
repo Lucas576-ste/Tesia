@@ -2,6 +2,7 @@
 
 import { CalendarPlus, FilePlus2, FolderPlus, Plus } from "lucide-react";
 import Link from "next/link";
+import { SeloPro } from "@/components/plano/aviso-pro";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +20,6 @@ const opcoes = [
 
 export function MenuAdicionar() {
   const { recursosPro } = usePlanoDemo().plano;
-  const visiveis = opcoes.filter(({ href }) => recursosPro || href !== "/app?novo=prazo");
 
   return (
     <DropdownMenu modal={false}>
@@ -30,14 +30,18 @@ export function MenuAdicionar() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        {visiveis.map(({ rotulo, href, icone: Icone }) => (
-          <DropdownMenuItem key={href} asChild>
-            <Link href={href}>
-              <Icone aria-hidden />
-              {rotulo}
-            </Link>
-          </DropdownMenuItem>
-        ))}
+        {opcoes.map(({ rotulo, href, icone: Icone }) => {
+          const bloqueado = !recursosPro && href === "/app?novo=prazo";
+          return (
+            <DropdownMenuItem key={href} asChild>
+              <Link href={bloqueado ? "/app/plano" : href}>
+                <Icone aria-hidden />
+                {rotulo}
+                {bloqueado && <SeloPro />}
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

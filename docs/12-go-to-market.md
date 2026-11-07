@@ -44,7 +44,6 @@ A estratégia muda com o tamanho:
 - **Tráfego pago em escala**, só quando o custo para conseguir um cliente for menor que 3 meses de mensalidade.
 - **SEO em escala:** uma página por tipo de prazo, peça e tribunal.
 - **Rede de afiliados** com painel próprio.
-- **Vendas para escritórios:** plano Escritório, demonstração e uma pessoa dedicada a vender.
 - **Cobertura nacional de tribunais:** calendário de feriados e suspensões de todos os tribunais. É pré-requisito para passar de algumas centenas de clientes.
 - **Time:** entre 200 e 300 clientes, contratar ao menos uma pessoa de suporte e uma de marketing/vendas.
 
@@ -55,7 +54,7 @@ Referência: 1.000 clientes com ticket médio de R$ 110 ≈ R$ 110 mil por mês.
 - Planos Start, Pro e Plus (ver `05-regras-de-negocio.md`).
 - **Plano anual** com 2 meses grátis: dinheiro adiantado e cancelamento menor.
 - Pacotes de peças extras.
-- Plano Sociedade (2 advogados, R$ 219) e, na fase 3, plano Escritório (R$ 99 por advogado, a partir de 3).
+- Plano Sociedade (2 advogados, R$ 219, ou R$ 109,50 por advogado). Plano para 3 ou mais está suspenso por enquanto.
 - Argumento de venda: sem taxa de ativação e agenda no celular a partir do Pro.
 - Add-ons futuros: cálculos previdenciários e trabalhistas, busca de intimações em mais tribunais, conferência de jurisprudência.
 

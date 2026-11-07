@@ -22,5 +22,6 @@ Esta pasta reúne todas as decisões de produto, técnicas e de negócio. Cada a
 | [14-cronograma-35-dias.md](14-cronograma-35-dias.md) | Plano dia a dia do MVP (35 dias, 2 h por dia) |
 | [15-landing.md](15-landing.md) | Textos, ordem das seções e regras da landing |
 | [16-plano-sugestoes-advogado.md](16-plano-sugestoes-advogado.md) | Plano aprovado a partir das sugestões de um advogado |
+| [17-planos-e-sociedade.md](17-planos-e-sociedade.md) | Diferença entre Start e Pro e desenho do plano Sociedade |
 
 Protótipo das telas: canvas "Protótipo Agente Jurídico" no Claude (5 telas: estilo, painel, intimação, rascunho, conteúdo).

@@ -22,18 +22,18 @@
 
 | Plano | Preço/mês | Peças/mês | Áreas | Usuários | Recursos |
 |---|---|---|---|---|---|
-| Start | R$ 79 | 15 | 1 | 1 | Só o essencial: intimação por upload, prazos vindos de intimações, painel em lista, alerta por e-mail, rascunho no estilo, .docx com timbrado |
-| Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + Quadro, prazos manuais e audiências, ajustes pela IA; quando existirem: busca automática de intimações, alertas por WhatsApp, agenda (iCal), relatório do mês, honorários simples |
+| Start | R$ 79 | 10 | 1 | 1 | Só o essencial: intimação por upload com resumo e peça recomendada, prazos vindos de intimações, prazo interno, painel em lista, alerta por e-mail, rascunho no estilo, .docx com timbrado |
+| Pro | R$ 129 | 50 | Todas | 1 | Tudo do Start + pontos que podem ser atacados, peças alternativas, Quadro, prazos manuais e audiências, ajustes pela IA; quando existirem: busca automática de intimações, alertas por WhatsApp, agenda (iCal), relatório do mês, honorários simples |
 | Plus (add-on) | + R$ 49 | — | — | — | Conteúdo para Instagram: 20 posts/mês e calendário |
-| Sociedade (logo após o MVP) | R$ 219 | 100 compartilhadas | Todas | 2 | Tudo do Pro + convite do sócio, responsável por prazo e peça, estilo próprio para cada advogado |
-| Escritório (fase 3) | R$ 99 por advogado (mín. 3) | 50 por advogado | Todas | 3 ou mais | Tudo do Sociedade + perfis e permissões |
+| Sociedade (logo após o MVP) | R$ 219 | 100 compartilhadas | Todas | 2 | Tudo do Pro + etapas por prazo, divisão por área, rede de segurança, filtros da dupla, notas internas, estilo próprio para cada advogado |
 | Cliente Fundador (6 vagas, só DF) | R$ 79 | 50 | Todas | 1 | Recursos do Pro; 15 dias grátis com até 15 peças, sem cartão; preço mantido enquanto a assinatura estiver ativa |
 
 Regras:
-- **Teste grátis:** 7 dias, com limite de 5 peças, sem cartão.
+- **Teste grátis:** 7 dias, com limite de 5 peças, sem cartão e com os recursos do Pro. No fim, o advogado escolhe o plano.
+- **Funções do Pro no Start:** continuam visíveis, com selo "Pro" e link para o plano. Alertas, prazo fatal e prazo interno nunca são limitados por plano.
 - **Resumo e análise de intimações:** ilimitados em todos os planos (custo de IA quase zero).
 - **Contagem de peça:** cada geração de rascunho conta 1 peça. Até 3 ajustes pela IA na mesma peça não contam. A partir do 4º ajuste, conta como nova peça.
-- **Pacote extra:** 10 peças por R$ 19, válido no mês da compra.
+- **Pacote extra:** 10 peças por R$ 29 no Start e R$ 19 nos demais planos, válido no mês da compra.
 - **Limite atingido:** o sistema avisa ao chegar em 80% e bloqueia novas gerações em 100%, oferecendo o pacote extra ou o upgrade. Análise de intimações e prazos continuam funcionando.
 - **Inadimplência:** 5 dias de tolerância. Depois, a conta fica só leitura (o advogado vê prazos e baixa peças, mas não gera novas). Os dados nunca são apagados por inadimplência antes de 90 dias.
 - **Cancelamento:** o acesso vai até o fim do período pago. O advogado pode exportar todas as peças antes de sair.
@@ -119,11 +119,17 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 
 ## Plano Sociedade
 
-- Dois advogados no mesmo escritório. O dono convida o sócio por e-mail.
-- Os dois veem todos os processos, prazos e peças e têm as mesmas permissões.
-- Cada prazo e cada peça tem um responsável. O painel tem o filtro "Meus prazos" e "Todos".
-- Cada advogado tem o seu próprio perfil de estilo.
-- As 100 peças do mês são compartilhadas.
+- Exatamente 2 advogados, cada um com login e OAB próprios. Por enquanto não existe terceiro advogado nem vaga avulsa. Detalhes em `17-planos-e-sociedade.md`.
+- **Titular:** paga e cuida de plano, cancelamento e remoção, e pode transferir essa função ao sócio. No dia a dia, os dois operam igual e veem todos os processos, prazos e peças.
+- **Etapas:** cada prazo tem Elaborar, Revisar (opcional) e Protocolar, cada uma com responsável. Ao concluir uma etapa, o próximo é avisado.
+- **Divisão por área:** a dupla define um responsável por área, e cada intimação nova chega com a sugestão. Sem dono, o prazo fica em "Sem responsável", em destaque para os dois.
+- **Rede de segurança:** passou do prazo interno sem rascunho, o responsável é avisado. Na véspera do fatal, ainda aberto, os dois são avisados.
+- **Filtros:** "Meus", "Do sócio", "Sem responsável" e "Todos".
+- **Estilo:** cada advogado tem o próprio perfil. O rascunho usa o estilo de quem elabora, e trocar depois conta como nova peça.
+- **Peças:** as 100 do mês são compartilhadas, sem cota individual, e os dois recebem o aviso de 80%.
+- **Saída ou separação:** antes de remover alguém, os prazos abertos precisam ser transferidos. Na separação, cada um exporta os processos em que é responsável e o titular fica com a conta. **Pendente de revisão jurídica.**
+- **Inadimplência:** vale para os dois, e o sócio também é avisado antes de a conta ficar só leitura.
+- **Mudança de plano:** de Pro para Sociedade, cobrança proporcional. Para voltar ao Pro, é preciso remover o sócio, e o limite cai para 50 peças no ciclo seguinte. O Cliente Fundador que mudar perde o preço de fundador.
 - O programa Cliente Fundador é individual: 1 advogado por vaga. O plano Sociedade não entra no beta.
 
 ## Indicar a Tesia

@@ -70,8 +70,14 @@ export const faturasExemplo = [
 ];
 
 export const planosEscolhaExemplo = [
-  { id: "start", nome: "Start", preco: "R$ 79/mês", resumo: "15 peças por mês e 1 área" },
+  { id: "start", nome: "Start", preco: "R$ 79/mês", resumo: "10 peças por mês e 1 área" },
   { id: "pro", nome: "Pro", preco: "R$ 129/mês", resumo: "50 peças por mês e todas as áreas" },
+  {
+    id: "sociedade",
+    nome: "Sociedade",
+    preco: "R$ 219/mês",
+    resumo: "2 advogados e 100 peças compartilhadas",
+  },
 ];
 
 export const exemploPlanoSchema = z

@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { AvisoPro } from "@/components/plano/aviso-pro";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,9 +36,7 @@ const todasAbas = Object.keys(ABAS_CONFIGURACOES) as AbaConfiguracoes[];
 export function TelaConfiguracoes({ abaInicial }: { abaInicial: AbaConfiguracoes }) {
   const { id, plano } = usePlanoDemo();
   const [abaEscolhida, setAba] = useState(abaInicial);
-  const abas = todasAbas.filter(
-    (chave) => (chave !== "equipe" || plano.equipe) && (chave !== "agenda" || plano.recursosPro),
-  );
+  const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);
   const aba = abas.includes(abaEscolhida) ? abaEscolhida : "perfil";
 
   function trocarAba(valor: string) {
@@ -75,7 +74,16 @@ export function TelaConfiguracoes({ abaInicial }: { abaInicial: AbaConfiguracoes
             forceMount
             className="data-[state=inactive]:hidden"
           >
-            {chave === "perfil" ? <AbaPerfil key={id} /> : conteudos[chave]}
+            {chave === "perfil" ? (
+              <AbaPerfil key={id} />
+            ) : chave === "agenda" && !plano.recursosPro ? (
+              <AvisoPro
+                titulo="Agenda no celular"
+                descricao="Veja prazos e audiências no Google Agenda, Apple Calendário ou Outlook."
+              />
+            ) : (
+              conteudos[chave]
+            )}
           </TabsContent>
         ))}
       </Tabs>
