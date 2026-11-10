@@ -10,6 +10,9 @@ Regra: **só avançar de fase quando a anterior tiver clientes pagando.**
 
 ## Fase 1 — MVP (35 dias, ver `14-cronograma-35-dias.md`)
 Objetivo: beta com os clientes fundadores.
+
+Aqui, um item só é marcado quando funciona com dados reais. O andamento das telas com dados de exemplo fica em `14-cronograma-35-dias.md`.
+
 - [ ] Monorepo (web, worker, packages)
 - [ ] Cadastro, login, escolha de áreas
 - [ ] Upload de peças antigas e perfil de estilo
