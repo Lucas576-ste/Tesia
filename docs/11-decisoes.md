@@ -69,6 +69,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | Login obrigatório em `/app` e `/onboarding`, inclusive na Vercel; a demonstração aberta acaba | Decisão de Lucas; o produto passa a ter contas reais |
 | 2026-11-10 | Escritório, usuário dono e teste de 7 dias no Pro criados por gatilho no cadastro | Fica tudo na mesma transação e o app não precisa da chave secreta |
 | 2026-11-10 | Cadastro mostra "7 dias grátis com os recursos do Pro", no lugar de "Programa fundador: 15 dias" | Segue `05-regras-de-negocio.md`; os 15 dias do fundador são combinados na venda pessoal |
+| 2026-11-10 | Fila própria no Postgres (tabela `fila`, gatilho e `SKIP LOCKED`) no lugar do pg-boss | O job nasce na mesma transação da intimação e o app na Vercel não precisa de conexão direta ao banco |
+| 2026-11-10 | PDF enviado direto do navegador ao Storage, na pasta do escritório | Evita o limite de tamanho das funções da Vercel; o RLS do Storage impede pasta alheia |
 
 ## Pendências
 

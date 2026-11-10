@@ -115,6 +115,51 @@ values (current_setting('teste.esc_a')::uuid, '00000000-0000-0000-0000-000000000
 insert into feriados (data, nome, abrangencia, escritorio_id)
 values ('2026-12-02', 'Feriado só do escritório A', 'municipal', current_setting('teste.esc_a')::uuid);
 
+insert into storage.objects (bucket_id, name)
+select 'intimacoes', current_setting('teste.esc_a') || '/intimacao.pdf';
+
+do $$
+begin
+  insert into storage.objects (bucket_id, name)
+  values ('intimacoes', current_setting('teste.esc_b') || '/invasao.pdf');
+  raise exception 'A não pode enviar arquivo na pasta de B';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
+do $$
+begin
+  insert into storage.objects (bucket_id, name) values ('intimacoes', 'sem-pasta.pdf');
+  raise exception 'Arquivo fora de pasta deveria ser recusado';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
+insert into intimacoes (escritorio_id, arquivo_path)
+values (current_setting('teste.esc_a')::uuid, current_setting('teste.esc_a') || '/intimacao.pdf');
+
+do $$
+begin
+  insert into intimacoes (escritorio_id, arquivo_path)
+  values (current_setting('teste.esc_a')::uuid, current_setting('teste.esc_b') || '/x.pdf');
+  raise exception 'Intimação não pode apontar para arquivo de outro escritório';
+exception
+  when check_violation then null;
+end;
+$$;
+
+do $$
+begin
+  assert (select count(*) from storage.objects) = 1, 'A deveria ver só o próprio arquivo';
+  perform 1 from fila;
+  raise exception 'Usuário logado não pode ler a fila';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
 select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
 
 do $$
@@ -138,5 +183,23 @@ begin
 end;
 $$;
 
+do $$
+begin
+  perform 1 from fila;
+  raise exception 'Anônimo não pode ler a fila';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
 reset role;
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'analisar_intimacao' and status = 'pendente'
+    and escritorio_id = current_setting('teste.esc_a')::uuid) = 1,
+    'Intimação nova deveria criar um job na fila';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

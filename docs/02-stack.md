@@ -12,7 +12,7 @@ Linguagem principal: **TypeScript de ponta a ponta**. A escala e a estabilidade 
 | Worker | Node.js (TypeScript) | Processa OCR, IA e geração de documentos fora da requisição |
 | Banco | PostgreSQL no Supabase (região São Paulo) | Confiável, RLS para isolar dados, dados no Brasil |
 | Vetores (RAG) | pgvector | Busca das peças parecidas do advogado sem outro banco |
-| Fila | Fila no Postgres (pg-boss ou fila do Supabase) | Um serviço a menos no MVP. Redis + BullMQ quando o volume pedir |
+| Fila | Tabela `fila` no Postgres, alimentada por gatilho e consumida pelo worker com `FOR UPDATE SKIP LOCKED` | Um serviço a menos no MVP e job criado na mesma transação da intimação. Redis + BullMQ quando o volume pedir |
 | Arquivos | Supabase Storage (criptografado) | PDFs e peças dos clientes |
 | Autenticação | Supabase Auth | Já usado no projeto de conteúdo |
 | Validação | zod | Tipos e validação compartilhados entre front, API e worker |

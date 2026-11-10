@@ -260,5 +260,11 @@ Foto do mês fechado, gerada por job no dia 1: `escritorio_id`, `competencia`, `
 
 ## Auditoria
 
+### fila
+`escritorio_id`, `tipo` (ex.: `analisar_intimacao`), `dados` (jsonb), `status` (`pendente`, `executando`, `concluida`, `falhou`), `tentativas`, `max_tentativas`, `disponivel_em`, `iniciado_em`, `concluido_em`, `erro`. RLS ligado e sem acesso para usuários: só o worker usa. Intimação nova com status `recebida` cria o job por gatilho.
+
+### Storage
+Bucket privado `intimacoes`, até 20 MB, só PDF. Caminho `escritorio_id/uuid.pdf`; o usuário só envia e lê na pasta do próprio escritório, e `intimacoes.arquivo_path` precisa estar nessa pasta.
+
 ### auditoria
 `escritorio_id`, `usuario_id`, `acao` (ex.: `peca.download`, `prazo.confirmado`, `prazo.interno_alterado`), `entidade`, `entidade_id`, `ip`, `criado_em`.

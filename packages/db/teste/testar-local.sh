@@ -29,6 +29,6 @@ aplicar
 echo "Migrations e seeds aplicados (seeds rodados duas vezes)"
 rodar -f teste/rls.sql
 
-rodar -c "drop schema public cascade; drop schema auth cascade; drop role anon, authenticated, service_role; create schema public;"
+rodar -c "drop schema public cascade; drop schema auth cascade; drop schema storage cascade; drop role anon, authenticated, service_role; create schema public;"
 aplicar
 echo "Migrations aplicadas de novo do zero"

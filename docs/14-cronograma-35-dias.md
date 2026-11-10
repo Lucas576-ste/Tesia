@@ -150,11 +150,13 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito antes, em 2026-11-10:** os Dias 15 e 16 foram adiantados porque não dependem de contas externas. Os calendários dos tribunais do DF entram com os seeds do Dia 14, e as regras ainda passam pela revisão do advogado.
 
-### Dia 17 — Upload e fila
+### Dia 17 — Upload e fila ✅
 - Upload real para o storage, registro da intimação
 - Fila no Postgres (pg-boss) e worker básico
 
 **Pronto quando:** enviar um PDF cria um job que o worker processa.
+
+**Feito em 2026-11-10:** fila própria no Postgres no lugar do pg-boss, testada ponta a ponta com o Supabase real. Por enquanto o worker confere o arquivo e deixa a intimação em `processando`; a leitura entra no Dia 18.
 
 ### Dia 18 — Leitura do documento e cliente de IA
 - Extração de texto do PDF, com leitura pelo Claude quando vier vazio

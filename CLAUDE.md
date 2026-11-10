@@ -53,3 +53,4 @@ Rodar na raiz:
 - `pnpm --filter @tesia/db test:local`: aplica migrations e seeds num Postgres local (Docker) e testa o RLS
 - `pnpm format`: formata com o Prettier
 - `pnpm --filter @tesia/web dev`: sobe só um app (troque pelo pacote desejado)
+- `pnpm --filter @tesia/worker dev`: sobe o worker, que lê o `.env.local` da raiz e consome a tabela `fila`

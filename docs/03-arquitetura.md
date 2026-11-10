@@ -27,7 +27,7 @@
 ## Fluxo de uma intimação
 
 1. O advogado envia o PDF pela web.
-2. A API salva o arquivo no storage, cria o registro da intimação com status `recebida` e coloca um job na fila.
+2. O navegador envia o PDF direto ao bucket privado `intimacoes`, na pasta do escritório. A API grava a intimação com status `recebida`, e um gatilho no banco cria o job na tabela `fila`, na mesma transação.
 3. O worker pega o job:
    1. Extrai o texto do PDF. Se vier vazio, usa OCR.
    2. Chama a IA de extração (Haiku) e recebe um JSON com partes, ato, datas e resultado.
@@ -44,7 +44,8 @@
 - Chamadas de IA e OCR levam de segundos a minutos. Elas não podem rodar dentro da requisição HTTP.
 - Se muitos usuários enviarem ao mesmo tempo, os jobs esperam na fila e nada cai.
 - Para ganhar velocidade, basta subir mais workers.
-- Jobs que falham são tentados de novo automaticamente (com limite de tentativas).
+- Jobs que falham são tentados de novo automaticamente, com espera crescente e até 3 tentativas. Erros definitivos (arquivo que não é PDF) falham na hora e marcam a intimação como `erro`.
+- Jobs presos em `executando` há mais de 10 minutos voltam para a fila.
 
 ## Isolamento de dados (multi-tenant)
 
