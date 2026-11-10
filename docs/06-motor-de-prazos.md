@@ -82,10 +82,19 @@ Vencimento: 18/11/2026
 ## Pacote `packages/prazos`
 
 - Código puro, sem acesso a banco. Recebe regra, data e calendário e devolve vencimento e memória de cálculo.
-- Interface sugerida:
-  - `calcularPrazo({ dataDisponibilizacao, dias, contagem, calendario, regrasSuspensao })`
-  - `proximoDiaUtil(data, calendario)`
-  - `feriadosNacionais(ano)`
+- Interface (implementada em 2026-11-10, com testes em `src/*.test.ts`):
+  - `criarCalendario({ feriados, suspensoes, recessoCivil })`: feriados nacionais por algoritmo, mais feriados e suspensões do tribunal, do estado, do município e do escritório. `recessoCivil` liga o recesso de 20/12 a 20/01 e fica desligado no penal.
+  - `calcularPrazo({ dataDisponibilizacao, dias, contagem, fundamento }, calendario)`: devolve publicação, início, vencimento e memória de cálculo.
+  - `calcularPrazoInterno({ fatal, hoje, calendario, diasUteis })`
+  - `proximoDiaUtil(data, calendario)`, `ehDiaUtil(data, calendario)`, `feriadosNacionais(ano)` e `pascoa(ano)`
+- Datas sempre no formato `AAAA-MM-DD`, calculadas em UTC.
+- Nos dias corridos, o início da contagem também é o primeiro dia útil após a publicação (Súmula 310 do STF), e o vencimento em dia sem expediente é prorrogado.
+
+### Para o advogado revisor
+- Carnaval (segunda e terça) e Corpus Christi entram como dias sem expediente, marcados como `forense`. Não são feriados nacionais por lei, mas os tribunais costumam suspender o expediente.
+- O recesso de 20/12 a 20/01 também adia a publicação e o início da contagem, não só o curso do prazo.
+- Prazo em dobro, intimação pelo sistema do tribunal e indisponibilidade ainda não estão no motor.
+
 - **Cobertura de testes alta**, com casos reais validados por advogados: virada de ano, recesso, feriados móveis, vencimento em sexta antes de feriado, mudança de mês.
 
 ## Riscos

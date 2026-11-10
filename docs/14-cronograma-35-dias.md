@@ -25,9 +25,9 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Dia 0 — Preparação (antes de começar, ~1 h)
 
-- [ ] Repositório no GitHub
+- [x] Repositório no GitHub
 - [ ] Conta no Supabase (projeto na região São Paulo)
-- [ ] Conta na Vercel
+- [x] Conta na Vercel
 - [ ] Chave da API do Claude
 - [ ] Conta no provedor de embeddings (Voyage ou OpenAI)
 - [ ] Conta no Resend e domínio
@@ -38,7 +38,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Semana 1 — Fundação e telas (dias 1 a 7)
 
-### Dia 1 — Monorepo e base
+### Dia 1 — Monorepo e base ✅
 - Criar o monorepo com Turborepo + pnpm (`apps/web`, `apps/worker`, `packages/*`)
 - Next.js + Tailwind + biblioteca de componentes (ex.: shadcn/ui)
 - Cores, fontes e tokens visuais iguais ao protótipo
@@ -46,36 +46,36 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Pronto quando:** a página inicial abre no link da Vercel.
 
-### Dia 2 — Layout do aplicativo e componentes
+### Dia 2 — Layout do aplicativo e componentes ✅
 - Menu lateral (com Indicar a Tesia), barra superior com botão "+ Adicionar" e menu, faixa de alerta de prazo, botão de ajuda flutuante
 - Componentes: botão, card, tabela, selo de status, área de upload, modal, toast
 - Estados de carregando, vazio e erro
 
 **Pronto quando:** uma página de exemplo mostra todos os componentes.
 
-### Dia 3 — Telas públicas
+### Dia 3 — Telas públicas ✅
 - Landing simples, login, cadastro, recuperar senha, termos e privacidade (texto provisório)
 
 **Pronto quando:** dá para navegar entre as telas públicas.
 
-### Dia 4 — Onboarding
+### Dia 4 — Onboarding ✅
 - Dados profissionais, ensinar o estilo, modelo de documento, barra de progresso
 - Dados de exemplo (sem backend)
 
 **Pronto quando:** o fluxo de primeiro acesso é navegável do início ao fim.
 
-### Dia 5 — Painel de prazos
+### Dia 5 — Painel de prazos ✅
 - Contadores compactos e clicáveis, alternância Lista | Quadro, tabela de prazos, filtros, estado vazio, faixa de prazo crítico
 
 **Pronto quando:** o painel fica igual ao protótipo, com dados de exemplo.
 
-### Dia 6 — Nova intimação e análise
+### Dia 6 — Nova intimação e análise ✅
 - Upload com etapas de progresso
 - Tela de análise: resumo, pontos atacáveis, prazo com memória de cálculo, peça sugerida, PDF ao lado
 
 **Pronto quando:** o fluxo upload → análise é navegável.
 
-### Dia 7 — Editor da peça
+### Dia 7 — Editor da peça ✅
 - Editor de texto (ex.: TipTap) com pendências destacadas
 - Painel lateral: pendências, fontes, campo de ajuste
 - Botões de baixar e marcar como protocolado
@@ -86,26 +86,28 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Semana 2 — Telas restantes, validação e banco (dias 8 a 14)
 
-### Dia 8 — Processos e peças
+### Dia 8 — Processos e peças ✅
 - Lista de processos, detalhe do processo com linha do tempo, lista de peças
 
-### Dia 9 — Conta
+### Dia 9 — Conta ✅
 - Meu estilo, configurações (abas), plano e uso
 - Modais: limite atingido, fim do teste grátis, prazo editado, novo prazo manual
 - Tela Indicar a Tesia (simples)
 
 **Pronto quando:** todas as 20 telas do MVP estão navegáveis com dados de exemplo.
 
-### Dia 10 — Teste manual do prompt (validação da IA)
+### Dia 10 — Mostrar as telas a advogados
+- Mostrar o app navegável para 2 ou 3 advogados, incluindo pelo menos uma dupla (roteiro em `18-roteiro-advogados.md`)
+- Anotar o que confunde e o que falta
+- Ajustes rápidos de UI
+
+**Por que aqui:** as telas já estão prontas, e corrigir antes do banco é mais barato.
+
+### Dia 11 — Teste manual do prompt (validação da IA)
 - Com as peças e intimações reais separadas no dia 0, testar no Claude os prompts de perfil de estilo, extração e geração (ver `07-ia-e-prompts.md`)
 - Anotar o que funcionou e ajustar os prompts
 
 **Por que aqui:** a qualidade do rascunho é o maior risco do produto. Descobrir agora custa 2 horas; descobrir no dia 30 custa o projeto.
-
-### Dia 11 — Mostrar as telas a advogados
-- Mostrar o app navegável para 2 ou 3 advogados
-- Anotar o que confunde e o que falta
-- Ajustes rápidos de UI
 
 ### Dia 12 — Banco de dados
 - Projeto Supabase (São Paulo)
@@ -127,11 +129,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Semana 3 — Motor de prazos e análise da intimação (dias 15 a 21)
 
-### Dia 15 — Motor de prazos (parte 1)
+### Dia 15 — Motor de prazos (parte 1) ✅
 - `packages/prazos`: feriados nacionais (fixos e móveis), dias úteis, próximo dia útil
 - Testes
 
-### Dia 16 — Motor de prazos (parte 2)
+### Dia 16 — Motor de prazos (parte 2) ✅
 - Disponibilização → publicação → início da contagem
 - Dias úteis e corridos, suspensão de 20/12 a 20/01, feriados do tribunal e do escritório
 - Memória de cálculo
@@ -139,6 +141,8 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Testes com casos reais (virada de ano, feriado móvel, fim de mês)
 
 **Pronto quando:** todos os testes passam.
+
+**Feito antes, em 2026-11-10:** os Dias 15 e 16 foram adiantados porque não dependem de contas externas. Os calendários dos tribunais do DF entram com os seeds do Dia 14, e as regras ainda passam pela revisão do advogado.
 
 ### Dia 17 — Upload e fila
 - Upload real para o storage, registro da intimação
@@ -254,10 +258,12 @@ Detalhes de cada item em `08-roadmap.md` (fase 1.5).
 
 ## Acompanhamento
 
+Dias com ✅ estão concluídos. Até o Dia 9, isso significa telas navegáveis com dados de exemplo, sem backend.
+
 | Semana | Entrega principal | Status |
 |---|---|---|
-| 1 | Telas principais navegáveis | |
-| 2 | Todas as telas + validação da IA + banco e login | |
+| 1 | Telas principais navegáveis | Concluída, com dados de exemplo |
+| 2 | Todas as telas + validação da IA + banco e login | Em andamento: telas prontas; próximo é o Dia 10 |
 | 3 | Intimação real vira prazo confirmado | |
 | 4 | Rascunho no estilo do advogado em .docx | |
 | 5 | Beta em produção com os primeiros fundadores | |

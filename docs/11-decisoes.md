@@ -58,6 +58,10 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-07 | Sem limite de estilo por plano | Poderia piorar a primeira impressão do rascunho |
 | 2026-11-07 | Máximo de 2 advogados por enquanto; plano Escritório suspenso | Foco no solo e em duplas |
 | 2026-11-07 | Sociedade com etapas por prazo, divisão por área e rede de segurança, sem kanban de tarefas | Uma dupla precisa combinar quem faz o quê sem deixar nada cair entre os dois |
+| 2026-11-07 | Dias 10 e 11 trocados: primeiro mostrar as telas a advogados, depois testar os prompts | As telas estão prontas e os ajustes de UI vêm antes do banco |
+| 2026-11-10 | Motor de prazos (Dias 15 e 16) adiantado, com testes em vitest | Não depende de contas externas e é a parte de maior risco jurídico |
+| 2026-11-10 | Carnaval e Corpus Christi tratados como dias sem expediente forense, marcados como `forense` | Não são feriados nacionais por lei, mas os tribunais costumam suspender; vai para revisão do advogado |
+| 2026-11-10 | Recesso de 20/12 a 20/01 também adia publicação e início da contagem | Interpretação usual do CPC, art. 220; vai para revisão do advogado |
 
 ## Pendências
 

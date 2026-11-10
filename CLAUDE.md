@@ -48,5 +48,6 @@ Rodar na raiz:
 - `pnpm build`: gera o build de web e worker
 - `pnpm lint`: roda o ESLint
 - `pnpm typecheck`: checa os tipos de todos os pacotes
+- `pnpm test`: roda os testes (hoje, os do motor de prazos)
 - `pnpm format`: formata com o Prettier
 - `pnpm --filter @tesia/web dev`: sobe só um app (troque pelo pacote desejado)
