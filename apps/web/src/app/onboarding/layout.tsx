@@ -19,7 +19,8 @@ export default function OnboardingLayout({ children }: { children: ReactNode }) 
       </div>
       <BarraProgresso />
       <p className="rounded-md bg-atencao-fundo px-3 py-2 text-xs text-atencao">
-        Demonstração: nenhum dado ou arquivo sai do seu navegador.
+        Seus dados profissionais são salvos. O envio de peças e do modelo ainda é demonstração:
+        nenhum arquivo sai do seu navegador.
       </p>
       <main className="flex flex-col gap-5">{children}</main>
     </div>

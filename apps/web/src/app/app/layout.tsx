@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AjudaFlutuante } from "@/components/layout/ajuda-flutuante";
 import { BarraSuperior } from "@/components/layout/barra-superior";
@@ -8,14 +9,17 @@ import { ProvedorPlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { Toaster } from "@/components/ui/sonner";
 import { lerPlanoDemo } from "@/lib/plano-demo";
 import { mostrarSeletorPlano } from "@/lib/planos-exemplo";
+import { exigirUsuario, rotuloOab } from "@/lib/sessao";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
+  const usuario = await exigirUsuario();
+  if (!usuario.oab_numero) redirect("/onboarding/perfil");
   const estado = await lerPlanoDemo();
 
   return (
     <ProvedorPlanoDemo estado={estado}>
       <div className="flex min-h-dvh">
-        <MenuLateral />
+        <MenuLateral conta={{ nome: usuario.nome, oab: rotuloOab(usuario) }} />
         <div className="flex min-w-0 flex-1 flex-col">
           {mostrarSeletorPlano && <SeletorPlanoDemo />}
           <BarraSuperior uso={estado.uso} />

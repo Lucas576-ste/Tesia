@@ -97,6 +97,9 @@ Aplicativo (menu lateral)
 
 ### 5. Login (`/login`) — MVP
 - E-mail e senha, entrar com Google, link para recuperar senha
+- `/app` e `/onboarding` exigem login; quem tenta abrir sem login volta para o mesmo endereço depois de entrar
+- Links de e-mail (confirmação e recuperação) passam por `/auth/callback`; sessão inválida passa por `/auth/sair` e mostra "Sua sessão terminou"
+- "Sair da conta" fica em Configurações
 
 ### 6. Recuperar senha (`/recuperar-senha`) — MVP
 - Envio de link por e-mail e tela de nova senha

@@ -117,11 +117,13 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-10:** migrations, RLS e teste de acesso cruzado passam num Postgres local, e tudo foi aplicado no Supabase (São Paulo).
 
-### Dia 13 — Autenticação
+### Dia 13 — Autenticação ✅
 - Cadastro, login e recuperação com Supabase Auth
 - Criar o escritório e o usuário no cadastro
 - Onboarding salvando OAB, UF e áreas
 - Teste automatizado: um escritório não acessa dados de outro
+
+**Feito em 2026-11-10:** login obrigatório em `/app` e `/onboarding`, escritório criado por gatilho no cadastro e teste no navegador contra o Supabase real (entrar, onboarding salvando no banco, sair, sessão revogada). As telas de dentro do app continuam com dados de exemplo.
 
 ### Dia 14 — Dados de referência ✅
 - Seeds: áreas, tipos de peça do lançamento, regras de prazo, feriados nacionais e tribunais do DF

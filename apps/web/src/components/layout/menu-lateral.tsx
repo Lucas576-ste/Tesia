@@ -4,11 +4,14 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { advogadoExemplo } from "./dados-exemplo";
 import { itemEstaAtivo, itemIndicar, itensMenu } from "./itens-menu";
 import { SimboloTesia } from "./simbolo-tesia";
 
-export function MenuLateral() {
+type MenuLateralProps = {
+  conta: { nome: string; oab: string };
+};
+
+export function MenuLateral({ conta }: MenuLateralProps) {
   const caminho = usePathname();
 
   return (
@@ -45,8 +48,8 @@ export function MenuLateral() {
         className="flex items-center gap-2 border-t border-menu-ativo px-5 py-4 transition-colors outline-none hover:bg-menu-ativo focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-inset"
       >
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{advogadoExemplo.nome}</span>
-          <span className="block truncate text-xs text-menu-texto">{advogadoExemplo.oab}</span>
+          <span className="block truncate text-sm font-medium">{conta.nome}</span>
+          <span className="block truncate text-xs text-menu-texto">{conta.oab}</span>
         </span>
         <ChevronRight aria-hidden className="size-4 shrink-0 text-menu-texto" />
         <span className="sr-only">Abrir conta</span>

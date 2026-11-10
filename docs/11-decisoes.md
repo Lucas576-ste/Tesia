@@ -66,6 +66,9 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | Embedding com 1024 dimensões | Funciona com Voyage e OpenAI; o provedor ainda não foi escolhido |
 | 2026-11-10 | Regras de prazo entram inativas e só são ativadas com revisão registrada | Nenhuma regra é usada sem conferência de um advogado |
 | 2026-11-10 | Assinatura, uso e auditoria são só leitura para o usuário; a escrita é feita pelo servidor | O cliente não pode alterar o próprio plano nem o próprio consumo |
+| 2026-11-10 | Login obrigatório em `/app` e `/onboarding`, inclusive na Vercel; a demonstração aberta acaba | Decisão de Lucas; o produto passa a ter contas reais |
+| 2026-11-10 | Escritório, usuário dono e teste de 7 dias no Pro criados por gatilho no cadastro | Fica tudo na mesma transação e o app não precisa da chave secreta |
+| 2026-11-10 | Cadastro mostra "7 dias grátis com os recursos do Pro", no lugar de "Programa fundador: 15 dias" | Segue `05-regras-de-negocio.md`; os 15 dias do fundador são combinados na venda pessoal |
 
 ## Pendências
 

@@ -51,6 +51,9 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | whatsapp | text | para alertas |
 | modelo_docx_path | text | modelo .docx com timbrado do advogado |
 | calendario_token | text | token secreto do link de agenda (iCal); pode ser renovado |
+| termos_aceitos_em | timestamptz | quando aceitou os termos e a política no cadastro |
+
+O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cria o escritório, o usuário dono e a assinatura em teste de 7 dias no Pro.
 
 ### clientes
 | Campo | Tipo | Observação |

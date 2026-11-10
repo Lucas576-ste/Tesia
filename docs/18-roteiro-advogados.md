@@ -7,6 +7,7 @@
 ## Antes da conversa
 
 - Suba o projeto no computador (`pnpm --filter @tesia/web dev`). O seletor de plano só funciona assim.
+- O app exige login. Entre antes com a sua conta (ou uma conta de teste já com o onboarding feito), para não gastar a conversa no cadastro.
 - Deixe abertos os links: `/app?plano=start`, `/app?plano=pro` e `/app?plano=sociedade`, em `http://localhost:3000`.
 - Avise que os dados são de exemplo e que a IA ainda não está ligada.
 - Peça para gravar ou anote as frases exatas.

@@ -27,10 +27,11 @@ import { GrupoOpcoes } from "./grupo-opcoes";
 
 type FormularioPerfilProps = {
   comNome?: boolean;
-  valoresIniciais?: Perfil;
+  valoresIniciais?: Partial<Perfil>;
   rotuloBotao?: string;
   maxAreas?: number | null;
   aoSalvar?: () => void;
+  salvar?: (perfil: Perfil) => Promise<{ erro?: string }>;
 };
 
 export function FormularioPerfil({
@@ -39,11 +40,12 @@ export function FormularioPerfil({
   rotuloBotao = "Continuar",
   maxAreas = null,
   aoSalvar,
+  salvar,
 }: FormularioPerfilProps) {
   const router = useRouter();
   const form = useForm<Perfil>({
     resolver: zodResolver(perfilSchema),
-    defaultValues: valoresIniciais ?? { oab: "", areas: [], tribunais: [], whatsapp: "" },
+    defaultValues: { oab: "", areas: [], tribunais: [], whatsapp: "", ...valoresIniciais },
   });
   const uf = useWatch({ control: form.control, name: "uf" });
   const tribunais = useWatch({ control: form.control, name: "tribunais" });
@@ -51,11 +53,18 @@ export function FormularioPerfil({
   const excedeAreas = maxAreas !== null && areas.length > maxAreas;
   const foraDoDf = (uf && uf !== "DF") || tribunais?.includes(OUTRO_TRIBUNAL);
 
-  function enviar({ nome }: Perfil) {
+  async function enviar(perfil: Perfil) {
     if (excedeAreas) return;
-    if (comNome && (nome ?? "").length < 2) {
+    if (comNome && (perfil.nome ?? "").length < 2) {
       form.setError("nome", { message: "Informe seu nome." });
       return;
+    }
+    if (salvar) {
+      const { erro } = await salvar(perfil);
+      if (erro) {
+        form.setError("root", { message: erro });
+        return;
+      }
     }
     if (aoSalvar) aoSalvar();
     else router.push("/onboarding/estilo");
@@ -170,7 +179,16 @@ export function FormularioPerfil({
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full sm:w-auto sm:self-end">
+        {form.formState.errors.root && (
+          <p role="alert" className="rounded-md bg-erro-fundo px-3 py-2 text-sm text-erro">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          className="w-full sm:w-auto sm:self-end"
+        >
           {rotuloBotao}
         </Button>
       </form>
