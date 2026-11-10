@@ -109,11 +109,13 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Por que aqui:** a qualidade do rascunho é o maior risco do produto. Descobrir agora custa 2 horas; descobrir no dia 30 custa o projeto.
 
-### Dia 12 — Banco de dados
+### Dia 12 — Banco de dados ✅
 - Projeto Supabase (São Paulo)
 - Migrations das tabelas principais (ver `04-modelo-de-dados.md`): escritórios, usuários, processos, intimações, prazos, peças, estilo, referências, uso
 - RLS em todas as tabelas com `escritorio_id`
 - Já incluir os campos de prazo manual (`origem`, `tipo`, `hora`), `data_prazo_interno` e `responsavel_id` em prazos, `responsavel_id` em peças e `calendario_token` em usuários, para não precisar migrar depois
+
+**Feito em 2026-11-10:** migrations, RLS e teste de acesso cruzado passam num Postgres local, e tudo foi aplicado no Supabase (São Paulo).
 
 ### Dia 13 — Autenticação
 - Cadastro, login e recuperação com Supabase Auth
@@ -121,9 +123,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Onboarding salvando OAB, UF e áreas
 - Teste automatizado: um escritório não acessa dados de outro
 
-### Dia 14 — Dados de referência
+### Dia 14 — Dados de referência ✅
 - Seeds: áreas, tipos de peça do lançamento, regras de prazo, feriados nacionais e tribunais do DF
 - Enviar a lista de regras de prazo para revisão de um advogado
+
+**Feito localmente em 2026-11-10:** seeds prontos, com as regras inativas até a revisão. O TJDFT fica sem feriados próprios até alguém levantar a portaria anual.
 
 ---
 

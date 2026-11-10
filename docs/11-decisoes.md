@@ -62,6 +62,10 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | Motor de prazos (Dias 15 e 16) adiantado, com testes em vitest | Não depende de contas externas e é a parte de maior risco jurídico |
 | 2026-11-10 | Carnaval e Corpus Christi tratados como dias sem expediente forense, marcados como `forense` | Não são feriados nacionais por lei, mas os tribunais costumam suspender; vai para revisão do advogado |
 | 2026-11-10 | Recesso de 20/12 a 20/01 também adia publicação e início da contagem | Interpretação usual do CPC, art. 220; vai para revisão do advogado |
+| 2026-11-10 | Banco (Dia 12) e dados de referência (Dia 14) testados num Postgres local com pgvector e aplicados no Supabase | O teste local de RLS roda sem tocar no banco real |
+| 2026-11-10 | Embedding com 1024 dimensões | Funciona com Voyage e OpenAI; o provedor ainda não foi escolhido |
+| 2026-11-10 | Regras de prazo entram inativas e só são ativadas com revisão registrada | Nenhuma regra é usada sem conferência de um advogado |
+| 2026-11-10 | Assinatura, uso e auditoria são só leitura para o usuário; a escrita é feita pelo servidor | O cliente não pode alterar o próprio plano nem o próprio consumo |
 
 ## Pendências
 
@@ -78,6 +82,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Levantar calendários de feriados e suspensões dos tribunais do DF | Lucas | Antes do dia 15 |
 | Revisão dos textos legais por advogado | Lucas | Antes do lançamento |
 | Validar com advogados as regras especiais de prazo (prazo em dobro, intimação pelo sistema) | Lucas | Antes do dia 15 |
+| Enviar `packages/db/seeds/03_regras_prazo.sql` e `04_feriados_df.sql` ao advogado revisor. Perguntas: incluir recurso inominado no cível/consumidor (JEC) e apelação em família? O prazo de manifestação sobre laudo no JEF é o do CPC? | Lucas | Antes de ativar as regras |
 | Validar com 2 ou 3 duplas o preço de R$ 219, as etapas e o alerta ao sócio | Lucas | Antes do plano Sociedade |
 | Validar com advogados os limites do Start (10 peças) | Lucas | Antes de abrir o Start |
 | Revisão jurídica da separação da dupla (sigilo e dados de clientes) | Lucas | Antes do plano Sociedade |

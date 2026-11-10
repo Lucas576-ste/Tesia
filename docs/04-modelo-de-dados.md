@@ -5,6 +5,8 @@ Princípios:
 - Todas as tabelas têm `id` (uuid), `criado_em` e `atualizado_em`.
 - RLS ativo em todas as tabelas com `escritorio_id`.
 - Exclusão lógica (`excluido_em`) para processos, peças e intimações.
+- Chaves estrangeiras entre tabelas de negócio incluem o `escritorio_id`, para que nenhum registro aponte para outro escritório.
+- Migrations em `packages/db/migrations`, seeds em `packages/db/seeds` e teste local de RLS com `pnpm --filter @tesia/db test:local`.
 
 ## Diagrama de relacionamentos
 
@@ -110,6 +112,7 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | contagem | enum | `uteis`, `corridos` |
 | data_inicio | date | |
 | data_vencimento | date | prazo fatal |
+| data_vencimento_sugerida | date | data calculada pelo motor, guardada quando o advogado edita o fatal |
 | data_prazo_interno | date | opcional; vazio em audiências e compromissos |
 | memoria_calculo | jsonb | passo a passo exibido ao advogado |
 | confirmado_por | uuid | usuário que confirmou |
@@ -156,7 +159,7 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 | escritorio_id | uuid | |
 | secao | text | ex.: `sintese_fatos`, `merito`, `pedidos` |
 | texto | text | |
-| embedding | vector | dimensão conforme o modelo de embedding escolhido |
+| embedding | vector(1024) | 1024 serve para Voyage e OpenAI (com o parâmetro de dimensões) |
 
 ### perfis_estilo
 | Campo | Tipo | Observação |
@@ -193,6 +196,9 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 | contagem | enum | `uteis`, `corridos` |
 | fundamento | text | artigo de lei exibido na memória de cálculo |
 | prioridade | int | desempate entre regras |
+| ativa | bool | começa `false`; só vira `true` depois da revisão por advogado |
+| revisada_por | text | nome e OAB de quem revisou |
+| revisada_em | timestamptz | obrigatório para ativar |
 
 ### feriados
 | Campo | Tipo | Observação |

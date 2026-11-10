@@ -1,0 +1,26 @@
+insert into regras_prazo (area, rito, tipo_ato, tipo_peca_codigo, dias, contagem, fundamento, prioridade) values
+  ('civel', 'comum', 'citacao', 'contestacao', 15, 'uteis', 'CPC, art. 335', 1),
+  ('civel', 'comum', 'contestacao', 'replica', 15, 'uteis', 'CPC, arts. 350 e 351', 1),
+  ('civel', 'comum', 'sentenca', 'apelacao', 15, 'uteis', 'CPC, art. 1.003, §5º', 1),
+  ('civel', 'comum', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'CPC, art. 1.023', 2),
+  ('civel', 'comum', 'decisao_interlocutoria', 'embargos_declaracao', 5, 'uteis', 'CPC, art. 1.023', 2),
+  ('civel', 'comum', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º', 3),
+  ('civel', 'jec', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'Lei 9.099/1995, arts. 12-A e 49', 2),
+  ('civel', 'jec', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º, c/c Lei 9.099/1995, art. 12-A', 3),
+  ('trabalhista', 'trabalhista', 'sentenca', 'recurso_ordinario', 8, 'uteis', 'CLT, arts. 775 e 895, I', 1),
+  ('trabalhista', 'trabalhista', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'CLT, art. 897-A', 2),
+  ('trabalhista', 'trabalhista', 'calculos', 'manifestacao_calculos', 8, 'uteis', 'CLT, art. 879, §2º', 1),
+  ('trabalhista', 'trabalhista', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º, c/c CLT, art. 769', 3),
+  ('previdenciario', 'jef', 'sentenca', 'recurso_inominado', 10, 'uteis', 'Lei 9.099/1995, arts. 12-A e 42, c/c Lei 10.259/2001, art. 1º', 1),
+  ('previdenciario', 'jef', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'Lei 9.099/1995, art. 49', 2),
+  ('previdenciario', 'jef', 'recurso', 'contrarrazoes', 10, 'uteis', 'Lei 9.099/1995, art. 42, §2º', 1),
+  ('previdenciario', 'jef', 'laudo', 'manifestacao_laudo', 15, 'uteis', 'CPC, art. 477, §1º (o juiz costuma fixar outro prazo)', 1),
+  ('previdenciario', 'jef', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º', 3),
+  ('familia', 'comum', 'citacao', 'contestacao', 15, 'uteis', 'CPC, arts. 335 e 697', 1),
+  ('familia', 'comum', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'CPC, art. 1.023', 2),
+  ('familia', 'comum', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º', 3)
+on conflict (area, rito, tipo_ato, tipo_peca_codigo) do update
+  set dias = excluded.dias,
+      contagem = excluded.contagem,
+      fundamento = excluded.fundamento,
+      prioridade = excluded.prioridade;
