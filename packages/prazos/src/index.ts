@@ -1,4 +1,10 @@
-export { calcularPrazo, type EntradaPrazo, type ResultadoPrazo } from "./calcular-prazo";
+export {
+  calcularPrazo,
+  cienciaAutomatica,
+  DIAS_CIENCIA_PORTAL,
+  type EntradaPrazo,
+  type ResultadoPrazo,
+} from "./calcular-prazo";
 export {
   criarCalendario,
   ehDiaUtil,

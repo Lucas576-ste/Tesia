@@ -180,8 +180,10 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-12:** worker grava processo, prazo sugerido e análise; tela de análise e painel com dados reais; confirmação grava no banco. Testado ponta a ponta com IA simulada e depois com o Claude (PDF com texto e escaneado, cerca de US$ 0,0013 por intimação). Os modais do painel (prazo manual e prazo interno) ainda não gravam no banco.
 
-### Dia 21 — Folga para atrasos
+### Dia 21 — Folga para atrasos ✅
 - Usar para terminar o que ficou pendente na semana
+
+**Usado em 2026-11-12:** forma de recebimento da intimação (diário, portal e citação), depois da conversa com um advogado. Motor conta a ciência do portal; a IA identifica a forma; a tela deixa trocar a forma e informar a abertura, com recálculo na hora. Testado com a API real (24/24 na avaliação) e no navegador.
 
 ---
 

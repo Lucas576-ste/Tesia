@@ -7,7 +7,9 @@ export type CasoAvaliacao = {
   esperado: {
     numero_processo: string;
     tipo_ato: string;
+    forma_intimacao: string;
     data_disponibilizacao: string | null;
+    data_envio_portal: string | null;
     peca: string;
   };
 };
@@ -39,7 +41,9 @@ Intimem-se.`,
     esperado: {
       numero_processo: "0712345-67.2026.8.07.0001",
       tipo_ato: "sentenca",
+      forma_intimacao: "diario",
       data_disponibilizacao: "2026-11-03",
+      data_envio_portal: null,
       peca: "apelacao",
     },
   },
@@ -65,7 +69,9 @@ O perito não respondeu ao quesito 4 da parte autora, sobre a necessidade de esf
     esperado: {
       numero_processo: "1023456-78.2026.4.01.3400",
       tipo_ato: "laudo",
+      forma_intimacao: "diario",
       data_disponibilizacao: "2026-11-05",
+      data_envio_portal: null,
       peca: "manifestacao_laudo",
     },
   },
@@ -97,8 +103,37 @@ Intimem-se as partes.`,
     esperado: {
       numero_processo: "0000789-12.2026.5.10.0005",
       tipo_ato: "sentenca",
+      forma_intimacao: "nao_identificada",
       data_disponibilizacao: null,
+      data_envio_portal: null,
       peca: "recurso_ordinario",
+    },
+  },
+  {
+    nome: "Trabalhista, intimação pelo portal sobre cálculos",
+    texto: `PJe - Processo Judicial Eletrônico - Tribunal Regional do Trabalho da 10ª Região
+EXPEDIENTE - INTIMAÇÃO ELETRÔNICA
+Destinatário: Advogado(a) Fulano Teste (OAB/DF 00000)
+Data de expedição: 04/11/2026. Prazo para ciência: 10 dias.
+Processo: ATSum 0000321-45.2026.5.10.0007 - 7ª Vara do Trabalho de Brasília
+Reclamante: Marcos Exemplo Lima. Reclamada: Transportes Fictícios Ltda.
+DESPACHO (assinado em 03/11/2026). Ficam as partes intimadas para, no prazo de 8 dias, manifestarem-se sobre os cálculos de liquidação apresentados pelo perito contábil.`,
+    opcoes: [
+      {
+        codigo: "manifestacao_calculos",
+        nome: "Manifestação sobre cálculos",
+        dias: 8,
+        fundamento: "CLT, art. 879, §2º",
+      },
+      { codigo: "manifestacao_simples", nome: "Manifestação simples" },
+    ],
+    esperado: {
+      numero_processo: "0000321-45.2026.5.10.0007",
+      tipo_ato: "calculos",
+      forma_intimacao: "portal",
+      data_disponibilizacao: null,
+      data_envio_portal: "2026-11-04",
+      peca: "manifestacao_calculos",
     },
   },
 ];

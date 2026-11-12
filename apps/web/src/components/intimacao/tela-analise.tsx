@@ -124,6 +124,9 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 prazo={analise.prazo}
                 motivoSemPrazo={analise.motivoSemPrazo}
                 hoje={analise.hoje}
+                regra={analise.regra}
+                calendario={analise.calendario}
+                recebimento={analise.recebimento}
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
               />

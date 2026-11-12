@@ -2,6 +2,7 @@ import { analiseGravadaSchema, memoriaCalculoSchema, nomePartes } from "@tesia/s
 import { z } from "zod";
 import { hojeEmBrasilia } from "@/lib/datas-servidor";
 import { STATUS_INTIMACAO } from "@/lib/envio-intimacao";
+import type { CalendarioPrazo, FormaRecebimento, RegraPrazo } from "@/lib/recalculo-prazo";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
 export type TrechoDocumento = { id: string; texto: string };
@@ -31,6 +32,9 @@ export type Analise = {
   pecas: { nome: string; justificativa: string }[];
   documento: TrechoDocumento[];
   hoje: string;
+  recebimento: { forma: FormaRecebimento; disponibilizacao: string; envio: string };
+  regra: RegraPrazo | null;
+  calendario: CalendarioPrazo;
 };
 
 export type EstadoIntimacao =
@@ -41,7 +45,71 @@ const linhaSchema = z.object({
   status: z.enum(STATUS_INTIMACAO),
   texto: z.string().nullable(),
   extracao: z.unknown(),
+  processos: z
+    .union([
+      z.object({
+        tribunal: z.string().nullable(),
+        uf: z.string().nullable(),
+        municipio: z.string().nullable(),
+      }),
+      z.array(
+        z.object({
+          tribunal: z.string().nullable(),
+          uf: z.string().nullable(),
+          municipio: z.string().nullable(),
+        }),
+      ),
+    ])
+    .nullable()
+    .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor)),
 });
+
+const feriadosSchema = z.array(
+  z.object({
+    data: z.string(),
+    nome: z.string(),
+    abrangencia: z.string(),
+    municipio: z.string().nullable(),
+  }),
+);
+const suspensoesSchema = z.array(
+  z.object({ inicio: z.string(), fim: z.string(), motivo: z.string() }),
+);
+
+type SupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
+
+async function buscarCalendario(
+  supabase: SupabaseServidor,
+  local: { tribunal: string | null; uf: string | null; municipio: string | null } | null,
+  rito: string,
+): Promise<CalendarioPrazo> {
+  const recessoCivil = rito !== "criminal";
+  const filtros = ["escritorio_id.not.is.null"];
+  if (local?.tribunal) filtros.push(`and(abrangencia.eq.tribunal,tribunal.eq.${local.tribunal})`);
+  if (local?.uf) filtros.push(`and(abrangencia.in.(estadual,municipal),uf.eq.${local.uf})`);
+  const { data: feriados } = await supabase
+    .from("feriados")
+    .select("data, nome, abrangencia, municipio")
+    .or(filtros.join(","));
+  const municipio = local?.municipio?.toLocaleLowerCase("pt-BR");
+  const lista = (feriadosSchema.safeParse(feriados).data ?? []).filter(
+    (feriado) =>
+      feriado.abrangencia !== "municipal" ||
+      feriado.municipio?.toLocaleLowerCase("pt-BR") === municipio,
+  );
+
+  const { data: suspensoes } = local?.tribunal
+    ? await supabase
+        .from("suspensoes_tribunal")
+        .select("inicio:data_inicio, fim:data_fim, motivo")
+        .or(`tribunal.eq.${local.tribunal},escritorio_id.not.is.null`)
+    : { data: [] };
+  return {
+    feriados: lista.map(({ data, nome }) => ({ data, nome })),
+    suspensoes: suspensoesSchema.safeParse(suspensoes).data ?? [],
+    recessoCivil,
+  };
+}
 
 const prazoSchema = z.object({
   status: z.enum(["sugerido", "confirmado", "cumprido", "perdido", "descartado"]),
@@ -101,7 +169,7 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("intimacoes")
-    .select("id, status, texto, extracao")
+    .select("id, status, texto, extracao, processos(tribunal, uf, municipio)")
     .eq("id", id)
     .is("excluido_em", null)
     .maybeSingle();
@@ -124,6 +192,12 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
   const prazo = z.array(prazoSchema).safeParse(prazos).data?.[0];
 
   const { dados, resumo, pecas } = gravada.data;
+  const regraGravada = gravada.data.prazo;
+  const calendario = await buscarCalendario(supabase, linha.data.processos, dados.rito);
+  const forma: FormaRecebimento =
+    dados.forma_intimacao === "portal" || dados.forma_intimacao === "citacao"
+      ? dados.forma_intimacao
+      : "diario";
   const documento = dividirDocumento(linha.data.texto ?? "");
   const pontos = resumo.pontos_ataque.length
     ? resumo.pontos_ataque
@@ -148,6 +222,22 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       pecas: pecas.map(({ nome, justificativa }) => ({ nome, justificativa })),
       documento,
       hoje: hojeEmBrasilia(),
+      recebimento: {
+        forma,
+        disponibilizacao: dados.data_disponibilizacao ?? "",
+        envio:
+          dados.data_envio_portal ??
+          (forma === "portal" ? (dados.data_disponibilizacao ?? "") : ""),
+      },
+      regra: regraGravada
+        ? {
+            dias: regraGravada.dias,
+            contagem: regraGravada.contagem,
+            fundamento: regraGravada.fundamento,
+            revisada: regraGravada.regra_revisada,
+          }
+        : null,
+      calendario,
     },
   };
 }

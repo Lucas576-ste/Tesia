@@ -107,12 +107,7 @@ async function executar(job: Job, contexto: Contexto) {
     dados.municipio,
   );
   const calendario = montarCalendario(feriados, suspensoes, dados.rito);
-  const prazo = calcularPrazoSugerido(
-    regra,
-    dados.data_disponibilizacao,
-    calendario,
-    hojeEmBrasilia(),
-  );
+  const prazo = calcularPrazoSugerido(regra, dados, calendario, hojeEmBrasilia());
 
   const resumo = await comIa(() => resumirIntimacao(ia, texto, dados));
   await registrarUso(db, job, { etapa: "resumo", ...resumo });
@@ -128,16 +123,16 @@ async function executar(job: Job, contexto: Contexto) {
         recomendada: false,
       })),
     ].map((peca) => ({ ...peca, nome: nomeDaPeca(opcoes, peca.codigo) })),
-    prazo:
-      regra && prazo
-        ? {
-            dias: regra.dias,
-            contagem: regra.contagem,
-            fundamento: regra.fundamento,
-            regra_revisada: regra.ativa,
-          }
-        : null,
-    motivo_sem_prazo: prazo ? null : motivoSemPrazo(regra, dados.data_disponibilizacao),
+    prazo: regra
+      ? {
+          dias: regra.dias,
+          contagem: regra.contagem,
+          fundamento: regra.fundamento,
+          regra_revisada: regra.ativa,
+          forma: prazo?.forma ?? null,
+        }
+      : null,
+    motivo_sem_prazo: prazo ? null : motivoSemPrazo(regra, dados),
   };
 
   await gravarAnalise(db, {

@@ -15,7 +15,11 @@ export const analiseGravadaSchema = z.object({
     area: z.string().nullable(),
     rito: z.string(),
     tipo_ato: z.string(),
+    forma_intimacao: z
+      .enum(["diario", "portal", "citacao", "nao_identificada"])
+      .default("nao_identificada"),
     data_disponibilizacao: z.string().nullable(),
+    data_envio_portal: z.string().nullable().default(null),
     resultado: z.string().nullable(),
     pontos: z.array(z.object({ titulo: z.string(), trecho })),
   }),
@@ -37,6 +41,7 @@ export const analiseGravadaSchema = z.object({
       contagem: z.enum(["uteis", "corridos"]),
       fundamento: z.string(),
       regra_revisada: z.boolean(),
+      forma: z.enum(["diario", "portal"]).nullable().default("diario"),
     })
     .nullable(),
   motivo_sem_prazo: z.string().nullable(),

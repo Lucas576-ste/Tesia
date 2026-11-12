@@ -20,6 +20,12 @@ const regra = (id: string, dias: number, prioridade: number, ativa = false) => (
   ativa,
 });
 
+const diario = (data: string | null) => ({
+  forma_intimacao: "diario",
+  data_disponibilizacao: data,
+  data_envio_portal: null,
+});
+
 const opcoes: OpcaoBanco[] = [
   { codigo: "embargos_declaracao", nome: "Embargos de declaração", regra: regra("e", 5, 2) },
   { codigo: "recurso_inominado", nome: "Recurso inominado", regra: regra("r", 10, 1) },
@@ -64,8 +70,8 @@ describe("calcularPrazoSugerido", () => {
       "jef",
     );
     const r = regra("r", 10, 1);
-    const sem = calcularPrazoSugerido(r, "2026-11-23", semFeriado, "2026-11-23");
-    const com = calcularPrazoSugerido(r, "2026-11-23", comFeriado, "2026-11-23");
+    const sem = calcularPrazoSugerido(r, diario("2026-11-23"), semFeriado, "2026-11-23");
+    const com = calcularPrazoSugerido(r, diario("2026-11-23"), comFeriado, "2026-11-23");
     expect(sem?.vencimento).toBe("2026-12-08");
     expect(com?.vencimento).toBe("2026-12-09");
     expect(com?.interno).toBe("2026-12-04");
@@ -74,11 +80,43 @@ describe("calcularPrazoSugerido", () => {
 
   it("sem data ou sem regra, não calcula e explica o motivo", () => {
     const calendario = montarCalendario([], [], "comum");
-    expect(calcularPrazoSugerido(null, "2026-11-10", calendario, "2026-11-10")).toBeNull();
-    expect(calcularPrazoSugerido(regra("r", 10, 1), null, calendario, "2026-11-10")).toBeNull();
-    expect(motivoSemPrazo(null, "2026-11-10")).toContain("regra");
-    expect(motivoSemPrazo(regra("r", 10, 1), null)).toContain("data");
-    expect(motivoSemPrazo(regra("r", 10, 1), "2026-11-10")).toBeNull();
+    expect(calcularPrazoSugerido(null, diario("2026-11-10"), calendario, "2026-11-10")).toBeNull();
+    expect(
+      calcularPrazoSugerido(regra("r", 10, 1), diario(null), calendario, "2026-11-10"),
+    ).toBeNull();
+    expect(motivoSemPrazo(null, diario("2026-11-10"))).toContain("regra");
+    expect(motivoSemPrazo(regra("r", 10, 1), diario(null))).toContain("data");
+    expect(motivoSemPrazo(regra("r", 10, 1), diario("2026-11-10"))).toBeNull();
+  });
+
+  it("no portal, conta pela ciência automática a partir do envio", () => {
+    const calendario = montarCalendario([], [], "trabalhista");
+    const recebimento = {
+      forma_intimacao: "portal",
+      data_disponibilizacao: null,
+      data_envio_portal: "2026-11-04",
+    };
+    const prazo = calcularPrazoSugerido(regra("c", 8, 1), recebimento, calendario, "2026-11-04");
+    expect(prazo?.forma).toBe("portal");
+    expect(prazo?.inicio).toBe("2026-11-17");
+    expect(prazo?.memoria.join(" ")).toContain("Ciência automática");
+  });
+
+  it("citação e portal sem envio não calculam e explicam o motivo", () => {
+    const calendario = montarCalendario([], [], "comum");
+    const citacao = {
+      forma_intimacao: "citacao",
+      data_disponibilizacao: "2026-11-10",
+      data_envio_portal: null,
+    };
+    const portal = {
+      forma_intimacao: "portal",
+      data_disponibilizacao: null,
+      data_envio_portal: null,
+    };
+    expect(calcularPrazoSugerido(regra("r", 15, 1), citacao, calendario, "2026-11-10")).toBeNull();
+    expect(motivoSemPrazo(regra("r", 15, 1), citacao)).toContain("Citação");
+    expect(motivoSemPrazo(regra("r", 15, 1), portal)).toContain("envio");
   });
 });
 

@@ -22,7 +22,9 @@ const extracao: Extracao = {
   area: "previdenciario",
   rito: "jef",
   tipo_ato: "sentenca",
+  forma_intimacao: "diario",
   data_disponibilizacao: "2026-11-10",
+  data_envio_portal: null,
   resultado: "Pedido julgado improcedente",
   pontos: [
     {
@@ -62,6 +64,17 @@ describe("extrairDados", () => {
       const etapa = await extrairDados(cliente, documento);
       expect(etapa.resultado.data_disponibilizacao).toBeNull();
     }
+  });
+
+  it("valida também a data de envio do portal", async () => {
+    const { cliente } = clienteFalso({
+      ...extracao,
+      forma_intimacao: "portal",
+      data_envio_portal: "05/11/2026",
+    });
+    const etapa = await extrairDados(cliente, documento);
+    expect(etapa.resultado.forma_intimacao).toBe("portal");
+    expect(etapa.resultado.data_envio_portal).toBeNull();
   });
 
   it("falha em recusa, resposta cortada ou formato inválido", async () => {

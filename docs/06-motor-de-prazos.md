@@ -37,9 +37,15 @@ Regras gerais a implementar:
 | Processo penal: prazos em dias corridos | CPP, art. 798 |
 | Suspensão dos prazos de 20/12 a 20/01 (processo civil) | CPC, art. 220 |
 | Prazo que vence em dia sem expediente é prorrogado para o primeiro dia útil seguinte | Regra geral de contagem |
+| Intimação pelo portal: ciência na abertura ou, sem abertura, no 10º dia corrido após o envio (adiada para o primeiro dia útil); o prazo começa no dia útil seguinte à ciência | Lei 11.419/2006, art. 5º, §§ 1º e 3º |
+
+### Formas de recebimento
+- **Diário (DJEN, DJe):** disponibilização, publicação no primeiro dia útil seguinte e início no próximo dia útil.
+- **Portal do tribunal (PJe, e-SAJ, Projudi):** `calcularPrazo({ forma: "portal", dataDisponibilizacao: envio, dataAbertura? })`. Confirmado com advogado em 2026-11-12.
+- **Citação:** sem cálculo automático no MVP. O início depende da forma da citação (correio, oficial de justiça, meio eletrônico), e a tela pede a data.
+- A IA identifica a forma (`forma_intimacao`) e a data de envio; o advogado pode trocar a forma e informar a abertura na tela, e o prazo é recalculado na hora.
 
 Pontos que exigem atenção e validação por advogado antes de implementar:
-- Intimação eletrônica pelo próprio sistema do tribunal (ciência na consulta ou após o prazo de consulta).
 - Prazo em dobro (Fazenda Pública, Defensoria, litisconsortes com procuradores diferentes em autos físicos).
 - Regras próprias de cada tribunal e o recesso na Justiça do Trabalho e no processo penal.
 - Indisponibilidade dos sistemas dos tribunais.
@@ -93,7 +99,7 @@ Vencimento: 18/11/2026
 ### Para o advogado revisor
 - Carnaval (segunda e terça) e Corpus Christi entram como dias sem expediente, marcados como `forense`. Não são feriados nacionais por lei, mas os tribunais costumam suspender o expediente.
 - O recesso de 20/12 a 20/01 também adia a publicação e o início da contagem, não só o curso do prazo.
-- Prazo em dobro, intimação pelo sistema do tribunal e indisponibilidade ainda não estão no motor.
+- Prazo em dobro, regra de início da citação e indisponibilidade ainda não estão no motor.
 
 - **Cobertura de testes alta**, com casos reais validados por advogados: virada de ano, recesso, feriados móveis, vencimento em sexta antes de feriado, mudança de mês.
 

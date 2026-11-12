@@ -109,22 +109,44 @@ export function montarCalendario(
 }
 
 export type PrazoSugerido = {
+  forma: "diario" | "portal";
   inicio: string;
   vencimento: string;
   interno: string;
   memoria: string[];
 };
 
+export type DadosRecebimento = {
+  forma_intimacao: string;
+  data_disponibilizacao: string | null;
+  data_envio_portal: string | null;
+};
+
+export function marcoDoPrazo({
+  forma_intimacao,
+  data_disponibilizacao,
+  data_envio_portal,
+}: DadosRecebimento) {
+  if (forma_intimacao === "citacao") return null;
+  if (forma_intimacao === "portal") {
+    const envio = data_envio_portal ?? data_disponibilizacao;
+    return envio ? { forma: "portal" as const, data: envio } : null;
+  }
+  return data_disponibilizacao ? { forma: "diario" as const, data: data_disponibilizacao } : null;
+}
+
 export function calcularPrazoSugerido(
   regra: RegraBanco | null,
-  dataDisponibilizacao: string | null,
+  recebimento: DadosRecebimento,
   calendario: Calendario,
   hoje: string,
 ): PrazoSugerido | null {
-  if (!regra || !dataDisponibilizacao) return null;
+  const marco = marcoDoPrazo(recebimento);
+  if (!regra || !marco) return null;
   const resultado = calcularPrazo(
     {
-      dataDisponibilizacao,
+      forma: marco.forma,
+      dataDisponibilizacao: marco.data,
       dias: regra.dias,
       contagem: regra.contagem,
       fundamento: regra.fundamento,
@@ -132,6 +154,7 @@ export function calcularPrazoSugerido(
     calendario,
   );
   return {
+    forma: marco.forma,
     inicio: resultado.inicio,
     vencimento: resultado.vencimento,
     interno: calcularPrazoInterno({ fatal: resultado.vencimento, hoje, calendario }),
@@ -139,10 +162,15 @@ export function calcularPrazoSugerido(
   };
 }
 
-export function motivoSemPrazo(regra: RegraBanco | null, dataDisponibilizacao: string | null) {
+export function motivoSemPrazo(regra: RegraBanco | null, recebimento: DadosRecebimento) {
+  if (recebimento.forma_intimacao === "citacao")
+    return "Citação: o prazo começa conforme a forma da citação (correio, oficial de justiça ou meio eletrônico). Informe a data.";
   if (!regra) return "Não há regra de prazo cadastrada para esta peça. Informe a data.";
-  if (!dataDisponibilizacao)
-    return "A data de disponibilização não aparece no documento. Informe a data.";
+  if (!marcoDoPrazo(recebimento)) {
+    return recebimento.forma_intimacao === "portal"
+      ? "A data de envio no portal não aparece no documento. Informe a data de envio ou de abertura."
+      : "A data de disponibilização não aparece no documento. Informe a data.";
+  }
   return null;
 }
 

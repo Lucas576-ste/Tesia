@@ -20,7 +20,9 @@ for (const caso of CASOS) {
   const comparacoes = [
     ["numero_processo", extracao.resultado.numero_processo, caso.esperado.numero_processo],
     ["tipo_ato", extracao.resultado.tipo_ato, caso.esperado.tipo_ato],
+    ["forma", extracao.resultado.forma_intimacao, caso.esperado.forma_intimacao],
     ["data", extracao.resultado.data_disponibilizacao, caso.esperado.data_disponibilizacao],
+    ["envio_portal", extracao.resultado.data_envio_portal, caso.esperado.data_envio_portal],
     ["peca", escolha.resultado.recomendada.codigo, caso.esperado.peca],
   ] as const;
   const custoCaso = [extracao, resumo, escolha].reduce(

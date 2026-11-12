@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { ClienteIa } from "../cliente.js";
 import { INSTRUCOES_EXTRACAO, VERSAO_EXTRACAO } from "../prompts/extracao.js";
 import { chamarEtapa, type ResultadoEtapa } from "./chamada.js";
-import { AREAS, POLOS, RITOS, TIPOS_ATO } from "./listas.js";
+import { AREAS, FORMAS_INTIMACAO, POLOS, RITOS, TIPOS_ATO } from "./listas.js";
 import { manterComTrecho } from "./trechos.js";
 
 export const extracaoSchema = z.object({
@@ -16,7 +16,9 @@ export const extracaoSchema = z.object({
   area: z.enum(AREAS).nullable(),
   rito: z.enum(RITOS),
   tipo_ato: z.enum(TIPOS_ATO),
+  forma_intimacao: z.enum(FORMAS_INTIMACAO),
   data_disponibilizacao: z.string().nullable(),
+  data_envio_portal: z.string().nullable(),
   resultado: z.string().nullable(),
   pontos: z.array(z.object({ titulo: z.string(), trecho: z.string() })),
 });
@@ -46,6 +48,7 @@ export async function extrairDados(
       ...etapa.resultado,
       uf: etapa.resultado.uf?.toUpperCase().slice(0, 2) ?? null,
       data_disponibilizacao: dataValida(etapa.resultado.data_disponibilizacao),
+      data_envio_portal: dataValida(etapa.resultado.data_envio_portal),
       pontos: manterComTrecho(etapa.resultado.pontos, texto),
     },
   };

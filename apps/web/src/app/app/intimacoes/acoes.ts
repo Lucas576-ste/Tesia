@@ -52,6 +52,14 @@ const confirmacaoSchema = z
     intimacaoId: z.uuid(),
     vencimento: z.iso.date("Informe o prazo fatal."),
     interno: z.iso.date("Informe o prazo interno."),
+    recalculo: z
+      .object({
+        sugerida: z.iso.date(),
+        inicio: z.iso.date(),
+        memoria: z.array(z.string().max(300)).max(20),
+        regraRevisada: z.boolean(),
+      })
+      .optional(),
   })
   .refine(({ vencimento, interno }) => interno <= vencimento, {
     message: "O prazo interno não pode ser depois do prazo fatal.",
@@ -70,9 +78,17 @@ export async function confirmarPrazo(
   if (!resultado.success) {
     return { erro: resultado.error.issues[0]?.message ?? "Datas inválidas." };
   }
-  const { intimacaoId, vencimento, interno } = resultado.data;
+  const { intimacaoId, vencimento, interno, recalculo } = resultado.data;
   const supabase = await criarClienteServidor();
+  const novoCalculo = recalculo
+    ? {
+        data_vencimento_sugerida: recalculo.sugerida,
+        data_inicio: recalculo.inicio <= vencimento ? recalculo.inicio : null,
+        memoria_calculo: { linhas: recalculo.memoria, regra_revisada: recalculo.regraRevisada },
+      }
+    : {};
   const confirmacao = {
+    ...novoCalculo,
     status: "confirmado",
     data_vencimento: vencimento,
     data_prazo_interno: interno,
@@ -93,7 +109,7 @@ export async function confirmarPrazo(
     const inicioValido = existente.data_inicio && existente.data_inicio <= vencimento;
     const { error } = await supabase
       .from("prazos")
-      .update({ ...confirmacao, ...(inicioValido ? {} : { data_inicio: null }) })
+      .update({ ...(inicioValido || recalculo ? {} : { data_inicio: null }), ...confirmacao })
       .eq("id", existente.id);
     if (error) return { erro: "Não foi possível confirmar o prazo." };
   } else {

@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { PrazoAnalise } from "@/lib/analise";
+import type { Analise, PrazoAnalise } from "@/lib/analise";
+import { recalcularPrazo, type Recebimento } from "@/lib/recalculo-prazo";
+import { RecebimentoIntimacao } from "./recebimento-intimacao";
 import {
   calcularPrazoInterno,
   DIAS_PRAZO_INTERNO,
@@ -24,14 +26,44 @@ import {
   prazoInternoSchema,
 } from "@/lib/prazo-interno";
 
-type BlocoPrazoProps = {
+type BlocoPrazoProps = Pick<
+  Analise,
+  "prazo" | "motivoSemPrazo" | "hoje" | "regra" | "calendario" | "recebimento"
+> & {
   intimacaoId: string;
-  prazo: PrazoAnalise | null;
-  motivoSemPrazo: string | null;
-  hoje: string;
   confirmado: boolean;
   aoMudarConfirmacao: (confirmado: boolean) => void;
 };
+
+type Base = {
+  inicio: string | null;
+  vencimento: string;
+  interno: string | null;
+  memoria: string[];
+};
+
+function baseInicial(prazo: PrazoAnalise | null): Base | null {
+  if (!prazo) return null;
+  return {
+    inicio: prazo.inicioIso,
+    vencimento: prazo.sugeridoIso,
+    interno: prazo.internoIso,
+    memoria: prazo.memoria,
+  };
+}
+
+function motivoRecalculo(recebimento: Recebimento, temRegra: boolean) {
+  if (recebimento.forma === "citacao")
+    return "Na citação, o prazo começa conforme a forma da citação. Informe o prazo fatal.";
+  if (!temRegra) return "Não há regra de prazo cadastrada para esta peça. Informe a data.";
+  if (
+    recebimento.forma === "portal" &&
+    recebimento.abertura &&
+    recebimento.abertura < recebimento.envio
+  )
+    return "A abertura não pode ser antes do envio.";
+  return "Informe a data acima para eu calcular o prazo.";
+}
 
 function AvisoRegra() {
   return (
@@ -47,18 +79,41 @@ export function BlocoPrazo({
   prazo,
   motivoSemPrazo,
   hoje,
+  regra,
+  calendario,
+  recebimento: recebimentoInicial,
   confirmado,
   aoMudarConfirmacao,
 }: BlocoPrazoProps) {
-  const sugerida = prazo?.sugeridoIso ?? "";
-  const [data, setData] = useState(prazo?.vencimentoIso ?? "");
+  const [recebimento, setRecebimento] = useState<Recebimento>({
+    ...recebimentoInicial,
+    abertura: "",
+  });
+  const [alterouRecebimento, setAlterouRecebimento] = useState(false);
+  const base: Base | null = alterouRecebimento
+    ? recalcularPrazo(regra, calendario, recebimento, hoje)
+    : baseInicial(prazo);
+  const sugerida = base?.vencimento ?? "";
+  const [fatalManual, setFatalManual] = useState<string | null>(
+    prazo && prazo.vencimentoIso !== prazo.sugeridoIso ? prazo.vencimentoIso : null,
+  );
+  const data = fatalManual ?? sugerida;
   const [editando, setEditando] = useState(!prazo);
   const [conferindo, setConferindo] = useState(false);
-  const [internoEscolhido, setInternoEscolhido] = useState<string | null>(
-    prazo?.internoIso ?? null,
-  );
+  const [internoEscolhido, setInternoEscolhido] = useState<string | null>(null);
   const [enviando, iniciar] = useTransition();
-  const interno = internoEscolhido ?? (data ? calcularPrazoInterno(data, hoje) : "");
+  const internoPadrao =
+    data && data === sugerida && base?.interno
+      ? base.interno
+      : data
+        ? calcularPrazoInterno(data, hoje)
+        : "";
+  const interno = internoEscolhido ?? internoPadrao;
+  const motivo = base
+    ? null
+    : alterouRecebimento
+      ? motivoRecalculo(recebimento, Boolean(regra))
+      : motivoSemPrazo;
   const erroInterno = data
     ? prazoInternoSchema(data).safeParse(interno).error?.issues[0]?.message
     : undefined;
@@ -66,13 +121,33 @@ export function BlocoPrazo({
   const depoisDaSugerida = Boolean(sugerida) && data > sugerida;
 
   function mudarFatal(novaData: string) {
-    setData(novaData);
+    setFatalManual(novaData);
     if (internoEscolhido && novaData && internoEscolhido > novaData) setInternoEscolhido(null);
+  }
+
+  function mudarRecebimento(novo: Recebimento) {
+    setRecebimento(novo);
+    setAlterouRecebimento(true);
+    setFatalManual(null);
+    setInternoEscolhido(null);
   }
 
   function confirmar() {
     iniciar(async () => {
-      const resultado = await confirmarPrazo({ intimacaoId, vencimento: data, interno });
+      const resultado = await confirmarPrazo({
+        intimacaoId,
+        vencimento: data,
+        interno,
+        recalculo:
+          alterouRecebimento && base?.inicio
+            ? {
+                sugerida: base.vencimento,
+                inicio: base.inicio,
+                memoria: base.memoria,
+                regraRevisada: regra?.revisada ?? false,
+              }
+            : undefined,
+      });
       if ("erro" in resultado) {
         toast.error(resultado.erro);
         return;
@@ -90,15 +165,16 @@ export function BlocoPrazo({
 
   return (
     <section className="flex flex-col gap-3 rounded-xl border-l-4 border-destaque bg-card p-4 shadow-xs">
-      <h2 className="text-lg font-semibold">{prazo ? "Prazo sugerido" : "Prazo"}</h2>
+      <h2 className="text-lg font-semibold">{base ? "Prazo sugerido" : "Prazo"}</h2>
       <div>
         <p className="text-xs text-texto-secundario">Prazo fatal</p>
         <p className="font-serif text-3xl font-semibold tabular-nums">
           {data ? formatarData(data) : "Sem data"}
         </p>
-        {prazo && (
+        {regra && (
           <p className="text-sm text-texto-secundario">
-            {prazo.dias} dias {prazo.contagem} · {prazo.fundamento}
+            {regra.dias} dias {regra.contagem === "corridos" ? "corridos" : "úteis"} ·{" "}
+            {regra.fundamento}
           </p>
         )}
         {editada && (
@@ -107,16 +183,21 @@ export function BlocoPrazo({
           </p>
         )}
       </div>
-      {!prazo && motivoSemPrazo && (
+      <RecebimentoIntimacao
+        recebimento={recebimento}
+        bloqueado={confirmado || enviando}
+        aoMudar={mudarRecebimento}
+      />
+      {motivo && (
         <p role="note" className="rounded-md bg-atencao-fundo p-2 text-sm text-atencao">
-          {motivoSemPrazo}
+          {motivo}
         </p>
       )}
-      {prazo && !prazo.regraRevisada && <AvisoRegra />}
+      {regra && !regra.revisada && base && <AvisoRegra />}
       <dl className="grid grid-cols-2 gap-3 text-sm tabular-nums">
         <div>
           <dt className="text-xs text-texto-secundario">Início da contagem</dt>
-          <dd>{prazo?.inicioIso ? formatarData(prazo.inicioIso) : "Sem data"}</dd>
+          <dd>{base?.inicio ? formatarData(base.inicio) : "Sem data"}</dd>
         </div>
         <div>
           <dt className="text-xs text-texto-secundario">Prazo interno</dt>
@@ -128,17 +209,17 @@ export function BlocoPrazo({
         {internoEscolhido === null &&
           ` Por padrão, fica ${DIAS_PRAZO_INTERNO} dias úteis antes do fatal.`}
       </p>
-      {prazo && prazo.memoria.length > 0 && (
+      {base && base.memoria.length > 0 && (
         <details className="rounded-md border p-3 text-sm">
           <summary className="cursor-pointer font-medium">Ver a conta do prazo</summary>
           <ul className="mt-2 flex flex-col gap-1 text-texto-secundario">
-            {prazo.memoria.map((linha) => (
+            {base.memoria.map((linha) => (
               <li key={linha}>{linha}</li>
             ))}
           </ul>
         </details>
       )}
-      {editando && !confirmado && (
+      {(editando || !base) && !confirmado && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="data-prazo">Prazo fatal</Label>
@@ -200,7 +281,7 @@ export function BlocoPrazo({
           >
             {enviando ? "Confirmando..." : "Confirmo o prazo"}
           </Button>
-          {prazo && (
+          {base && (
             <Button variant="outline" onClick={() => setEditando((atual) => !atual)}>
               {editando ? "Fechar edição" : "Editar datas"}
             </Button>
