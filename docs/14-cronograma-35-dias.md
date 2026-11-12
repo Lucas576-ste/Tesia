@@ -164,10 +164,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-11:** texto extraído com `unpdf` e gravado em `intimacoes.texto`; PDF escaneado transcrito pelo Haiku, com custo em `uso_ia`. A intimação segue em `processando` até a análise do Dia 19. Falta testar o PDF escaneado com a chave da API, que entra depois.
 
-### Dia 19 — Prompts da análise
+### Dia 19 — Prompts da análise ✅
 - Extração (Haiku, JSON validado com zod)
 - Resumo e pontos atacáveis
 - Escolha da peça entre as opções do banco
+
+**Feito em 2026-11-12:** as três etapas em `packages/ia/src/analise/`, testadas com respostas simuladas. A rodada com a API real (`pnpm --filter @tesia/ia avaliar`) fica para quando a chave existir.
 
 ### Dia 20 — Análise funcionando de ponta a ponta
 - Worker grava extração, prazo calculado e resumo

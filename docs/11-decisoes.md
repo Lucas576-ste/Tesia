@@ -72,6 +72,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | Fila própria no Postgres (tabela `fila`, gatilho e `SKIP LOCKED`) no lugar do pg-boss | O job nasce na mesma transação da intimação e o app na Vercel não precisa de conexão direta ao banco |
 | 2026-11-10 | PDF enviado direto do navegador ao Storage, na pasta do escritório | Evita o limite de tamanho das funções da Vercel; o RLS do Storage impede pasta alheia |
 | 2026-11-11 | OCR de PDF escaneado pelo Claude Haiku, no lugar do AWS Textract | Uma conta a menos; o Haiku já lê PDF e custa menos de um centavo por intimação |
+| 2026-11-12 | Trechos citados pela IA são conferidos no texto do documento pelo código, e os que não existem são descartados | A IA não pode apontar como base da decisão algo que o documento não diz |
 | 2026-11-11 | Worker roda com `tsx` também em produção, sem etapa de compilação | Importa `@tesia/ia` direto do código TypeScript, como o web; sem bundler para manter |
 
 ## Pendências

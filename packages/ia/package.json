@@ -8,12 +8,14 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "avaliar": "tsx --env-file=../../.env.local scripts/avaliar.ts"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
     "typescript": "6.0.3",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "tsx": "4.23.15"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.3.0",
