@@ -14,9 +14,6 @@ export default async function NovaIntimacaoPage() {
       <BalaoLia className="text-sm">
         Envie o PDF da intimação ou da decisão. Eu leio e separo o que importa para você.
       </BalaoLia>
-      <p className="rounded-md bg-atencao-fundo px-3 py-2 text-xs text-atencao">
-        O arquivo é recebido e conferido. A leitura pela IA entra nos próximos dias.
-      </p>
       <EnvioIntimacao escritorioId={usuario.escritorio_id} />
     </div>
   );

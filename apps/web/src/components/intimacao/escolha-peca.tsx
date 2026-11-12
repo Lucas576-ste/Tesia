@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import type { Analise } from "@/lib/analises-exemplo";
+import type { Analise } from "@/lib/analise";
 
 export function EscolhaPeca({ pecas }: { pecas: Analise["pecas"] }) {
   const recomendada = pecas[0]?.nome;
@@ -36,7 +36,8 @@ export function EscolhaPeca({ pecas }: { pecas: Analise["pecas"] }) {
       ))}
       {escolhida !== recomendada && (
         <p role="status" className="rounded-md bg-atencao-fundo p-2 text-sm text-atencao">
-          Cada peça pode ter outro prazo. Nesta demonstração, o prazo acima não é recalculado.
+          Cada peça pode ter outro prazo. O prazo acima foi calculado para a peça recomendada;
+          ajuste a data se escolher outra.
         </p>
       )}
     </fieldset>

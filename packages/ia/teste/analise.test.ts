@@ -3,6 +3,7 @@ import { escolherPeca, schemaEscolha } from "../src/analise/escolha-peca.js";
 import { extrairDados, type Extracao } from "../src/analise/extracao.js";
 import { limitarFrases, resumirIntimacao } from "../src/analise/resumo.js";
 import { trechoNoDocumento } from "../src/analise/trechos.js";
+import { VERSAO_EXTRACAO } from "../src/prompts/extracao.js";
 import { RespostaInvalidaDaIa } from "../src/transcricao.js";
 import { clienteFalso } from "./cliente-falso.js";
 
@@ -49,7 +50,7 @@ describe("extrairDados", () => {
     const etapa = await extrairDados(cliente, documento);
     expect(etapa.resultado.pontos.map((ponto) => ponto.titulo)).toEqual(["Laudo"]);
     expect(etapa.resultado.uf).toBe("DF");
-    expect(etapa.versaoPrompt).toBe("extracao@1");
+    expect(etapa.versaoPrompt).toBe(VERSAO_EXTRACAO);
     expect(etapa.uso.modelo).toBe("claude-haiku-5-5");
     expect(etapa.uso.custoEstimado).toBeGreaterThan(0);
     expect(parse).toHaveBeenCalledOnce();
@@ -91,6 +92,14 @@ describe("resumirIntimacao", () => {
     const etapa = await resumirIntimacao(cliente, documento, extracao);
     expect(etapa.resultado.o_que_aconteceu).toBe("Um. Dois. Três. Quatro.");
     expect(etapa.resultado.pontos_ataque).toHaveLength(1);
+  });
+
+  it("limitarFrases não corta em número de processo nem em abreviação", () => {
+    const texto =
+      "Processo 1023456-78.2026.4.01.3400 contra o Banco Exemplo S.A. (réu) foi julgado. Dois. Três. Quatro. Cinco.";
+    expect(limitarFrases(texto)).toBe(
+      "Processo 1023456-78.2026.4.01.3400 contra o Banco Exemplo S.A. (réu) foi julgado. Dois. Três. Quatro.",
+    );
   });
 
   it("limitarFrases mantém texto sem ponto final", () => {

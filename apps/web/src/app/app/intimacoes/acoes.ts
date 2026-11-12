@@ -1,5 +1,7 @@
 "use server";
 
+import { analiseGravadaSchema } from "@tesia/shared";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { STATUS_INTIMACAO, idsSchema, registroSchema } from "@/lib/envio-intimacao";
 import { usuarioAtual } from "@/lib/sessao";
@@ -43,4 +45,78 @@ export async function consultarStatus(ids: string[]) {
   const { data } = await supabase.from("intimacoes").select("id, status").in("id", resultado.data);
   const linhas = statusSchema.safeParse(data);
   return linhas.success ? linhas.data : [];
+}
+
+const confirmacaoSchema = z
+  .object({
+    intimacaoId: z.uuid(),
+    vencimento: z.iso.date("Informe o prazo fatal."),
+    interno: z.iso.date("Informe o prazo interno."),
+  })
+  .refine(({ vencimento, interno }) => interno <= vencimento, {
+    message: "O prazo interno não pode ser depois do prazo fatal.",
+  });
+
+const prazoExistenteSchema = z.object({ id: z.uuid(), data_inicio: z.string().nullable() });
+const intimacaoSchema = z.object({ processo_id: z.uuid().nullable(), extracao: z.unknown() });
+
+export async function confirmarPrazo(
+  entrada: z.input<typeof confirmacaoSchema>,
+): Promise<{ ok: true } | { erro: string }> {
+  const usuario = await usuarioAtual();
+  if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
+
+  const resultado = confirmacaoSchema.safeParse(entrada);
+  if (!resultado.success) {
+    return { erro: resultado.error.issues[0]?.message ?? "Datas inválidas." };
+  }
+  const { intimacaoId, vencimento, interno } = resultado.data;
+  const supabase = await criarClienteServidor();
+  const confirmacao = {
+    status: "confirmado",
+    data_vencimento: vencimento,
+    data_prazo_interno: interno,
+    confirmado_por: usuario.id,
+    confirmado_em: new Date().toISOString(),
+  };
+
+  const { data: existentes } = await supabase
+    .from("prazos")
+    .select("id, data_inicio")
+    .eq("intimacao_id", intimacaoId)
+    .in("status", ["sugerido", "confirmado"])
+    .order("criado_em", { ascending: false })
+    .limit(1);
+  const existente = z.array(prazoExistenteSchema).safeParse(existentes).data?.[0];
+
+  if (existente) {
+    const inicioValido = existente.data_inicio && existente.data_inicio <= vencimento;
+    const { error } = await supabase
+      .from("prazos")
+      .update({ ...confirmacao, ...(inicioValido ? {} : { data_inicio: null }) })
+      .eq("id", existente.id);
+    if (error) return { erro: "Não foi possível confirmar o prazo." };
+  } else {
+    const { data: linha } = await supabase
+      .from("intimacoes")
+      .select("processo_id, extracao")
+      .eq("id", intimacaoId)
+      .maybeSingle();
+    const intimacao = intimacaoSchema.safeParse(linha);
+    if (!intimacao.success) return { erro: "Intimação não encontrada." };
+    const analise = analiseGravadaSchema.safeParse(intimacao.data.extracao);
+    const peca = analise.data?.pecas.find((item) => item.recomendada)?.nome ?? "Prazo da intimação";
+    const { error } = await supabase.from("prazos").insert({
+      ...confirmacao,
+      escritorio_id: usuario.escritorio_id,
+      processo_id: intimacao.data.processo_id,
+      intimacao_id: intimacaoId,
+      origem: "intimacao",
+      descricao: peca,
+    });
+    if (error) return { erro: "Não foi possível confirmar o prazo." };
+  }
+
+  revalidatePath("/app");
+  return { ok: true };
 }

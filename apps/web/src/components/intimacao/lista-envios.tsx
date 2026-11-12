@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AlertCircle, CheckCircle2, FileText, LoaderCircle } from "lucide-react";
 import { ROTULOS_STATUS, type StatusIntimacao } from "@/lib/envio-intimacao";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ function IconeStatus({ status }: { status: Envio["status"] }) {
 export function ListaEnvios({ envios }: { envios: Envio[] }) {
   return (
     <ul role="status" aria-live="polite" className="flex flex-col gap-2">
-      {envios.map(({ chave, nome, status, erro }) => (
+      {envios.map(({ chave, nome, status, erro, intimacaoId }) => (
         <li key={chave} className="flex items-center gap-2 rounded-md border bg-card p-3 text-sm">
           <FileText aria-hidden className="size-4 shrink-0 text-texto-secundario" />
           <span className="min-w-0 flex-1 break-all">{nome}</span>
@@ -33,6 +34,14 @@ export function ListaEnvios({ envios }: { envios: Envio[] }) {
             <IconeStatus status={status} />
             {erro ?? ROTULOS_STATUS[status]}
           </span>
+          {status === "analisada" && intimacaoId && (
+            <Link
+              href={`/app/intimacoes/${intimacaoId}`}
+              className="shrink-0 text-xs font-medium text-primaria underline-offset-4 hover:underline"
+            >
+              Ver análise
+            </Link>
+          )}
         </li>
       ))}
     </ul>

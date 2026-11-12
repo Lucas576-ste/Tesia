@@ -1,8 +1,9 @@
 "use client";
 
 import { CheckCircle2, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { confirmarPrazo } from "@/app/app/intimacoes/acoes";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Analise } from "@/lib/analises-exemplo";
+import type { PrazoAnalise } from "@/lib/analise";
 import {
   calcularPrazoInterno,
   DIAS_PRAZO_INTERNO,
@@ -24,22 +25,45 @@ import {
 } from "@/lib/prazo-interno";
 
 type BlocoPrazoProps = {
-  prazo: Analise["prazo"];
+  intimacaoId: string;
+  prazo: PrazoAnalise | null;
+  motivoSemPrazo: string | null;
+  hoje: string;
   confirmado: boolean;
   aoMudarConfirmacao: (confirmado: boolean) => void;
 };
 
-export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazoProps) {
-  const [data, setData] = useState(prazo.vencimentoIso);
-  const [editando, setEditando] = useState(false);
+function AvisoRegra() {
+  return (
+    <p role="note" className="flex gap-2 rounded-md bg-atencao-fundo p-2 text-sm text-atencao">
+      <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />A regra deste prazo ainda não
+      foi revisada por um advogado. Confira a contagem antes de confirmar.
+    </p>
+  );
+}
+
+export function BlocoPrazo({
+  intimacaoId,
+  prazo,
+  motivoSemPrazo,
+  hoje,
+  confirmado,
+  aoMudarConfirmacao,
+}: BlocoPrazoProps) {
+  const sugerida = prazo?.sugeridoIso ?? "";
+  const [data, setData] = useState(prazo?.vencimentoIso ?? "");
+  const [editando, setEditando] = useState(!prazo);
   const [conferindo, setConferindo] = useState(false);
-  const [internoEscolhido, setInternoEscolhido] = useState<string | null>(null);
-  const interno = internoEscolhido ?? (data ? calcularPrazoInterno(data) : "");
+  const [internoEscolhido, setInternoEscolhido] = useState<string | null>(
+    prazo?.internoIso ?? null,
+  );
+  const [enviando, iniciar] = useTransition();
+  const interno = internoEscolhido ?? (data ? calcularPrazoInterno(data, hoje) : "");
   const erroInterno = data
     ? prazoInternoSchema(data).safeParse(interno).error?.issues[0]?.message
     : undefined;
-  const editada = data !== prazo.vencimentoIso;
-  const depoisDaSugerida = data > prazo.vencimentoIso;
+  const editada = Boolean(sugerida) && data !== sugerida;
+  const depoisDaSugerida = Boolean(sugerida) && data > sugerida;
 
   function mudarFatal(novaData: string) {
     setData(novaData);
@@ -47,37 +71,52 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
   }
 
   function confirmar() {
-    aoMudarConfirmacao(true);
-    setEditando(false);
-    setConferindo(false);
-    toast.success(
-      editada
-        ? "Prazo confirmado. A data sugerida e a escolhida foram registradas."
-        : "Prazo confirmado.",
-    );
+    iniciar(async () => {
+      const resultado = await confirmarPrazo({ intimacaoId, vencimento: data, interno });
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+      aoMudarConfirmacao(true);
+      setEditando(false);
+      setConferindo(false);
+      toast.success(
+        editada
+          ? "Prazo confirmado. A data sugerida e a escolhida foram registradas."
+          : "Prazo confirmado. Ele já aparece no painel.",
+      );
+    });
   }
 
   return (
     <section className="flex flex-col gap-3 rounded-xl border-l-4 border-destaque bg-card p-4 shadow-xs">
-      <h2 className="text-lg font-semibold">Prazo sugerido</h2>
+      <h2 className="text-lg font-semibold">{prazo ? "Prazo sugerido" : "Prazo"}</h2>
       <div>
         <p className="text-xs text-texto-secundario">Prazo fatal</p>
         <p className="font-serif text-3xl font-semibold tabular-nums">
           {data ? formatarData(data) : "Sem data"}
         </p>
-        <p className="text-sm text-texto-secundario">
-          {prazo.dias} dias {prazo.contagem} · {prazo.fundamento}
-        </p>
+        {prazo && (
+          <p className="text-sm text-texto-secundario">
+            {prazo.dias} dias {prazo.contagem} · {prazo.fundamento}
+          </p>
+        )}
         {editada && (
           <p className="text-sm text-texto-secundario tabular-nums">
-            Data sugerida: {formatarData(prazo.vencimentoIso)}
+            Data sugerida: {formatarData(sugerida)}
           </p>
         )}
       </div>
+      {!prazo && motivoSemPrazo && (
+        <p role="note" className="rounded-md bg-atencao-fundo p-2 text-sm text-atencao">
+          {motivoSemPrazo}
+        </p>
+      )}
+      {prazo && !prazo.regraRevisada && <AvisoRegra />}
       <dl className="grid grid-cols-2 gap-3 text-sm tabular-nums">
         <div>
           <dt className="text-xs text-texto-secundario">Início da contagem</dt>
-          <dd>{formatarData(prazo.inicioIso)}</dd>
+          <dd>{prazo?.inicioIso ? formatarData(prazo.inicioIso) : "Sem data"}</dd>
         </div>
         <div>
           <dt className="text-xs text-texto-secundario">Prazo interno</dt>
@@ -89,14 +128,16 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
         {internoEscolhido === null &&
           ` Por padrão, fica ${DIAS_PRAZO_INTERNO} dias úteis antes do fatal.`}
       </p>
-      <details className="rounded-md border p-3 text-sm">
-        <summary className="cursor-pointer font-medium">Ver a conta do prazo</summary>
-        <ul className="mt-2 flex flex-col gap-1 text-texto-secundario">
-          {prazo.memoria.map((linha) => (
-            <li key={linha}>{linha}</li>
-          ))}
-        </ul>
-      </details>
+      {prazo && prazo.memoria.length > 0 && (
+        <details className="rounded-md border p-3 text-sm">
+          <summary className="cursor-pointer font-medium">Ver a conta do prazo</summary>
+          <ul className="mt-2 flex flex-col gap-1 text-texto-secundario">
+            {prazo.memoria.map((linha) => (
+              <li key={linha}>{linha}</li>
+            ))}
+          </ul>
+        </details>
+      )}
       {editando && !confirmado && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
@@ -139,22 +180,31 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
             <CheckCircle2 aria-hidden className="size-4" />
             Prazo confirmado por você
           </p>
-          <Button variant="ghost" size="sm" onClick={() => aoMudarConfirmacao(false)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              aoMudarConfirmacao(false);
+              setEditando(true);
+            }}
+          >
             Alterar
           </Button>
         </div>
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
-            disabled={!data || Boolean(erroInterno)}
+            disabled={!data || Boolean(erroInterno) || enviando}
             onClick={editada ? () => setConferindo(true) : confirmar}
             className="sm:flex-1"
           >
-            Confirmo o prazo
+            {enviando ? "Confirmando..." : "Confirmo o prazo"}
           </Button>
-          <Button variant="outline" onClick={() => setEditando((atual) => !atual)}>
-            {editando ? "Fechar edição" : "Editar datas"}
-          </Button>
+          {prazo && (
+            <Button variant="outline" onClick={() => setEditando((atual) => !atual)}>
+              {editando ? "Fechar edição" : "Editar datas"}
+            </Button>
+          )}
         </div>
       )}
       <Dialog open={conferindo} onOpenChange={setConferindo}>
@@ -168,11 +218,11 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
           <dl className="grid grid-cols-2 gap-3 text-sm tabular-nums">
             <div>
               <dt className="text-xs text-texto-secundario">Data sugerida</dt>
-              <dd className="font-medium">{formatarData(prazo.vencimentoIso)}</dd>
+              <dd className="font-medium">{sugerida ? formatarData(sugerida) : "Sem data"}</dd>
             </div>
             <div>
               <dt className="text-xs text-texto-secundario">Data escolhida</dt>
-              <dd className="font-medium">{formatarData(data)}</dd>
+              <dd className="font-medium">{data ? formatarData(data) : "Sem data"}</dd>
             </div>
           </dl>
           {depoisDaSugerida && (
@@ -184,7 +234,9 @@ export function BlocoPrazo({ prazo, confirmado, aoMudarConfirmacao }: BlocoPrazo
             <DialogClose asChild>
               <Button variant="outline">Voltar</Button>
             </DialogClose>
-            <Button onClick={confirmar}>Confirmar data</Button>
+            <Button onClick={confirmar} disabled={enviando}>
+              Confirmar data
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

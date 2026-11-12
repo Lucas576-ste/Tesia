@@ -1,24 +1,14 @@
 import type { Metadata } from "next";
-import { advogadoExemplo, prazosExemplo } from "@/components/layout/dados-exemplo";
 import { PainelPrazos } from "@/components/painel/painel-prazos";
-import { buscarAnalise } from "@/lib/analises-exemplo";
 import { filtroPrazosSchema } from "@/lib/filtros-prazos";
-import { listarProcessos } from "@/lib/processos-exemplo";
+import { listarPrazosConfirmados, listarProcessosResumo } from "@/lib/painel";
+import { exigirUsuario } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Painel de prazos · Tesia" };
 
 type PainelPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
-
-const idsComAnalise = prazosExemplo.map(({ id }) => id).filter((id) => buscarAnalise(id));
-
-const processos = listarProcessos().map(({ id, partes, cnj, area }) => ({
-  id,
-  partes,
-  cnj,
-  area,
-}));
 
 function urlSemNovo(parametros: Record<string, string | string[] | undefined>) {
   const busca = new URLSearchParams();
@@ -31,15 +21,18 @@ function urlSemNovo(parametros: Record<string, string | string[] | undefined>) {
 
 export default async function PainelPage({ searchParams }: PainelPageProps) {
   const parametros = await searchParams;
-  const vazio = parametros.exemplo === "vazio";
+  const [usuario, prazos, processos] = await Promise.all([
+    exigirUsuario(),
+    listarPrazosConfirmados(),
+    listarProcessosResumo(),
+  ]);
 
   return (
     <PainelPrazos
-      key={vazio ? "vazio" : "exemplo"}
-      nome={advogadoExemplo.nome.split(" ")[0] ?? ""}
-      prazosIniciais={vazio ? [] : prazosExemplo}
+      nome={usuario.nome.split(" ")[0] ?? ""}
+      prazosIniciais={prazos}
       filtro={filtroPrazosSchema.parse(parametros)}
-      idsComAnalise={idsComAnalise}
+      idsComAnalise={prazos.map(({ id }) => id)}
       processos={processos}
       novoPrazo={parametros.novo === "prazo"}
       urlSemNovo={urlSemNovo(parametros)}

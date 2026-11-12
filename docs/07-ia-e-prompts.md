@@ -70,13 +70,14 @@ Regras do prompt:
 
 ## Como as etapas 1 a 3 rodam
 
-- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@1`, `resumo@1`, `escolha-peca@1`).
+- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@2`, `resumo@2`, `escolha-peca@1`).
 - Saída estruturada da API (`messages.parse` com o schema zod), validada antes de usar.
 - Listas fechadas iguais às do banco: área (`civel`, `trabalhista`, `previdenciario`, `familia`), rito (`rito_processo`) e tipo de ato (os de `regras_prazo` mais `outro`).
 - Data fora do formato `AAAA-MM-DD` ou inexistente vira `null`.
 - Todo trecho citado (pontos da decisão e pontos atacáveis) é conferido pelo código no texto do documento. O que não está lá é descartado.
 - Na escolha da peça, o schema aceita só os códigos das opções enviadas.
-- Resumo cortado em 4 frases pelo código.
+- Resumo cortado em 4 frases pelo código, sem quebrar em números de processo ou abreviações como "S.A.". `resumo@2` proíbe citar nomes de campos e comentários sobre o que falta no documento.
+- Rito não identificado (`outro`) busca as regras do procedimento comum.
 - Avaliação com casos fictícios: `pnpm --filter @tesia/ia avaliar` (usa a API real e mostra acertos e custo).
 
 ## 4. Geração da peça

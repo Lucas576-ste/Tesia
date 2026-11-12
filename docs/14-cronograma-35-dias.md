@@ -162,21 +162,23 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Extração de texto do PDF, com leitura pelo Claude quando vier vazio
 - `packages/ia`: cliente da API, registro de tokens e custo em `uso_ia`
 
-**Feito em 2026-11-11:** texto extraído com `unpdf` e gravado em `intimacoes.texto`; PDF escaneado transcrito pelo Haiku, com custo em `uso_ia`. A intimação segue em `processando` até a análise do Dia 19. Falta testar o PDF escaneado com a chave da API, que entra depois.
+**Feito em 2026-11-11:** texto extraído com `unpdf` e gravado em `intimacoes.texto`; PDF escaneado transcrito pelo Haiku, com custo em `uso_ia`. A intimação segue em `processando` até a análise do Dia 19. PDF escaneado testado com a API real em 2026-11-12.
 
 ### Dia 19 — Prompts da análise ✅
 - Extração (Haiku, JSON validado com zod)
 - Resumo e pontos atacáveis
 - Escolha da peça entre as opções do banco
 
-**Feito em 2026-11-12:** as três etapas em `packages/ia/src/analise/`, testadas com respostas simuladas. A rodada com a API real (`pnpm --filter @tesia/ia avaliar`) fica para quando a chave existir.
+**Feito em 2026-11-12:** as três etapas em `packages/ia/src/analise/`, testadas com respostas simuladas. Avaliação com a API real em 2026-11-12: 12/12 acertos nos 3 casos, cerca de US$ 0,001 por intimação.
 
-### Dia 20 — Análise funcionando de ponta a ponta
+### Dia 20 — Análise funcionando de ponta a ponta ✅
 - Worker grava extração, prazo calculado e resumo
 - Tela de análise com dados reais e atualização ao terminar
 - Confirmação do prazo → prazo aparece no painel real
 
 **Pronto quando:** uma intimação real vira um prazo confirmado no painel.
+
+**Feito em 2026-11-12:** worker grava processo, prazo sugerido e análise; tela de análise e painel com dados reais; confirmação grava no banco. Testado ponta a ponta com IA simulada e depois com o Claude (PDF com texto e escaneado, cerca de US$ 0,0013 por intimação). Os modais do painel (prazo manual e prazo interno) ainda não gravam no banco.
 
 ### Dia 21 — Folga para atrasos
 - Usar para terminar o que ficou pendente na semana

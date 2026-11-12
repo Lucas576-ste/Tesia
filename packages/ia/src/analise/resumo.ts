@@ -17,10 +17,10 @@ export type Resumo = z.infer<typeof resumoSchema>;
 export const MAXIMO_FRASES_RESUMO = 4;
 
 export function limitarFrases(texto: string, maximo = MAXIMO_FRASES_RESUMO) {
-  const frases = texto.trim().match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) ?? [];
-  return frases
+  return texto
+    .trim()
+    .split(/(?<=[.!?])\s+(?=["“(]?[A-ZÀ-Ý])/u)
     .slice(0, maximo)
-    .map((frase) => frase.trim())
     .join(" ");
 }
 

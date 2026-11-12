@@ -1,16 +1,30 @@
 import {
   ehErroDefinitivoDaApi,
+  escolherPeca,
+  extrairDados,
   lerDocumento,
   RespostaInvalidaDaIa,
+  resumirIntimacao,
   transcreverPdf,
-  type Leitura,
 } from "@tesia/ia";
+import type { AnaliseGravada } from "@tesia/shared";
 import { z } from "zod";
+import { buscarCalendario, buscarOpcoes, gravarAnalise, registrarUso } from "../analise/banco.js";
+import {
+  calcularPrazoSugerido,
+  hojeEmBrasilia,
+  montarCalendario,
+  motivoSemPrazo,
+  nomeDaPeca,
+  opcoesParaIa,
+  regraDaPeca,
+  siglaTribunal,
+} from "../analise/montar.js";
 import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ intimacao_id: z.uuid() });
-const linhaSchema = z.object({ arquivo_path: z.string() });
+const linhaSchema = z.object({ arquivo_path: z.string(), texto: z.string().nullable() });
 
 function intimacaoDoJob(job: Job) {
   const resultado = dadosSchema.safeParse(job.dados);
@@ -18,9 +32,9 @@ function intimacaoDoJob(job: Job) {
   return resultado.data.intimacao_id;
 }
 
-async function ler(pdf: Uint8Array, { ia }: Contexto): Promise<Leitura> {
+async function comIa<T>(chamada: () => Promise<T>): Promise<T> {
   try {
-    return await lerDocumento(pdf, { transcrever: (arquivo) => transcreverPdf(ia, arquivo) });
+    return await chamada();
   } catch (erro) {
     if (erro instanceof RespostaInvalidaDaIa || ehErroDefinitivoDaApi(erro)) {
       throw new ErroDefinitivo(erro instanceof Error ? erro.message : String(erro));
@@ -29,38 +43,17 @@ async function ler(pdf: Uint8Array, { ia }: Contexto): Promise<Leitura> {
   }
 }
 
-async function registrarUso(job: Job, leitura: Leitura, { db }: Contexto) {
-  if (leitura.origem !== "ia") return;
-  const { uso, versaoPrompt, duracaoMs } = leitura.transcricao;
-  await db.query(
-    `insert into uso_ia (escritorio_id, job_id, etapa, modelo, versao_prompt,
-       tokens_entrada, tokens_cache, tokens_saida, custo_estimado, duracao_ms)
-     values ($1, $2, 'transcricao', $3, $4, $5, $6, $7, $8, $9)`,
-    [
-      job.escritorio_id,
-      job.id,
-      uso.modelo,
-      versaoPrompt,
-      uso.tokensEntrada,
-      uso.tokensCache,
-      uso.tokensSaida,
-      uso.custoEstimado,
-      duracaoMs,
-    ],
-  );
-}
-
-async function executar(job: Job, contexto: Contexto) {
-  const { db, supabase, registrar } = contexto;
-  const intimacaoId = intimacaoDoJob(job);
+async function obterTexto(job: Job, intimacaoId: string, contexto: Contexto) {
+  const { db, supabase, ia, registrar } = contexto;
   const { rows } = await db.query(
     `update intimacoes set status = 'processando'
      where id = $1 and escritorio_id = $2 and excluido_em is null
-     returning arquivo_path`,
+     returning arquivo_path, texto`,
     [intimacaoId, job.escritorio_id],
   );
   const linha = linhaSchema.safeParse(rows[0]);
   if (!linha.success) throw new ErroDefinitivo("Intimação ou arquivo não encontrado");
+  if (linha.data.texto) return linha.data.texto;
 
   const { data, error } = await supabase.storage
     .from("intimacoes")
@@ -71,8 +64,11 @@ async function executar(job: Job, contexto: Contexto) {
   const cabecalho = Buffer.from(pdf.subarray(0, 5)).toString("latin1");
   if (!cabecalho.startsWith("%PDF")) throw new ErroDefinitivo("O arquivo não é um PDF válido");
 
-  const leitura = await ler(pdf, contexto);
-  await registrarUso(job, leitura, contexto);
+  const leitura = await comIa(() =>
+    lerDocumento(pdf, { transcrever: (arquivo) => transcreverPdf(ia, arquivo) }),
+  );
+  if (leitura.origem === "ia")
+    await registrarUso(db, job, { etapa: "transcricao", ...leitura.transcricao });
   await db.query("update intimacoes set texto = $1 where id = $2 and escritorio_id = $3", [
     leitura.texto,
     intimacaoId,
@@ -83,6 +79,89 @@ async function executar(job: Job, contexto: Contexto) {
     origem: leitura.origem,
     paginas: leitura.paginas,
     caracteres: leitura.texto.length,
+  });
+  return leitura.texto;
+}
+
+async function executar(job: Job, contexto: Contexto) {
+  const { db, ia, registrar } = contexto;
+  const intimacaoId = intimacaoDoJob(job);
+  const texto = await obterTexto(job, intimacaoId, contexto);
+
+  const extracao = await comIa(() => extrairDados(ia, texto));
+  await registrarUso(db, job, { etapa: "extracao", ...extracao });
+  const dados = extracao.resultado;
+
+  const opcoes = await buscarOpcoes(db, dados.area, dados.rito, dados.tipo_ato);
+  const escolha = await comIa(() => escolherPeca(ia, dados, opcoesParaIa(opcoes)));
+  await registrarUso(db, job, { etapa: "escolha_peca", ...escolha });
+  const recomendada = escolha.resultado.recomendada.codigo;
+  const regra = regraDaPeca(opcoes, recomendada);
+
+  const tribunal = siglaTribunal(dados.numero_processo, dados.tribunal);
+  const { feriados, suspensoes } = await buscarCalendario(
+    db,
+    job.escritorio_id,
+    tribunal,
+    dados.uf,
+    dados.municipio,
+  );
+  const calendario = montarCalendario(feriados, suspensoes, dados.rito);
+  const prazo = calcularPrazoSugerido(
+    regra,
+    dados.data_disponibilizacao,
+    calendario,
+    hojeEmBrasilia(),
+  );
+
+  const resumo = await comIa(() => resumirIntimacao(ia, texto, dados));
+  await registrarUso(db, job, { etapa: "resumo", ...resumo });
+
+  const analise: AnaliseGravada = {
+    versao: 1,
+    dados,
+    resumo: resumo.resultado,
+    pecas: [
+      { ...escolha.resultado.recomendada, recomendada: true },
+      ...escolha.resultado.alternativas.map((alternativa) => ({
+        ...alternativa,
+        recomendada: false,
+      })),
+    ].map((peca) => ({ ...peca, nome: nomeDaPeca(opcoes, peca.codigo) })),
+    prazo:
+      regra && prazo
+        ? {
+            dias: regra.dias,
+            contagem: regra.contagem,
+            fundamento: regra.fundamento,
+            regra_revisada: regra.ativa,
+          }
+        : null,
+    motivo_sem_prazo: prazo ? null : motivoSemPrazo(regra, dados.data_disponibilizacao),
+  };
+
+  await gravarAnalise(db, {
+    job,
+    intimacaoId,
+    analise,
+    tribunal,
+    prazo:
+      regra && prazo
+        ? {
+            ...prazo,
+            regraId: regra.id,
+            descricao: nomeDaPeca(opcoes, recomendada),
+            dias: regra.dias,
+            contagem: regra.contagem,
+            memoria_calculo: { linhas: prazo.memoria, regra_revisada: regra.ativa },
+          }
+        : null,
+  });
+  registrar("intimacao_analisada", {
+    job_id: job.id,
+    tipo_ato: dados.tipo_ato,
+    com_prazo: Boolean(prazo),
+    regra_revisada: regra?.ativa ?? null,
   });
 }
 

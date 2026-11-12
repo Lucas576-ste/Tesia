@@ -9,10 +9,9 @@ import { BalaoLia } from "@/components/lia/balao-lia";
 import { AvisoPro } from "@/components/plano/aviso-pro";
 import { ModalLimite } from "@/components/plano/modal-limite";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Analise } from "@/lib/analises-exemplo";
+import type { Analise } from "@/lib/analise";
 import { BlocoPrazo } from "./bloco-prazo";
 import { DocumentoOriginal } from "./documento-original";
 import { EscolhaPeca } from "./escolha-peca";
@@ -27,7 +26,7 @@ const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block
 export function TelaAnalise({ analise }: { analise: Analise }) {
   const [aba, setAba] = useState("analise");
   const [destaque, setDestaque] = useState<string | null>(null);
-  const [confirmado, setConfirmado] = useState(false);
+  const [confirmado, setConfirmado] = useState(analise.confirmado);
   const router = useRouter();
   const { plano, uso } = usePlanoDemo();
   const [limiteAberto, setLimiteAberto] = useState(false);
@@ -54,10 +53,7 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
         </Link>
       </Button>
       <header className="flex flex-col gap-1">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h1 className="text-2xl font-semibold text-titulo md:text-3xl">{analise.partes}</h1>
-          <Badge variant="secondary">Dados de exemplo</Badge>
-        </div>
+        <h1 className="text-2xl font-semibold text-titulo md:text-3xl">{analise.partes}</h1>
         <p className="text-sm text-texto-secundario">
           <span className="whitespace-nowrap tabular-nums">{analise.cnj}</span> · {analise.orgao}
         </p>
@@ -81,24 +77,38 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 <section className="rounded-xl border bg-card p-4 shadow-xs">
                   <h2 className="text-lg font-semibold">Pontos que podem ser atacados</h2>
                   <ul className="mt-2 flex flex-col gap-2 text-sm">
-                    {analise.pontos.map(({ titulo, trechoId }) => (
+                    {analise.pontos.length === 0 && (
+                      <li className="text-texto-secundario">
+                        Não encontrei um ponto claro para atacar nesta decisão.
+                      </li>
+                    )}
+                    {analise.pontos.map(({ titulo, explicacao, trechoId }) => (
                       <li
-                        key={trechoId}
+                        key={titulo}
                         className="flex flex-wrap items-center justify-between gap-2"
                       >
                         <span className="flex min-w-0 flex-1 basis-48 gap-2">
                           <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-primaria" />
-                          {titulo}
+                          <span>
+                            {titulo}
+                            {explicacao && (
+                              <span className="block text-xs text-texto-secundario">
+                                {explicacao}
+                              </span>
+                            )}
+                          </span>
                         </span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          aria-pressed={destaque === trechoId}
-                          onClick={() => verTrecho(trechoId)}
-                        >
-                          <Quote aria-hidden />
-                          Ver trecho
-                        </Button>
+                        {trechoId && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            aria-pressed={destaque === trechoId}
+                            onClick={() => verTrecho(trechoId)}
+                          >
+                            <Quote aria-hidden />
+                            Ver trecho
+                          </Button>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -110,7 +120,10 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 />
               )}
               <BlocoPrazo
+                intimacaoId={analise.id}
                 prazo={analise.prazo}
+                motivoSemPrazo={analise.motivoSemPrazo}
+                hoje={analise.hoje}
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
               />

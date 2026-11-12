@@ -2,9 +2,10 @@ import { CircleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EstadoVazio } from "@/components/estado-vazio";
+import { AnaliseEmAndamento } from "@/components/intimacao/analise-em-andamento";
 import { TelaAnalise } from "@/components/intimacao/tela-analise";
 import { Button } from "@/components/ui/button";
-import { buscarAnalise } from "@/lib/analises-exemplo";
+import { buscarIntimacao } from "@/lib/analise";
 
 export const metadata: Metadata = { title: "Análise da intimação · Tesia" };
 
@@ -33,20 +34,24 @@ type AnalisePageProps = {
 
 export default async function AnalisePage({ params }: AnalisePageProps) {
   const { id } = await params;
-  if (id === "ilegivel") return <DocumentoIlegivel />;
+  const intimacao = await buscarIntimacao(id);
 
-  const analise = buscarAnalise(id);
-  if (analise) return <TelaAnalise key={analise.id} analise={analise} />;
-
-  return (
-    <EstadoVazio
-      titulo="Esta análise não faz parte da demonstração"
-      descricao="Por enquanto, há exemplos completos de dois prazos."
-      acao={
-        <Button asChild variant="outline">
-          <Link href="/app/intimacoes/1">Ver um exemplo</Link>
-        </Button>
-      }
-    />
-  );
+  if (!intimacao) {
+    return (
+      <EstadoVazio
+        titulo="Intimação não encontrada"
+        descricao="Ela pode ter sido excluída ou pertencer a outro escritório."
+        acao={
+          <Button asChild variant="outline">
+            <Link href="/app/intimacoes/nova">Enviar uma intimação</Link>
+          </Button>
+        }
+      />
+    );
+  }
+  if (intimacao.status === "erro") return <DocumentoIlegivel />;
+  if (intimacao.status !== "analisada") {
+    return <AnaliseEmAndamento lendo={intimacao.status === "processando"} />;
+  }
+  return <TelaAnalise key={intimacao.analise.id} analise={intimacao.analise} />;
 }

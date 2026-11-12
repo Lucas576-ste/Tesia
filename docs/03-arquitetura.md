@@ -31,10 +31,11 @@
 3. O worker pega o job:
    1. Extrai o texto do PDF com `unpdf`. Se vier com menos de 100 caracteres por página (escaneado), o Claude Haiku transcreve o PDF. O texto vai para `intimacoes.texto` e o consumo para `uso_ia`.
    2. Chama a IA de extração (Haiku) e recebe um JSON com partes, ato, datas e resultado.
-   3. O motor de prazos calcula o vencimento a partir das regras e dos feriados.
-   4. A IA escolhe a peça cabível entre as opções da tabela `tipos_peca`.
-   5. Gera o resumo.
-4. O resultado é gravado e o status vira `analisada`. A tela é avisada (Supabase Realtime ou polling).
+   3. Busca as peças possíveis em `regras_prazo` (área, rito e tipo de ato) e a IA escolhe uma delas.
+   4. O motor de prazos calcula o vencimento da peça escolhida com os feriados do tribunal (sigla tirada do número CNJ), da UF e do escritório, mais as suspensões.
+   5. Gera o resumo e os pontos atacáveis.
+   6. Numa transação: cria ou atualiza o processo pelo número CNJ, grava o prazo `sugerido` e a análise em `intimacoes.extracao`, e o status vira `analisada`.
+4. A tela da intimação consulta a cada 3 segundos enquanto ela está na fila ou em leitura, e mostra a análise quando termina.
 5. O advogado confirma o prazo e pede o rascunho. Um novo job de geração entra na fila.
 6. O worker gera a peça (Sonnet + perfil de estilo + RAG + documentos do processo), roda a revisão de citações e grava a peça com status `rascunho`.
 7. No download, o worker preenche o .docx modelo do advogado.

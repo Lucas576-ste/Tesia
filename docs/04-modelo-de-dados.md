@@ -95,7 +95,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | data_publicacao | date | calculada |
 | tipo_ato | text | ex.: `sentenca`, `decisao_interlocutoria`, `despacho` |
 | resultado | text | ex.: `improcedente` |
-| extracao | jsonb | JSON completo devolvido pela IA |
+| extracao | jsonb | análise gravada pelo worker: `versao`, `dados` (extração), `resumo`, `pecas` (recomendada e alternativas), `prazo` (dias, contagem, fundamento, `regra_revisada`) e `motivo_sem_prazo`. Schema em `packages/shared/src/analise.ts` |
 | resumo | text | |
 | status | enum | `recebida`, `processando`, `analisada`, `erro` |
 
