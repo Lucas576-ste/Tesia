@@ -11,7 +11,7 @@
 - TypeScript, monorepo com Turborepo + pnpm, pacotes `@tesia/*`
 - Next.js + React + Tailwind, com a API nas rotas do Next.js
 - Worker Node.js separado para OCR, IA, documentos e notificações
-- PostgreSQL, Auth e Storage no Supabase (São Paulo), pgvector, fila com pg-boss
+- PostgreSQL, Auth e Storage no Supabase (São Paulo), pgvector, fila própria em tabela do Postgres
 - API do Claude (Haiku para extração e resumo, Sonnet para peças), zod, docxtemplater, Resend, Sentry
 - Sem NestJS no MVP (decisão de 2026-11-04 em `docs/11-decisoes.md`).
 
@@ -48,9 +48,9 @@ Rodar na raiz:
 - `pnpm build`: gera o build de web e worker
 - `pnpm lint`: roda o ESLint
 - `pnpm typecheck`: checa os tipos de todos os pacotes
-- `pnpm test`: roda os testes (hoje, os do motor de prazos)
+- `pnpm test`: roda os testes (motor de prazos e `packages/ia`)
 - As variáveis ficam em `.env.local` na raiz; `apps/web/.env.local` é um link para ele (os dois são ignorados pelo git)
 - `pnpm --filter @tesia/db test:local`: aplica migrations e seeds num Postgres local (Docker) e testa o RLS
 - `pnpm format`: formata com o Prettier
 - `pnpm --filter @tesia/web dev`: sobe só um app (troque pelo pacote desejado)
-- `pnpm --filter @tesia/worker dev`: sobe o worker, que lê o `.env.local` da raiz e consome a tabela `fila`
+- `pnpm --filter @tesia/worker dev`: sobe o worker, que lê o `.env.local` da raiz e consome a tabela `fila` (precisa de `ANTHROPIC_API_KEY`)

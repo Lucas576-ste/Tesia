@@ -158,9 +158,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-10:** fila própria no Postgres no lugar do pg-boss, testada ponta a ponta com o Supabase real. Por enquanto o worker confere o arquivo e deixa a intimação em `processando`; a leitura entra no Dia 18.
 
-### Dia 18 — Leitura do documento e cliente de IA
+### Dia 18 — Leitura do documento e cliente de IA ✅
 - Extração de texto do PDF, com leitura pelo Claude quando vier vazio
 - `packages/ia`: cliente da API, registro de tokens e custo em `uso_ia`
+
+**Feito em 2026-11-11:** texto extraído com `unpdf` e gravado em `intimacoes.texto`; PDF escaneado transcrito pelo Haiku, com custo em `uso_ia`. A intimação segue em `processando` até a análise do Dia 19. Falta testar o PDF escaneado com a chave da API, que entra depois.
 
 ### Dia 19 — Prompts da análise
 - Extração (Haiku, JSON validado com zod)

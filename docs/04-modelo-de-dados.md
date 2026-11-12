@@ -230,7 +230,7 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 `escritorio_id`, `competencia` (ex.: `2026-11`), `pecas_geradas`, `pecas_extras`, `posts_gerados`, `tokens_entrada`, `tokens_saida`, `custo_estimado`.
 
 ### uso_ia
-Uma linha por chamada: `escritorio_id`, `job_id`, `etapa`, `modelo`, `tokens_entrada`, `tokens_cache`, `tokens_saida`, `custo_estimado`, `duracao_ms`.
+Uma linha por chamada: `escritorio_id`, `job_id`, `etapa`, `modelo`, `versao_prompt` (ex.: `transcricao@1`), `tokens_entrada`, `tokens_cache`, `tokens_saida`, `custo_estimado`, `duracao_ms`.
 
 ## Equipe e indicação
 

@@ -29,7 +29,7 @@
 1. O advogado envia o PDF pela web.
 2. O navegador envia o PDF direto ao bucket privado `intimacoes`, na pasta do escritório. A API grava a intimação com status `recebida`, e um gatilho no banco cria o job na tabela `fila`, na mesma transação.
 3. O worker pega o job:
-   1. Extrai o texto do PDF. Se vier vazio, usa OCR.
+   1. Extrai o texto do PDF com `unpdf`. Se vier com menos de 100 caracteres por página (escaneado), o Claude Haiku transcreve o PDF. O texto vai para `intimacoes.texto` e o consumo para `uso_ia`.
    2. Chama a IA de extração (Haiku) e recebe um JSON com partes, ato, datas e resultado.
    3. O motor de prazos calcula o vencimento a partir das regras e dos feriados.
    4. A IA escolhe a peça cabível entre as opções da tabela `tipos_peca`.

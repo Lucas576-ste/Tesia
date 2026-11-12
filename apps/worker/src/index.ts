@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { criarClienteIa } from "@tesia/ia";
 import pg from "pg";
 import { ambiente } from "./ambiente.js";
 import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from "./fila.js";
@@ -9,18 +10,20 @@ const tarefas: Record<string, Tarefa> = {
   analisar_intimacao: analisarIntimacao,
 };
 
+function registrar(evento: string, dados: Record<string, unknown>) {
+  console.log(JSON.stringify({ evento, ...dados, em: new Date().toISOString() }));
+}
+
 const contexto: Contexto = {
   db: new pg.Pool({ connectionString: ambiente.DATABASE_URL, max: 3 }),
   supabase: createClient(ambiente.NEXT_PUBLIC_SUPABASE_URL, ambiente.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   }),
+  ia: criarClienteIa(ambiente.ANTHROPIC_API_KEY),
+  registrar,
 };
 
 let ativo = true;
-
-function registrar(evento: string, dados: Record<string, unknown>) {
-  console.log(JSON.stringify({ evento, ...dados, em: new Date().toISOString() }));
-}
 
 async function processar(job: Job) {
   const inicio = Date.now();

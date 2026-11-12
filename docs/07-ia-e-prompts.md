@@ -25,6 +25,14 @@
 
 Uma vez por advogado (e quando ele adiciona peças): **0. Perfil de estilo** (Sonnet).
 
+## Leitura do documento
+
+**Modelo:** Haiku, só quando o PDF não tem texto (escaneado).
+- O worker extrai o texto direto do PDF com `unpdf`. Com menos de 100 caracteres por página, envia o PDF ao Haiku.
+- Prompt `transcricao@1` (`packages/ia/src/prompts/transcricao.ts`): transcrever tudo, na ordem, sem resumir nem corrigir; trecho ilegível vira `[ILEGÍVEL]`.
+- Esforço `low` e streaming. Resposta cortada, recusa ou transcrição vazia viram erro definitivo, e a intimação fica como `erro`.
+- O custo é calculado em `packages/ia/src/custo.ts` com a tabela de `modelos.ts` e gravado em `uso_ia`.
+
 ## 0. Perfil de estilo
 
 **Entrada:** texto das peças enviadas pelo advogado.
