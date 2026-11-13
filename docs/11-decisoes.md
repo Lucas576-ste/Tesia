@@ -73,6 +73,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | PDF enviado direto do navegador ao Storage, na pasta do escritório | Evita o limite de tamanho das funções da Vercel; o RLS do Storage impede pasta alheia |
 | 2026-11-11 | OCR de PDF escaneado pelo Claude Haiku, no lugar do AWS Textract | Uma conta a menos; o Haiku já lê PDF e custa menos de um centavo por intimação |
 | 2026-11-12 | Trechos citados pela IA são conferidos no texto do documento pelo código, e os que não existem são descartados | A IA não pode apontar como base da decisão algo que o documento não diz |
+| 2026-11-13 | Embeddings com Voyage `voyage-law-2` | Modelo treinado em textos jurídicos, 1024 dimensões, recomendado pela Anthropic; centavos por mês |
+| 2026-11-13 | Peças de estilo só em PDF ou DOCX | O .doc antigo não tem extração de texto confiável |
 | 2026-11-12 | Visão de crescer de solo e dupla até o nível corporativo; MVP segue focado em solo e dupla | Ideias de todos os níveis guardadas no banco de ideias de `08-roadmap.md`, sem descartar nenhuma |
 | 2026-11-12 | Intimação pelo portal calculada pela ciência (abertura ou 10º dia corrido após o envio); citação sem cálculo automático no MVP | Regra confirmada com advogado; a citação tem início variável conforme a forma |
 | 2026-11-12 | Regras de prazo ainda não revisadas são usadas no cálculo, com aviso na análise | Sem isso nenhum prazo seria calculado até a revisão; o advogado confirma toda data antes de ir ao painel |
@@ -87,7 +89,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Teste manual de peças com o prompt de estilo | Lucas | |
 | Recrutar 1 advogado revisor por área | Lucas | |
 | Confirmar o nome Tesia: domínio no registro.br, marca no INPI (classes 9, 42 e 45) e @ no Instagram | Lucas | Antes do dia 32 |
-| Escolher o provedor de embeddings (Voyage ou OpenAI) | Lucas | |
+| Cadastrar cartão na Voyage para liberar o limite de chamadas por minuto | Lucas | Antes do lançamento |
 | Confirmar os termos do provedor de IA sobre retenção e treino | Lucas | Antes do lançamento |
 | Pesquisar DJEN, Diários Oficiais e APIs pagas de intimações (cobertura, custo, atraso, termos e LGPD) | Lucas | Durante o beta |
 | Validar com advogados o padrão do prazo interno e as perguntas de `16-plano-sugestoes-advogado.md` | Lucas | Ao mostrar as telas |

@@ -32,7 +32,7 @@ Estimativa por peça:
 | Peça gerada (Sonnet) | ~4 mil | US$ 0,04 |
 | **Total** | | **US$ 0,08 a 0,25 ≈ R$ 0,45 a R$ 1,40** |
 
-Processos longos aumentam o custo. Embeddings custam centavos por mês.
+Processos longos aumentam o custo. Embeddings custam centavos por mês: Voyage `voyage-law-2` sai a cerca de US$ 0,12 por milhão de tokens, com 50 milhões grátis por conta. Uma peça de estilo usa de 200 a 2.000 tokens.
 
 ## Custo de pagamento (Asaas)
 

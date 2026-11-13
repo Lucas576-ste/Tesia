@@ -1,8 +1,10 @@
 "use client";
 
-import { CheckCircle2, CircleAlert, FileText, LoaderCircle, X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { StatusPeca } from "@/components/estilo/status-peca";
+import { usePecasEstilo } from "@/components/estilo/usar-pecas-estilo";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,103 +16,35 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ZonaUpload } from "@/components/zona-upload";
-import { cn } from "@/lib/utils";
+import {
+  ACEITOS_PECA_ESTILO,
+  MAXIMO_PECAS_ESTILO as MAXIMO,
+  MINIMO_PECAS_ESTILO as MINIMO,
+  type PecaEstilo,
+} from "@/lib/estilo";
 import { PainelAprendizado } from "./painel-aprendizado";
 
-const MINIMO = 5;
-const MAXIMO = 10;
-const FORMATOS = /\.(pdf|docx?)$/i;
-
-type StatusPeca = "enviando" | "lendo" | "lido" | "erro";
-
-type Peca = {
-  id: number;
-  nome: string;
-  status: StatusPeca;
-  erro?: string;
+type EnvioPecasProps = {
+  escritorioId: string;
+  usuarioId: string;
+  pecasIniciais: PecaEstilo[];
 };
 
-const rotulos: Record<Exclude<StatusPeca, "erro">, string> = {
-  enviando: "Enviando",
-  lendo: "Lendo",
-  lido: "Lido",
-};
-
-function StatusArquivo({ peca }: { peca: Peca }) {
-  if (peca.status === "erro") {
-    return (
-      <span className="flex items-center gap-1 text-xs text-erro">
-        <CircleAlert aria-hidden className="size-4 shrink-0" />
-        {peca.erro}
-      </span>
-    );
-  }
-
-  const lido = peca.status === "lido";
-  const Icone = lido ? CheckCircle2 : LoaderCircle;
-  return (
-    <span
-      className={cn(
-        "flex items-center gap-1 text-xs",
-        lido ? "text-sucesso" : "text-texto-secundario",
-      )}
-    >
-      <Icone aria-hidden className={cn("size-4 shrink-0", !lido && "animate-spin")} />
-      {rotulos[peca.status]}
-    </span>
+export function EnvioPecas({ escritorioId, usuarioId, pecasIniciais }: EnvioPecasProps) {
+  const { pecas, adicionar, remover, lidas } = usePecasEstilo(
+    escritorioId,
+    usuarioId,
+    pecasIniciais,
   );
-}
-
-export function EnvioPecas() {
-  const [pecas, setPecas] = useState<Peca[]>([]);
   const [avisoAberto, setAvisoAberto] = useState(false);
-  const proximoId = useRef(0);
-  const temporizadores = useRef(new Set<ReturnType<typeof setTimeout>>());
-
-  useEffect(() => {
-    const ativos = temporizadores.current;
-    return () => ativos.forEach(clearTimeout);
-  }, []);
-
-  const lidas = pecas.filter(({ status }) => status === "lido").length;
   const pronto = lidas >= MINIMO;
-
-  function agendar(id: number, status: StatusPeca, espera: number) {
-    const temporizador = setTimeout(() => {
-      temporizadores.current.delete(temporizador);
-      setPecas((atuais) => atuais.map((peca) => (peca.id === id ? { ...peca, status } : peca)));
-    }, espera);
-    temporizadores.current.add(temporizador);
-  }
-
-  function adicionar(arquivos: File[]) {
-    let validas = pecas.filter(({ status }) => status !== "erro").length;
-    const novas = arquivos.map<Peca>((arquivo) => {
-      const id = proximoId.current++;
-      if (!FORMATOS.test(arquivo.name)) {
-        return { id, nome: arquivo.name, status: "erro", erro: "Envie PDF ou Word" };
-      }
-      if (validas >= MAXIMO) {
-        return { id, nome: arquivo.name, status: "erro", erro: `Limite de ${MAXIMO} peças` };
-      }
-      validas += 1;
-      agendar(id, "lendo", 500);
-      agendar(id, "lido", 1200);
-      return { id, nome: arquivo.name, status: "enviando" };
-    });
-    setPecas((atuais) => [...atuais, ...novas]);
-  }
-
-  function remover(id: number) {
-    setPecas((atuais) => atuais.filter((peca) => peca.id !== id));
-  }
 
   return (
     <div className="flex flex-col gap-4">
       <ZonaUpload
         titulo="Arraste suas peças ou clique para escolher"
-        descricao={`De ${MINIMO} a ${MAXIMO} peças em PDF ou Word`}
-        accept=".pdf,.doc,.docx"
+        descricao={`De ${MINIMO} a ${MAXIMO} peças em PDF ou Word (.docx)`}
+        accept={ACEITOS_PECA_ESTILO}
         aoEscolher={adicionar}
       />
       <p role="status" className="text-sm font-medium tabular-nums">
@@ -126,13 +60,13 @@ export function EnvioPecas() {
               <FileText aria-hidden className="size-4 shrink-0 text-texto-secundario" />
               <span className="min-w-0 flex-1 break-all">{peca.nome}</span>
               <span className="order-last w-full pl-6 sm:order-none sm:w-auto sm:pl-0">
-                <StatusArquivo peca={peca} />
+                <StatusPeca peca={peca} />
               </span>
               <Button
                 variant="ghost"
                 size="icon-sm"
                 aria-label={`Remover ${peca.nome}`}
-                onClick={() => remover(peca.id)}
+                onClick={() => void remover(peca.id)}
               >
                 <X aria-hidden />
               </Button>

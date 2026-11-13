@@ -149,7 +149,8 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 |---|---|---|
 | escritorio_id | uuid | |
 | usuario_id | uuid | |
-| arquivo_path | text | |
+| arquivo_path | text | `escritorio_id/usuario_id/uuid.pdf\|docx` no bucket privado `estilo` |
+| nome_arquivo | text | nome original, para a lista |
 | tipo_peca_id | uuid | detectado ou informado |
 | area | text | |
 | texto | text | |
@@ -160,9 +161,11 @@ Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: 
 |---|---|---|
 | estilo_documento_id | uuid | |
 | escritorio_id | uuid | |
-| secao | text | ex.: `sintese_fatos`, `merito`, `pedidos` |
+| secao | text | `enderecamento`, `qualificacao`, `fatos`, `preliminares`, `fundamentos`, `pedidos`, `fechamento` ou `outra` |
 | texto | text | |
-| embedding | vector(1024) | 1024 serve para Voyage e OpenAI (com o parâmetro de dimensões) |
+| embedding | vector(1024) | Voyage `voyage-law-2` |
+
+Cada peça nova entra na `fila` como `processar_peca_estilo` (gatilho). O worker extrai o texto, divide em seções (trechos de até 1.500 caracteres) e grava os embeddings.
 
 ### perfis_estilo
 | Campo | Tipo | Observação |

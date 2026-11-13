@@ -150,9 +150,40 @@ exception
 end;
 $$;
 
+insert into storage.objects (bucket_id, name)
+select 'estilo', current_setting('teste.esc_a') || '/u/peca.docx';
+
 do $$
 begin
-  assert (select count(*) from storage.objects) = 1, 'A deveria ver só o próprio arquivo';
+  insert into storage.objects (bucket_id, name)
+  values ('estilo', current_setting('teste.esc_b') || '/u/invasao.docx');
+  raise exception 'A não pode enviar peça de estilo na pasta de B';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
+insert into estilo_documentos (escritorio_id, usuario_id, arquivo_path, nome_arquivo)
+select escritorio_id, id, escritorio_id || '/u/peca.docx', 'peca.docx'
+from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+
+do $$
+begin
+  insert into estilo_documentos (escritorio_id, usuario_id, arquivo_path, nome_arquivo)
+  select escritorio_id, id, current_setting('teste.esc_b') || '/u/x.docx', 'x.docx'
+  from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  raise exception 'Peça de estilo não pode apontar para arquivo de outro escritório';
+exception
+  when check_violation then null;
+end;
+$$;
+
+insert into estilo_trechos (escritorio_id, estilo_documento_id, secao, texto)
+select escritorio_id, id, 'fatos', 'Trecho de teste' from estilo_documentos;
+
+do $$
+begin
+  assert (select count(*) from storage.objects) = 2, 'A deveria ver só os próprios arquivos';
   perform 1 from fila;
   raise exception 'Usuário logado não pode ler a fila';
 exception
@@ -168,6 +199,8 @@ begin
   assert (select count(*) from prazos) = 0, 'B não deveria ver prazos de A';
   assert (select count(*) from feriados where escritorio_id is not null) = 1, 'B deveria ver só o próprio feriado';
   assert (select parte_contraria from processos) is null, 'O processo de B não deveria ter sido alterado';
+  assert (select count(*) from estilo_documentos) = 0, 'B não deveria ver peças de estilo de A';
+  assert (select count(*) from estilo_trechos) = 0, 'B não deveria ver trechos de A';
 end;
 $$;
 
@@ -199,6 +232,14 @@ begin
   assert (select count(*) from fila where tipo = 'analisar_intimacao' and status = 'pendente'
     and escritorio_id = current_setting('teste.esc_a')::uuid) = 1,
     'Intimação nova deveria criar um job na fila';
+end;
+$$;
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'processar_peca_estilo' and status = 'pendente'
+    and escritorio_id = current_setting('teste.esc_a')::uuid) = 1,
+    'Peça de estilo nova deveria criar um job na fila';
 end;
 $$;
 

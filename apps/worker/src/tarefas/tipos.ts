@@ -7,6 +7,7 @@ export type Contexto = {
   db: Pool;
   supabase: SupabaseClient;
   ia: ClienteIa;
+  chaveEmbeddings: string;
   registrar: Registrar;
 };
 

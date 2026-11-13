@@ -12,7 +12,12 @@ import {
   type SuspensaoBanco,
 } from "./montar.js";
 
-export type UsoEtapa = { etapa: string; uso: UsoIa; versaoPrompt: string; duracaoMs: number };
+export type UsoEtapa = {
+  etapa: string;
+  uso: Omit<UsoIa, "modelo"> & { modelo: string };
+  versaoPrompt: string;
+  duracaoMs: number;
+};
 
 export async function registrarUso(
   db: Pool,

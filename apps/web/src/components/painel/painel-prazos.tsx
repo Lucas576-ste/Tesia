@@ -12,7 +12,6 @@ import { FaixaAlertaPrazo } from "@/components/layout/faixa-alerta-prazo";
 import { BalaoLia } from "@/components/lia/balao-lia";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { TabelaPrazos } from "@/components/tabela-prazos";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {

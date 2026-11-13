@@ -4,3 +4,4 @@ export { lerDocumento, textoSuficiente, type Leitura } from "./leitura.js";
 export { MODELOS, PRECOS_POR_MILHAO, type Modelo } from "./modelos.js";
 export { RespostaInvalidaDaIa, transcreverPdf, type Transcricao } from "./transcricao.js";
 export * from "./analise/index.js";
+export * from "./estilo/index.js";

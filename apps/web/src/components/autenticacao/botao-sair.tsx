@@ -1,7 +1,6 @@
 import { LogOut } from "lucide-react";
 import { sair } from "@/app/(autenticacao)/acoes";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 type BotaoSairProps = {
   variante?: "texto" | "icone";

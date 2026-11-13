@@ -5,6 +5,7 @@ const ambienteSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url("Defina NEXT_PUBLIC_SUPABASE_URL."),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20, "Defina SUPABASE_SERVICE_ROLE_KEY."),
   ANTHROPIC_API_KEY: z.string().min(20, "Defina ANTHROPIC_API_KEY."),
+  EMBEDDINGS_API_KEY: z.string().min(20, "Defina EMBEDDINGS_API_KEY (Voyage)."),
   INTERVALO_FILA_MS: z.coerce.number().int().positive().default(2000),
 });
 

@@ -9,58 +9,45 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ZonaUpload } from "@/components/zona-upload";
 import {
-  FORMATOS_PECA_ESTILO,
+  ACEITOS_PECA_ESTILO,
   MAXIMO_PECAS_ESTILO,
   MINIMO_PECAS_ESTILO,
   type PecaEstilo,
-} from "@/lib/estilo-exemplo";
+} from "@/lib/estilo";
+import { StatusPeca } from "./status-peca";
+import { usePecasEstilo } from "./usar-pecas-estilo";
 
-const HOJE_EXEMPLO = "04/11/2026";
+type TelaEstiloProps = {
+  escritorioId: string;
+  usuarioId: string;
+  pecasIniciais: PecaEstilo[];
+};
 
-export function TelaEstilo({ pecasIniciais }: { pecasIniciais: PecaEstilo[] }) {
-  const [pecas, setPecas] = useState(pecasIniciais);
-  const [mudou, setMudou] = useState(false);
+export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais }: TelaEstiloProps) {
+  const { pecas, adicionar, remover, lidas, validas } = usePecasEstilo(
+    escritorioId,
+    usuarioId,
+    pecasIniciais,
+  );
   const [usarRevisadas, setUsarRevisadas] = useState(true);
-
-  function adicionar(arquivos: File[]) {
-    const validos = arquivos.filter(({ name }) => FORMATOS_PECA_ESTILO.test(name));
-    if (validos.length < arquivos.length) toast.error("Envie peças em PDF ou Word.");
-    const vagas = MAXIMO_PECAS_ESTILO - pecas.length;
-    if (validos.length > vagas) toast.error(`O limite é de ${MAXIMO_PECAS_ESTILO} peças.`);
-    const novas = validos.slice(0, Math.max(vagas, 0)).map((arquivo) => ({
-      id: crypto.randomUUID(),
-      nome: arquivo.name,
-      data: HOJE_EXEMPLO,
-    }));
-    if (novas.length === 0) return;
-    setPecas((atuais) => [...atuais, ...novas]);
-    setMudou(true);
-  }
-
-  function remover(id: string) {
-    setPecas((atuais) => atuais.filter((peca) => peca.id !== id));
-    setMudou(true);
-  }
-
-  function atualizar() {
-    setMudou(false);
-    toast.success("Estilo atualizado neste exemplo. Nada foi enviado.");
-  }
 
   return (
     <div className="grid items-start gap-4 md:grid-cols-[1fr_20rem]">
       <div className="flex flex-col gap-4">
         <ZonaUpload
           titulo="Adicionar peças"
-          descricao={`De ${MINIMO_PECAS_ESTILO} a ${MAXIMO_PECAS_ESTILO} peças em PDF ou Word`}
-          accept=".pdf,.doc,.docx"
+          descricao={`De ${MINIMO_PECAS_ESTILO} a ${MAXIMO_PECAS_ESTILO} peças em PDF ou Word (.docx)`}
+          accept={ACEITOS_PECA_ESTILO}
           aoEscolher={adicionar}
         />
-        {pecas.length < MINIMO_PECAS_ESTILO && (
+        {validas < MINIMO_PECAS_ESTILO && (
           <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
             Com menos de {MINIMO_PECAS_ESTILO} peças, o rascunho fica mais genérico.
           </p>
         )}
+        <p className="text-sm font-medium tabular-nums">
+          {lidas} {lidas === 1 ? "peça lida" : "peças lidas"} de {MAXIMO_PECAS_ESTILO}
+        </p>
         {pecas.length === 0 ? (
           <EstadoVazio
             titulo="Nenhuma peça enviada"
@@ -68,22 +55,23 @@ export function TelaEstilo({ pecasIniciais }: { pecasIniciais: PecaEstilo[] }) {
           />
         ) : (
           <Card className="gap-0 py-0">
-            <ul>
-              {pecas.map(({ id, nome, data }) => (
+            <ul aria-live="polite">
+              {pecas.map((peca) => (
                 <li
-                  key={id}
-                  className="flex items-center gap-2 border-b p-3 text-sm last:border-b-0"
+                  key={peca.id}
+                  className="flex flex-wrap items-center gap-2 border-b p-3 text-sm last:border-b-0"
                 >
                   <FileText aria-hidden className="size-4 shrink-0 text-texto-secundario" />
-                  <span className="min-w-0 flex-1 break-all">{nome}</span>
+                  <span className="min-w-0 flex-1 break-all">{peca.nome}</span>
+                  <StatusPeca peca={peca} />
                   <span className="hidden text-xs text-texto-secundario tabular-nums sm:inline">
-                    {data}
+                    {peca.data}
                   </span>
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    aria-label={`Remover ${nome}`}
-                    onClick={() => remover(id)}
+                    aria-label={`Remover ${peca.nome}`}
+                    onClick={() => void remover(peca.id)}
                   >
                     <X aria-hidden />
                   </Button>
@@ -95,7 +83,10 @@ export function TelaEstilo({ pecasIniciais }: { pecasIniciais: PecaEstilo[] }) {
       </div>
       <div className="flex flex-col gap-4">
         <PainelAprendizado />
-        <Button disabled={!mudou} onClick={atualizar}>
+        <Button
+          disabled={lidas === 0}
+          onClick={() => toast.info("O perfil de estilo é montado a partir do próximo passo.")}
+        >
           Atualizar meu estilo
         </Button>
         <label className="flex cursor-pointer items-start gap-2 rounded-md border bg-card p-3 text-sm has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50">

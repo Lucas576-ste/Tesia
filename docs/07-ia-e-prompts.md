@@ -46,6 +46,10 @@ Uma vez por advogado (e quando ele adiciona peças): **0. Perfil de estilo** (So
 
 Além do perfil, cada peça é dividida em trechos por seção, que recebem embedding e vão para `estilo_trechos`.
 
+- Divisão por títulos ("DOS FATOS", "DO DIREITO", "DOS PEDIDOS", "I – ..."), sem IA, em `packages/ia/src/estilo/secoes.ts`. Endereçamento, qualificação e fechamento são reconhecidos pelo começo e pelo fim da peça.
+- Embeddings com Voyage `voyage-law-2`: `input_type` `document` para as peças e `query` para a busca da geração.
+- Teste real: "perito desconsiderou os exames" achou o trecho "o juiz não está adstrito ao laudo pericial", sem nenhuma palavra em comum.
+
 ## 1. Extração
 
 **Modelo:** Haiku.

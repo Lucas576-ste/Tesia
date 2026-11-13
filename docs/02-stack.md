@@ -17,7 +17,7 @@ Linguagem principal: **TypeScript de ponta a ponta**. A escala e a estabilidade 
 | Autenticação | Supabase Auth | Já usado no projeto de conteúdo |
 | Validação | zod | Tipos e validação compartilhados entre front, API e worker |
 | IA (texto) | API do Claude: Haiku para extração e resumo, Sonnet para gerar peças | Qualidade de escrita e leitura de PDF, inclusive escaneado |
-| Embeddings | Voyage AI ou OpenAI embeddings | A API do Claude não gera embeddings |
+| Embeddings | Voyage AI, modelo `voyage-law-2` (1024 dimensões) | Treinado em textos jurídicos; a API do Claude não gera embeddings |
 | Extração de texto | Leitura direta do PDF com `unpdf`; se vier quase vazio (escaneado), o Claude Haiku transcreve o PDF | Muitos PDFs de tribunal já têm texto, e o OCR pelo Claude dispensa outra conta (AWS Textract) |
 | Documentos | docxtemplater | Preenche o .docx modelo do próprio advogado (timbrado, fonte, margens) |
 | Pagamentos | Asaas | Pix, boleto, cartão recorrente e nota fiscal no Brasil |

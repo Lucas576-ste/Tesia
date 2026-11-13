@@ -189,9 +189,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Semana 4 — Estilo e geração da peça (dias 22 a 28)
 
-### Dia 22 — Peças de estilo
+### Dia 22 — Peças de estilo ✅
 - Upload das peças do advogado, extração de texto, divisão por seção
 - Embeddings e gravação no pgvector
+
+**Feito em 2026-11-13:** envio real no onboarding e em Meu estilo (PDF e DOCX), worker lê, divide em seções e grava os vetores da Voyage. Testado ponta a ponta com busca por similaridade no pgvector. O painel "O que aprendi sobre você" segue de exemplo até o Dia 23.
 
 ### Dia 23 — Perfil de estilo
 - Prompt do perfil de estilo

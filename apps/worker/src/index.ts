@@ -4,10 +4,12 @@ import pg from "pg";
 import { ambiente } from "./ambiente.js";
 import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from "./fila.js";
 import { analisarIntimacao } from "./tarefas/analisar-intimacao.js";
+import { processarPecaEstilo } from "./tarefas/processar-peca-estilo.js";
 import type { Contexto, Tarefa } from "./tarefas/tipos.js";
 
 const tarefas: Record<string, Tarefa> = {
   analisar_intimacao: analisarIntimacao,
+  processar_peca_estilo: processarPecaEstilo,
 };
 
 function registrar(evento: string, dados: Record<string, unknown>) {
@@ -20,6 +22,7 @@ const contexto: Contexto = {
     auth: { persistSession: false, autoRefreshToken: false },
   }),
   ia: criarClienteIa(ambiente.ANTHROPIC_API_KEY),
+  chaveEmbeddings: ambiente.EMBEDDINGS_API_KEY,
   registrar,
 };
 
