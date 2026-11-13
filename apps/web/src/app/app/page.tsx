@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PainelPrazos } from "@/components/painel/painel-prazos";
 import { filtroPrazosSchema } from "@/lib/filtros-prazos";
+import { resumoIntimacoes } from "@/lib/intimacoes";
 import { listarPrazosConfirmados, listarProcessosResumo } from "@/lib/painel";
 import { exigirUsuario } from "@/lib/sessao";
 
@@ -21,10 +22,11 @@ function urlSemNovo(parametros: Record<string, string | string[] | undefined>) {
 
 export default async function PainelPage({ searchParams }: PainelPageProps) {
   const parametros = await searchParams;
-  const [usuario, prazos, processos] = await Promise.all([
+  const [usuario, prazos, processos, intimacoes] = await Promise.all([
     exigirUsuario(),
     listarPrazosConfirmados(),
     listarProcessosResumo(),
+    resumoIntimacoes(),
   ]);
 
   return (
@@ -36,6 +38,7 @@ export default async function PainelPage({ searchParams }: PainelPageProps) {
       processos={processos}
       novoPrazo={parametros.novo === "prazo"}
       urlSemNovo={urlSemNovo(parametros)}
+      intimacoes={intimacoes}
     />
   );
 }

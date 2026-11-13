@@ -24,5 +24,6 @@ Esta pasta reúne todas as decisões de produto, técnicas e de negócio. Cada a
 | [16-plano-sugestoes-advogado.md](16-plano-sugestoes-advogado.md) | Plano aprovado a partir das sugestões de um advogado |
 | [17-planos-e-sociedade.md](17-planos-e-sociedade.md) | Diferença entre Start e Pro e desenho do plano Sociedade |
 | [18-roteiro-advogados.md](18-roteiro-advogados.md) | Roteiro de 15 minutos para mostrar o app a advogados |
+| [19-testes-manuais.md](19-testes-manuais.md) | Checklist de testes manuais, marcado conforme você testa |
 
 Protótipo das telas: canvas "Protótipo Agente Jurídico" no Claude (5 telas: estilo, painel, intimação, rascunho, conteúdo).

@@ -183,7 +183,7 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 ### Dia 21 — Folga para atrasos ✅
 - Usar para terminar o que ficou pendente na semana
 
-**Usado em 2026-11-12:** forma de recebimento da intimação (diário, portal e citação), depois da conversa com um advogado. Motor conta a ciência do portal; a IA identifica a forma; a tela deixa trocar a forma e informar a abertura, com recálculo na hora. Testado com a API real (24/24 na avaliação) e no navegador.
+**Usado em 2026-11-12:** forma de recebimento da intimação (diário, portal e citação), depois da conversa com um advogado. Motor conta a ciência do portal; a IA identifica a forma; a tela deixa trocar a forma e informar a abertura, com recálculo na hora. Testado com a API real (24/24 na avaliação) e no navegador. Também entrou a página "Intimações" (lista com a situação de cada uma) e o aviso no painel de intimações aguardando confirmação.
 
 ---
 

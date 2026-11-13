@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { EnvioIntimacao } from "@/components/intimacao/envio-intimacao";
 import { BalaoLia } from "@/components/lia/balao-lia";
 import { exigirUsuario } from "@/lib/sessao";
@@ -15,6 +16,12 @@ export default async function NovaIntimacaoPage() {
         Envie o PDF da intimação ou da decisão. Eu leio e separo o que importa para você.
       </BalaoLia>
       <EnvioIntimacao escritorioId={usuario.escritorio_id} />
+      <Link
+        href="/app/intimacoes"
+        className="self-start text-sm font-medium text-primaria underline-offset-4 hover:underline"
+      >
+        Ver todas as intimações
+      </Link>
     </div>
   );
 }

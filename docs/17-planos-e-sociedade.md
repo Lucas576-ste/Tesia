@@ -60,6 +60,15 @@ Estão em `05-regras-de-negocio.md`: titular, acesso, peças, saída ou separaç
 - **Landing:** novos itens de Start, Pro e Sociedade.
 - **Ainda não está nas telas:** notas internas, teste grátis real, convite e todos os itens de "Depois".
 
+## Sugestões de um advogado (2026-11-12)
+- **Já atende:** calculadora de prazos e IA que lê e resume (prontas); delegação com etapas na Sociedade (desenhada); rascunho no estilo do advogado (Semana 4).
+- **Candidatas para os próximos passos, nesta ordem:**
+  1. Mensagem para o cliente no Pro, revisada e enviada pelo advogado.
+  2. Comprovante de protocolo na etapa Protocolar da Sociedade.
+  3. Reavaliar quando fazer a captura automática pela OAB.
+  4. Tela de histórico de quem fez o quê.
+- As demais ideias, inclusive as do nível corporativo, estão no banco de ideias de `08-roadmap.md`.
+
 ## A validar
 
 - 10 peças no Start é estimativa, sem dados de uso real.

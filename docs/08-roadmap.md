@@ -95,3 +95,30 @@ Ficam de fora: CRM com funil de vendas, financeiro completo, BI avançado, kanba
 | BI e relatórios | 1.5 (relatório do mês) e 3 |
 | Hub de integrações e API | 3 |
 | Indicação dentro do produto | 1 (Indicar a Tesia) |
+
+## Banco de ideias por nível (sugestões de advogado, 2026-11-12)
+
+A Tesia começa rápido com solo e dupla e cresce até o nível corporativo. Nenhuma ideia é descartada: ficam aqui para quando chegar a hora.
+
+### Solo
+| Ideia | Fase | Observações |
+|---|---|---|
+| Mensagem para o cliente: traduz o andamento em português claro | 1.5 | Gerada a partir de "O que aconteceu". O advogado revisa e envia; sem envio automático (LGPD e ética da OAB) |
+| Captura automática pela OAB: processos e intimações chegam sozinhos | 1.5 | O advogado citou como a primeira necessidade. Avaliar adiantar |
+
+### Sociedade
+| Ideia | Fase | Observações |
+|---|---|---|
+| Comprovante de protocolo anexado para concluir a etapa Protocolar | 1.5 | Dá segurança de que o prazo foi cumprido |
+| Histórico de quem leu, alterou datas e subiu arquivos | 1.5 | A tabela `auditoria` já existe |
+| Contratos, procurações e recibos com os dados do cliente | 2 | Usa o modelo .docx do advogado e a lista de clientes |
+| Financeiro: parcelas, alertas de cobrança e divisão de honorários entre sócios | 2 a 3 | Ex.: percentual de quem captou e de quem executou |
+
+### Corporativo
+| Ideia | Fase | Observações |
+|---|---|---|
+| Jurimetria e BI: taxa de vitória por juiz ou comarca, tempo médio, provisionamento de risco | 3+ | Exige volume de dados e decisões públicas |
+| Revisão, assinatura e protocolo em lote com certificado em nuvem | 3+ | Muda a regra atual de que o sistema nunca protocola; revisar a decisão quando chegar a hora |
+| Gestão de correspondentes: contratar, enviar guias e pagar parceiros em outras cidades | 3+ | |
+| Permissões finas (RBAC): quem vê processos sigilosos, financeiro ou altera prazos críticos | 3 | Base para escritórios maiores |
+

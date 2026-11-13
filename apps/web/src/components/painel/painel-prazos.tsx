@@ -1,5 +1,6 @@
 "use client";
 
+import { Clock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -44,6 +45,7 @@ type PainelPrazosProps = {
   processos: ProcessoResumo[];
   novoPrazo: boolean;
   urlSemNovo: string;
+  intimacoes: { total: number; pendentes: number };
 };
 
 const FILTROS_EQUIPE = {
@@ -54,6 +56,27 @@ const FILTROS_EQUIPE = {
 } as const;
 
 type FiltroEquipe = keyof typeof FILTROS_EQUIPE;
+
+function AvisoPendentes({ quantidade }: { quantidade: number }) {
+  const texto =
+    quantidade === 1
+      ? "1 intimação aguardando sua confirmação"
+      : `${quantidade} intimações aguardando sua confirmação`;
+  return (
+    <div
+      role="status"
+      className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-atencao-fundo p-4 text-sm text-atencao"
+    >
+      <span className="flex items-center gap-2 font-medium">
+        <Clock aria-hidden className="size-4 shrink-0" />
+        {texto}
+      </span>
+      <Button asChild size="sm" variant="outline">
+        <Link href="/app/intimacoes?filtro=aguardando">Conferir agora</Link>
+      </Button>
+    </div>
+  );
+}
 
 function resumoAbertos(quantidade: number) {
   if (quantidade === 0) return "Nenhum prazo em aberto";
@@ -68,6 +91,7 @@ export function PainelPrazos({
   processos,
   novoPrazo,
   urlSemNovo,
+  intimacoes,
 }: PainelPrazosProps) {
   const router = useRouter();
   const [visaoSalva, trocarVisao] = useVisaoPainel();
@@ -168,6 +192,8 @@ export function PainelPrazos({
   let fala = "Nenhum prazo vence nos próximos 3 dias úteis.";
   if (critico) fala = `Comece por ${critico.peca} · ${critico.partes}, que vence ${critico.prazo}.`;
   if (prazos.length === 0) fala = "Assim que você enviar uma intimação, eu cuido do resto.";
+  if (prazos.length === 0 && intimacoes.pendentes > 0)
+    fala = "Já li suas intimações. Confira e confirme os prazos para eles aparecerem aqui.";
 
   return (
     <div className="flex flex-col gap-5">
@@ -178,13 +204,11 @@ export function PainelPrazos({
       )}
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 className="text-3xl font-semibold text-titulo">Olá, {nome}</h1>
-            <Badge variant="secondary">Dados de exemplo</Badge>
-          </div>
+          <h1 className="text-3xl font-semibold text-titulo">Olá, {nome}</h1>
           <p className="text-texto-secundario">{resumoAbertos(indicadores.abertos)}</p>
           <BalaoLia className="text-sm">{fala}</BalaoLia>
         </div>
+        {intimacoes.pendentes > 0 && <AvisoPendentes quantidade={intimacoes.pendentes} />}
         <div className="grid gap-3 sm:grid-cols-3">
           <CardIndicador
             tipo="vencimento"
@@ -205,7 +229,17 @@ export function PainelPrazos({
             href="/app?status=protocolado"
           />
         </div>
-        {prazos.length === 0 ? (
+        {prazos.length === 0 && intimacoes.total > 0 ? (
+          <EstadoVazio
+            titulo="Nenhum prazo confirmado ainda"
+            descricao="Os prazos aparecem aqui depois que você confere e confirma cada intimação."
+            acao={
+              <Button asChild variant="outline">
+                <Link href="/app/intimacoes">Ver intimações</Link>
+              </Button>
+            }
+          />
+        ) : prazos.length === 0 ? (
           <EstadoVazio
             titulo="Envie sua primeira intimação"
             descricao="Os prazos aparecem aqui depois que você envia e confirma a intimação."

@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { itemEstaAtivo, itemIndicar, itensMenu } from "./itens-menu";
@@ -43,17 +44,23 @@ export function MenuLateral({ conta }: MenuLateralProps) {
           );
         })}
       </nav>
-      <Link
-        href="/app/configuracoes"
-        className="flex items-center gap-2 border-t border-menu-ativo px-5 py-4 transition-colors outline-none hover:bg-menu-ativo focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-inset"
-      >
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{conta.nome}</span>
-          <span className="block truncate text-xs text-menu-texto">{conta.oab}</span>
-        </span>
-        <ChevronRight aria-hidden className="size-4 shrink-0 text-menu-texto" />
-        <span className="sr-only">Abrir conta</span>
-      </Link>
+      <div className="flex items-center border-t border-menu-ativo">
+        <Link
+          href="/app/configuracoes"
+          className="flex min-w-0 flex-1 items-center gap-2 py-4 pr-2 pl-5 transition-colors outline-none hover:bg-menu-ativo focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-inset"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium">{conta.nome}</span>
+            <span className="block truncate text-xs text-menu-texto">{conta.oab}</span>
+          </span>
+          <ChevronRight aria-hidden className="size-4 shrink-0 text-menu-texto" />
+          <span className="sr-only">Abrir conta</span>
+        </Link>
+        <BotaoSair
+          variante="icone"
+          className="pr-3 [&_button]:text-menu-texto [&_button]:hover:bg-menu-ativo [&_button]:hover:text-white"
+        />
+      </div>
     </aside>
   );
 }

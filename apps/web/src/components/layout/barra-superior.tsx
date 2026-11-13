@@ -1,5 +1,6 @@
 import { Bell, UserRound } from "lucide-react";
 import Link from "next/link";
+import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { SeletorTema } from "@/components/tema/seletor-tema";
 import { Button } from "@/components/ui/button";
 import { BuscaGlobal } from "./busca-global";
@@ -32,6 +33,7 @@ export function BarraSuperior({ uso }: BarraSuperiorProps) {
             <UserRound aria-hidden />
           </Link>
         </Button>
+        <BotaoSair variante="icone" className="md:hidden" />
       </div>
     </header>
   );

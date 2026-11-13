@@ -11,7 +11,7 @@ export function MenuInferior() {
   return (
     <nav
       aria-label="Menu principal"
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 bg-menu pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 bg-menu pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       {itensMenu.map(({ rotulo, rotuloCurto, href, icone: Icone }) => {
         const ativo = itemEstaAtivo(href, caminho);

@@ -18,6 +18,7 @@ Os advogados entrevistados confirmaram essa dor e apontaram funcionalidades da A
 ## Público
 
 - **Foco:** advogado solo e duplas de advogados. Por enquanto, não há plano para 3 ou mais.
+- **Visão de longo prazo:** começar rápido com solo e dupla e crescer até escritórios grandes e departamentos jurídicos. As ideias de cada nível estão no banco de ideias de `08-roadmap.md`.
 - **Áreas:** plataforma generalista. O advogado escolhe as áreas em que atua e o sistema monta peças e regras de prazo dessas áreas. Lançamento com 4 áreas: cível/consumidor, trabalhista, previdenciário e família.
 
 ## Solução (fluxo principal)

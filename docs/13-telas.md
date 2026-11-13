@@ -35,6 +35,7 @@ Onboarding (primeiro acesso)
 
 Aplicativo (menu lateral)
 ├── Painel de prazos (/app)                     ← tela inicial
+├── Intimações (/app/intimacoes): lista com a situação de cada uma e filtro "Aguardando confirmação"
 ├── Nova intimação (/app/intimacoes/nova)
 │     └── Análise da intimação (/app/intimacoes/:id)
 │           └── Editor da peça (/app/pecas/:id)
