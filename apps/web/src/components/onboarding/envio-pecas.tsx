@@ -22,15 +22,17 @@ import {
   MINIMO_PECAS_ESTILO as MINIMO,
   type PecaEstilo,
 } from "@/lib/estilo";
+import type { EstadoPerfil } from "@/lib/perfil-estilo";
 import { PainelAprendizado } from "./painel-aprendizado";
 
 type EnvioPecasProps = {
   escritorioId: string;
   usuarioId: string;
   pecasIniciais: PecaEstilo[];
+  perfil: EstadoPerfil;
 };
 
-export function EnvioPecas({ escritorioId, usuarioId, pecasIniciais }: EnvioPecasProps) {
+export function EnvioPecas({ escritorioId, usuarioId, pecasIniciais, perfil }: EnvioPecasProps) {
   const { pecas, adicionar, remover, lidas } = usePecasEstilo(
     escritorioId,
     usuarioId,
@@ -74,7 +76,7 @@ export function EnvioPecas({ escritorioId, usuarioId, pecasIniciais }: EnvioPeca
           ))}
         </ul>
       )}
-      {lidas > 0 && <PainelAprendizado />}
+      {(lidas > 0 || perfil.estado !== "vazio") && <PainelAprendizado perfil={perfil} />}
       <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
         <Button asChild variant="ghost" className="sm:mr-auto">
           <Link href="/onboarding/perfil">Voltar</Link>

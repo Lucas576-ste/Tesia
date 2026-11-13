@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -26,6 +27,7 @@ function hojeFormatado() {
 
 export function usePecasEstilo(escritorioId: string, usuarioId: string, iniciais: PecaEstilo[]) {
   const [pecas, setPecas] = useState(iniciais);
+  const router = useRouter();
   const pendentes = pecas.filter(
     ({ status, temporaria }) => status === "processando" && !temporaria,
   );
@@ -38,9 +40,10 @@ export function usePecasEstilo(escritorioId: string, usuarioId: string, iniciais
       setPecas((atuais) =>
         atuais.map((peca) => atualizadas.find(({ id }) => id === peca.id) ?? peca),
       );
+      if (atualizadas.some(({ status }) => status === "lido")) router.refresh();
     }, INTERVALO_MS);
     return () => clearInterval(intervalo);
-  }, [chavePendentes]);
+  }, [chavePendentes, router]);
 
   function atualizar(id: string, mudancas: Partial<PecaEstilo>) {
     setPecas((atuais) => atuais.map((peca) => (peca.id === id ? { ...peca, ...mudancas } : peca)));
@@ -96,6 +99,7 @@ export function usePecasEstilo(escritorioId: string, usuarioId: string, iniciais
     }
     setPecas((atuais) => atuais.filter((item) => item.id !== id));
     toast.success("Peça removida.");
+    router.refresh();
   }
 
   return {

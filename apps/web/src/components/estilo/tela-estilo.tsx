@@ -1,7 +1,9 @@
 "use client";
 
 import { FileText, X } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { pedirAtualizacaoEstilo } from "@/app/app/estilo/acoes";
 import { toast } from "sonner";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { PainelAprendizado } from "@/components/onboarding/painel-aprendizado";
@@ -14,6 +16,7 @@ import {
   MINIMO_PECAS_ESTILO,
   type PecaEstilo,
 } from "@/lib/estilo";
+import type { EstadoPerfil } from "@/lib/perfil-estilo";
 import { StatusPeca } from "./status-peca";
 import { usePecasEstilo } from "./usar-pecas-estilo";
 
@@ -21,15 +24,30 @@ type TelaEstiloProps = {
   escritorioId: string;
   usuarioId: string;
   pecasIniciais: PecaEstilo[];
+  perfil: EstadoPerfil;
 };
 
-export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais }: TelaEstiloProps) {
+export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais, perfil }: TelaEstiloProps) {
   const { pecas, adicionar, remover, lidas, validas } = usePecasEstilo(
     escritorioId,
     usuarioId,
     pecasIniciais,
   );
   const [usarRevisadas, setUsarRevisadas] = useState(true);
+  const [pedindo, iniciar] = useTransition();
+  const router = useRouter();
+
+  function atualizarEstilo() {
+    iniciar(async () => {
+      const resultado = await pedirAtualizacaoEstilo();
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+      toast.success("Vou reler suas peças e atualizar o seu estilo.");
+      router.refresh();
+    });
+  }
 
   return (
     <div className="grid items-start gap-4 md:grid-cols-[1fr_20rem]">
@@ -82,12 +100,12 @@ export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais }: TelaEstil
         )}
       </div>
       <div className="flex flex-col gap-4">
-        <PainelAprendizado />
+        <PainelAprendizado perfil={perfil} comDetalhes />
         <Button
-          disabled={lidas === 0}
-          onClick={() => toast.info("O perfil de estilo é montado a partir do próximo passo.")}
+          disabled={lidas === 0 || pedindo || perfil.estado === "atualizando"}
+          onClick={atualizarEstilo}
         >
-          Atualizar meu estilo
+          {perfil.estado === "atualizando" ? "Atualizando..." : "Atualizar meu estilo"}
         </Button>
         <label className="flex cursor-pointer items-start gap-2 rounded-md border bg-card p-3 text-sm has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50">
           <input

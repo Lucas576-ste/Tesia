@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { TelaEstilo } from "@/components/estilo/tela-estilo";
-import { listarPecasEstilo } from "@/lib/estilo-servidor";
+import { buscarPerfilEstilo, listarPecasEstilo } from "@/lib/estilo-servidor";
 import { exigirUsuario } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Meu estilo · Tesia" };
 
 export default async function EstiloPage() {
   const usuario = await exigirUsuario();
-  const pecas = await listarPecasEstilo(usuario.id);
+  const [pecas, perfil] = await Promise.all([
+    listarPecasEstilo(usuario.id),
+    buscarPerfilEstilo(usuario.id),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
@@ -21,6 +24,7 @@ export default async function EstiloPage() {
         escritorioId={usuario.escritorio_id}
         usuarioId={usuario.id}
         pecasIniciais={pecas}
+        perfil={perfil}
       />
     </div>
   );

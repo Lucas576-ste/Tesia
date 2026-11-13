@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.3.0",
+    "@tesia/shared": "workspace:*",
     "mammoth": "1.13.0",
     "unpdf": "1.9.1",
     "zod": "4.6.7"

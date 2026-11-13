@@ -77,3 +77,13 @@ export async function removerPecaEstilo(id: string): Promise<{ ok: true } | { er
   revalidatePath("/app/estilo");
   return { ok: true };
 }
+
+export async function pedirAtualizacaoEstilo(): Promise<{ ok: true } | { erro: string }> {
+  const usuario = await usuarioAtual();
+  if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.rpc("pedir_perfil_estilo");
+  if (error) return { erro: "Não foi possível atualizar o estilo agora." };
+  revalidatePath("/app/estilo");
+  return { ok: true };
+}

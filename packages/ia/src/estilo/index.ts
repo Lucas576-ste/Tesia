@@ -15,3 +15,10 @@ export {
   type SecaoEstilo,
   type TrechoEstilo,
 } from "./secoes.js";
+export {
+  gerarPerfilEstilo,
+  perfilEstiloSchema,
+  type PecaParaPerfil,
+  type PerfilEstilo,
+  type ResultadoPerfil,
+} from "./perfil.js";

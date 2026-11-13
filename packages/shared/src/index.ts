@@ -5,3 +5,4 @@ export {
   type AnaliseGravada,
   type MemoriaCalculo,
 } from "./analise";
+export { perfilEstiloSchema, type PerfilEstilo } from "./estilo";

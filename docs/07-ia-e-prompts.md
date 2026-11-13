@@ -44,6 +44,12 @@ Uma vez por advogado (e quando ele adiciona peças): **0. Perfil de estilo** (So
 - fórmulas de abertura e fechamento
 - frases para a tela "O que aprendi sobre você"
 
+Implementação (`packages/ia/src/estilo/perfil.ts`, prompt `perfil@1`):
+- Sonnet 5.5, saída estruturada, esforço `medium` e fallback automático do servidor (`fallbacks: "default"`) para recusas por engano.
+- Proíbe nomes de partes, números de processo e dados pessoais no perfil.
+- De 4 a 6 frases em segunda pessoa para a tela; menos de 4 vira erro.
+- Gerado sozinho quando as peças terminam de ser lidas (uma vez para várias peças) e pelo botão "Atualizar meu estilo".
+
 Além do perfil, cada peça é dividida em trechos por seção, que recebem embedding e vão para `estilo_trechos`.
 
 - Divisão por títulos ("DOS FATOS", "DO DIREITO", "DOS PEDIDOS", "I – ..."), sem IA, em `packages/ia/src/estilo/secoes.ts`. Endereçamento, qualificação e fechamento são reconhecidos pelo começo e pelo fim da peça.

@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { CabecalhoPasso } from "@/components/onboarding/cabecalho-passo";
 import { EnvioPecas } from "@/components/onboarding/envio-pecas";
-import { listarPecasEstilo } from "@/lib/estilo-servidor";
+import { buscarPerfilEstilo, listarPecasEstilo } from "@/lib/estilo-servidor";
 import { exigirUsuario } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Seu estilo · Tesia" };
 
 export default async function EstiloPage() {
   const usuario = await exigirUsuario();
-  const pecas = await listarPecasEstilo(usuario.id);
+  const [pecas, perfil] = await Promise.all([
+    listarPecasEstilo(usuario.id),
+    buscarPerfilEstilo(usuario.id),
+  ]);
 
   return (
     <>
@@ -20,6 +23,7 @@ export default async function EstiloPage() {
         escritorioId={usuario.escritorio_id}
         usuarioId={usuario.id}
         pecasIniciais={pecas}
+        perfil={perfil}
       />
     </>
   );

@@ -243,4 +243,58 @@ begin
 end;
 $$;
 
+update estilo_documentos set status = 'lido';
+update estilo_documentos set status = 'lido', texto = 'x';
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'gerar_perfil_estilo'
+    and escritorio_id = current_setting('teste.esc_a')::uuid) = 1,
+    'Peça lida deveria criar um único job de perfil';
+  assert (select pedido_em is not null from perfis_estilo
+    where escritorio_id = current_setting('teste.esc_a')::uuid),
+    'Peça lida deveria marcar o pedido do perfil';
+end;
+$$;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+select pedir_perfil_estilo();
+
+do $$
+begin
+  assert (select count(*) from perfis_estilo) = 1, 'B deveria ver só o próprio perfil';
+end;
+$$;
+
+do $$
+begin
+  perform public.enfileirar_perfil_estilo(current_setting('teste.esc_a')::uuid, '00000000-0000-0000-0000-000000000000');
+  raise exception 'Usuário logado não pode chamar a função interna de enfileirar';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
+reset role;
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'gerar_perfil_estilo') = 2,
+    'O botão de B deveria criar um job só para B';
+  assert (select count(*) from fila f join usuarios u on u.id = (f.dados ->> 'usuario_id')::uuid
+    where f.tipo = 'gerar_perfil_estilo' and u.auth_user_id = '00000000-0000-0000-0000-0000000000b1') = 1,
+    'O job de B deveria ser do usuário B';
+end;
+$$;
+
+delete from estilo_documentos;
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'gerar_perfil_estilo') = 2,
+    'Remover peça lida com job pendente não deveria duplicar o job';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

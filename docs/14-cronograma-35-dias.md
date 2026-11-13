@@ -193,11 +193,13 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Upload das peças do advogado, extração de texto, divisão por seção
 - Embeddings e gravação no pgvector
 
-**Feito em 2026-11-13:** envio real no onboarding e em Meu estilo (PDF e DOCX), worker lê, divide em seções e grava os vetores da Voyage. Testado ponta a ponta com busca por similaridade no pgvector. O painel "O que aprendi sobre você" segue de exemplo até o Dia 23.
+**Feito em 2026-11-13:** envio real no onboarding e em Meu estilo (PDF e DOCX), worker lê, divide em seções e grava os vetores da Voyage. Testado ponta a ponta com busca por similaridade no pgvector. O painel "O que aprendi sobre você" ficou real no Dia 23.
 
-### Dia 23 — Perfil de estilo
+### Dia 23 — Perfil de estilo ✅
 - Prompt do perfil de estilo
 - Tela "O que aprendi sobre você" e Meu estilo com dados reais
+
+**Feito em 2026-11-13:** perfil gerado pelo Sonnet sozinho quando as peças são lidas ou removidas (um único job para várias peças) e pelo botão "Atualizar meu estilo". Painel com as frases reais e "Ver detalhes". Testado ponta a ponta com o Claude: 6 frases fiéis às peças, sem dados pessoais, US$ 0,014 com 2 peças.
 
 ### Dia 24 — Geração da peça
 - Busca das peças parecidas no pgvector

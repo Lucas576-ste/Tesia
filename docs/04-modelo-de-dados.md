@@ -171,9 +171,13 @@ Cada peça nova entra na `fila` como `processar_peca_estilo` (gatilho). O worker
 | Campo | Tipo | Observação |
 |---|---|---|
 | usuario_id | uuid | único |
-| guia | jsonb | estrutura, tom, padrões de citação, fechamento |
+| guia | jsonb | `estrutura_por_tipo`, `tom`, `tamanho_frases`, `citacao_lei`, `citacao_jurisprudencia`, `referencias_frequentes`, `abertura`, `fechamento`, `expressoes_tipicas`, `frases_exibicao`. Schema em `packages/shared/src/estilo.ts` |
 | resumo_exibicao | text[] | frases mostradas na tela "O que aprendi sobre você" |
 | atualizado_com | int | quantidade de peças usadas |
+| pedido_em | timestamptz | última vez que o perfil foi pedido (peça lida, removida ou botão) |
+| gerado_em | timestamptz | última geração; a tela mostra "Atualizando" enquanto `pedido_em` for mais novo |
+
+O job `gerar_perfil_estilo` é criado por gatilho quando uma peça vira `lido` ou uma peça lida é removida, com 20 segundos de espera e sem duplicar job pendente. O botão "Atualizar meu estilo" chama `pedir_perfil_estilo()`, que só age no próprio usuário.
 
 ## Tabelas de referência (globais)
 
