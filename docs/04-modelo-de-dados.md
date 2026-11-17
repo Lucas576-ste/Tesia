@@ -132,7 +132,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | tipo_peca_id | uuid | |
 | responsavel_id | uuid | usuário responsável (plano Sociedade) |
 | titulo | text | |
-| conteudo | jsonb | `{ secoes: [{ titulo, texto }], aviso }`; `aviso` quando saiu genérico (sem perfil ou sem peças) |
+| conteudo | jsonb | `{ doc, aviso }`: `doc` é o documento do editor (JSON do Tiptap). A geração grava `{ secoes: [{ titulo, texto }], aviso }`, convertido para `doc` ao abrir; `aviso` quando saiu genérico |
 | versao | int | |
 | pendencias | jsonb | `[{ secao, titulo, texto }]` de cada `[CONFIRMAR: ...]` |
 | fontes | jsonb | `[{ trecho_id, documento, secao }]`: trechos das peças do advogado usados como base |
@@ -142,7 +142,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 Peça nova com status `gerando` entra na `fila` como `gerar_peca` (gatilho). Peça com `erro` não conta no limite.
 
 ### pecas_versoes
-Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: `ia` ou `usuario`).
+Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: `ia` ou `usuario`). A versão 1 é da IA; cada "Salvar versão" no editor cria a próxima, atualiza `pecas.conteudo`, `pecas.versao` e recalcula `pecas.pendencias`. Marcar como protocolada muda o prazo ligado para `cumprido` (reabrir volta para `confirmado`).
 
 ## Estilo do advogado
 

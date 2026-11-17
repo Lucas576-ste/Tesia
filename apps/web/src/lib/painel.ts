@@ -29,7 +29,32 @@ const linhaPrazoSchema = z.object({
   data_prazo_interno: z.string().nullable(),
   processos: umOuNenhum(processoSchema),
   intimacoes: umOuNenhum(z.object({ extracao: z.unknown() })),
+  status: z.enum(["confirmado", "cumprido"]),
+  pecas: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        status: z.string(),
+        criado_em: z.string(),
+        excluido_em: z.string().nullable(),
+      }),
+    )
+    .nullable(),
 });
+
+function pecaDoPrazo(linha: z.infer<typeof linhaPrazoSchema>) {
+  return (linha.pecas ?? [])
+    .filter(
+      (peca) => !peca.excluido_em && ["rascunho", "revisada", "protocolada"].includes(peca.status),
+    )
+    .sort((a, b) => b.criado_em.localeCompare(a.criado_em))[0];
+}
+
+function statusDoPrazo(linha: z.infer<typeof linhaPrazoSchema>): LinhaPrazo["status"] {
+  const peca = pecaDoPrazo(linha);
+  if (linha.status === "cumprido" || peca?.status === "protocolada") return "protocolado";
+  return peca ? "rascunho_pronto" : "nao_iniciado";
+}
 
 function rotuloArea(codigo: string | null | undefined) {
   if (!codigo) return "Sem área";
@@ -51,9 +76,9 @@ export async function listarPrazosConfirmados(): Promise<LinhaPrazo[]> {
   const { data } = await supabase
     .from("prazos")
     .select(
-      "id, intimacao_id, descricao, data_inicio, data_vencimento, data_prazo_interno, processos(id, numero_cnj, area, parte_contraria), intimacoes(extracao)",
+      "id, intimacao_id, descricao, status, data_inicio, data_vencimento, data_prazo_interno, processos(id, numero_cnj, area, parte_contraria), intimacoes(extracao), pecas(id, status, criado_em, excluido_em)",
     )
-    .eq("status", "confirmado")
+    .in("status", ["confirmado", "cumprido"])
     .eq("tipo", "prazo")
     .order("data_vencimento");
   const linhas = z.array(linhaPrazoSchema).safeParse(data);
@@ -70,7 +95,8 @@ export async function listarPrazosConfirmados(): Promise<LinhaPrazo[]> {
     inicio: linha.data_inicio ? isoParaData(linha.data_inicio) : undefined,
     prazoInterno: linha.data_prazo_interno ? isoParaData(linha.data_prazo_interno) : undefined,
     diasUteis: diasUteisAte(linha.data_vencimento, hoje),
-    status: "nao_iniciado",
+    status: statusDoPrazo(linha),
+    pecaId: pecaDoPrazo(linha)?.id,
   }));
 }
 

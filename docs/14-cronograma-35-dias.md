@@ -208,8 +208,10 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-13:** "Gerar rascunho" cria a peça, o worker busca os 3 trechos mais parecidos e o Sonnet escreve no estilo do advogado, com `[CONFIRMAR]` nos dados que faltam. Contador real de peças e bloqueio no limite. Testado ponta a ponta com a IA real (recurso inominado com títulos "I – DOS FATOS" e "Nestes termos", baseado no recurso antigo do advogado, US$ 0,028). A visualização é só leitura; o editor real é o Dia 25.
 
-### Dia 25 — Editor com dados reais
+### Dia 25 — Editor com dados reais ✅
 - Carregar a peça gerada, destacar pendências, salvar versões
+
+**Feito em 2026-11-17:** o rascunho abre no editor com as pendências destacadas; "Salvar versão" grava no banco, "Restaurar" volta versões antigas e "Marcar como protocolado" fecha a peça e o prazo. Lista Peças e painel com dados reais; os dados de exemplo das peças saíram. Testado ponta a ponta com a IA real. O teste achou e corrigiu a confusão entre JEF e JEC (classe do PJe), agora resolvida pelo número CNJ.
 
 **Pronto quando:** intimação → análise → rascunho no estilo do advogado funciona com dados reais.
 

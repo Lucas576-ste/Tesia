@@ -68,6 +68,13 @@ export function ritoParaRegra(rito: string) {
   return rito === "outro" ? "comum" : rito;
 }
 
+export function corrigirRito(numeroCnj: string | null, rito: string) {
+  const justica = numeroCnj?.match(/^\d{7}-\d{2}\.\d{4}\.(\d)\.\d{2}\.\d{4}$/)?.[1];
+  if (justica === "4" && rito === "jec") return "jef";
+  if (justica === "8" && rito === "jef") return "jec";
+  return rito;
+}
+
 export function opcoesParaIa(opcoes: OpcaoBanco[]): OpcaoPeca[] {
   const vistas = new Map<string, OpcaoPeca>();
   for (const { codigo, nome, regra } of ordenarPorPrioridade(opcoes)) {

@@ -80,7 +80,7 @@ Regras do prompt:
 
 ## Como as etapas 1 a 3 rodam
 
-- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@3`, `resumo@2`, `escolha-peca@1`).
+- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@4`, `resumo@2`, `geracao@2`).
 - Saída estruturada da API (`messages.parse` com o schema zod), validada antes de usar.
 - Listas fechadas iguais às do banco: área (`civel`, `trabalhista`, `previdenciario`, `familia`), rito (`rito_processo`) e tipo de ato (os de `regras_prazo` mais `outro`).
 - Data fora do formato `AAAA-MM-DD` ou inexistente vira `null`.
@@ -88,6 +88,7 @@ Regras do prompt:
 - Na escolha da peça, o schema aceita só os códigos das opções enviadas.
 - Resumo cortado em 4 frases pelo código, sem quebrar em números de processo ou abreviações como "S.A.". `resumo@2` proíbe citar nomes de campos e comentários sobre o que falta no documento.
 - Rito não identificado (`outro`) busca as regras do procedimento comum.
+- O worker corrige JEF e JEC pelo segmento da justiça no número CNJ (4 = federal, 8 = estadual): a classe do PJe no JEF se chama "Procedimento do Juizado Especial Cível" e confundia a IA.
 - `extracao@3` identifica a forma de recebimento (`diario`, `portal`, `citacao`, `nao_identificada`) e a data de envio do portal, só quando escrita.
 - Avaliação com casos fictícios: `pnpm --filter @tesia/ia avaliar` (usa a API real e mostra acertos e custo).
 

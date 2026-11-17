@@ -1,16 +1,36 @@
+import type { JSONContent } from "@tiptap/core";
+import { analiseGravadaSchema, nomePartes } from "@tesia/shared";
 import { z } from "zod";
+import { conteudoPecaSchema, documentoDoConteudo } from "@/lib/documento-peca";
+import { isoParaData } from "@/lib/prazo-interno";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
-export type PecaGerada = {
+export type VersaoSalva = { numero: number; origem: "ia" | "usuario"; data: string };
+
+export type PecaEditor = {
   id: string;
-  titulo: string;
-  status: "gerando" | "rascunho" | "revisada" | "protocolada" | "erro";
-  intimacaoId: string | null;
-  secoes: { titulo: string; texto: string }[];
+  tipo: string;
+  partes: string;
+  cnj: string | null;
+  vencimento: string | null;
+  status: "rascunho" | "protocolada";
+  documento: JSONContent;
   aviso: string | null;
-  pendencias: { secao: number; titulo: string; texto: string }[];
+  intimacaoId: string | null;
   fontes: { documento: string; secao: string }[];
+  versoes: VersaoSalva[];
 };
+
+export type EstadoPeca =
+  | { status: "gerando"; titulo: string }
+  | { status: "erro"; intimacaoId: string | null }
+  | { status: "pronta"; peca: PecaEditor };
+
+const umOuNenhum = <T extends z.ZodType>(schema: T) =>
+  z
+    .union([schema, z.array(schema)])
+    .nullable()
+    .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor));
 
 const linhaSchema = z.object({
   id: z.uuid(),
@@ -18,43 +38,72 @@ const linhaSchema = z.object({
   status: z.enum(["gerando", "rascunho", "revisada", "protocolada", "erro"]),
   intimacao_id: z.uuid().nullable(),
   conteudo: z.unknown(),
-  pendencias: z.unknown(),
   fontes: z.unknown(),
+  tipos_peca: umOuNenhum(z.object({ nome: z.string() })),
+  processos: umOuNenhum(z.object({ numero_cnj: z.string() })),
+  prazos: umOuNenhum(z.object({ data_vencimento: z.string() })),
+  intimacoes: umOuNenhum(z.object({ extracao: z.unknown() })),
 });
 
-const conteudoSchema = z.object({
-  secoes: z.array(z.object({ titulo: z.string(), texto: z.string() })).default([]),
-  aviso: z.string().nullable().default(null),
-});
-
-const pendenciasSchema = z.array(
-  z.object({ secao: z.number().int(), titulo: z.string(), texto: z.string() }),
+const versoesSchema = z.array(
+  z.object({ versao: z.number().int(), origem: z.enum(["ia", "usuario"]), criado_em: z.string() }),
 );
 const fontesSchema = z.array(z.object({ documento: z.string(), secao: z.string() }));
 
-export async function buscarPecaGerada(id: string): Promise<PecaGerada | null> {
+function dataHora(iso: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(iso));
+}
+
+export async function buscarPeca(id: string): Promise<EstadoPeca | null> {
   if (!z.uuid().safeParse(id).success) return null;
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("pecas")
-    .select("id, titulo, status, intimacao_id, conteudo, pendencias, fontes")
+    .select(
+      "id, titulo, status, intimacao_id, conteudo, fontes, tipos_peca(nome), processos(numero_cnj), prazos(data_vencimento), intimacoes(extracao)",
+    )
     .eq("id", id)
     .is("excluido_em", null)
     .maybeSingle();
   const linha = linhaSchema.safeParse(data);
   if (!linha.success) return null;
-  const conteudo = conteudoSchema.safeParse(linha.data.conteudo).data ?? {
-    secoes: [],
-    aviso: null,
-  };
+  const peca = linha.data;
+  if (peca.status === "gerando") return { status: "gerando", titulo: peca.titulo };
+  if (peca.status === "erro") return { status: "erro", intimacaoId: peca.intimacao_id };
+
+  const { data: versoes } = await supabase
+    .from("pecas_versoes")
+    .select("versao, origem, criado_em")
+    .eq("peca_id", id)
+    .order("versao");
+  const analise = analiseGravadaSchema.safeParse(peca.intimacoes?.extracao);
+
   return {
-    id: linha.data.id,
-    titulo: linha.data.titulo,
-    status: linha.data.status,
-    intimacaoId: linha.data.intimacao_id,
-    secoes: conteudo.secoes,
-    aviso: conteudo.aviso,
-    pendencias: pendenciasSchema.safeParse(linha.data.pendencias).data ?? [],
-    fontes: fontesSchema.safeParse(linha.data.fontes).data ?? [],
+    status: "pronta",
+    peca: {
+      id: peca.id,
+      tipo: peca.tipos_peca?.nome ?? peca.titulo,
+      partes: analise.success ? nomePartes(analise.data.dados.partes) : peca.titulo,
+      cnj: peca.processos?.numero_cnj ?? null,
+      vencimento: peca.prazos ? isoParaData(peca.prazos.data_vencimento) : null,
+      status: peca.status === "protocolada" ? "protocolada" : "rascunho",
+      documento: documentoDoConteudo(peca.conteudo),
+      aviso: conteudoPecaSchema.safeParse(peca.conteudo).data?.aviso ?? null,
+      intimacaoId: peca.intimacao_id,
+      fontes: fontesSchema.safeParse(peca.fontes).data ?? [],
+      versoes: (versoesSchema.safeParse(versoes).data ?? []).map(
+        ({ versao, origem, criado_em }) => ({
+          numero: versao,
+          origem,
+          data: dataHora(criado_em),
+        }),
+      ),
+    },
   };
 }

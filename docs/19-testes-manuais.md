@@ -17,6 +17,12 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [x] Enviar 2 ou 3 PDFs de uma vez
 - [x] Andamento aparece: "Na fila", "Lendo o documento", "Pronta" e o link "Ver análise"
 
+## Estilo e rascunho (testado em 2026-11-17)
+- [x] Enviar peças antigas em Meu estilo (PDF e Word) e ver "Lido"
+- [x] Painel "O que aprendi sobre você" mostra frases reais do estilo
+- [x] "Gerar rascunho no meu estilo" cria a peça com pontos [CONFIRMAR]
+- [ ] Revisão da escrita do rascunho por um advogado (estilo, erros jurídicos e posição dos [CONFIRMAR])
+
 ## Análise
 - [ ] Partes, número do processo e órgão estão certos
 - [ ] O resumo ("O que aconteceu") está correto e sem invenção

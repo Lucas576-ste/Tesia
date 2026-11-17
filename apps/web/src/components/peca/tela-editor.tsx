@@ -1,11 +1,11 @@
 "use client";
 
-import type { JSONContent } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ArrowLeft, Download, ShieldAlert } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { buscarVersao, marcarProtocolada, salvarVersao } from "@/app/app/pecas/acoes";
 import { toast } from "sonner";
 import { EstadoCarregando } from "@/components/estado-carregando";
 import { BalaoLia } from "@/components/lia/balao-lia";
@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { PecaExemplo } from "@/lib/pecas-exemplo";
+import type { PecaEditor } from "@/lib/peca";
 import { AvisoPro } from "@/components/plano/aviso-pro";
 import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { BarraFormatacao } from "./barra-formatacao";
@@ -29,7 +29,7 @@ import { ExtensaoPendencias, encontrarPendencias, type Pendencia } from "./exten
 import { PainelAjuste } from "./painel-ajuste";
 import { PainelFontes } from "./painel-fontes";
 import { PainelPendencias } from "./painel-pendencias";
-import { PainelVersoes, type VersaoPeca } from "./painel-versoes";
+import { PainelVersoes } from "./painel-versoes";
 
 const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block";
 
@@ -44,32 +44,39 @@ function falaLia(quantidade: number, protocolada: boolean) {
   return `Escrevi no seu estilo e marquei ${quantidade} pontos para você conferir.`;
 }
 
-export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise: boolean }) {
+export function TelaEditor({ peca }: { peca: PecaEditor }) {
   const { recursosPro } = usePlanoDemo().plano;
   const [aba, setAba] = useState("peca");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
-  const [protocolada, setProtocolada] = useState(peca.status === "protocolado");
+  const [protocolada, setProtocolada] = useState(peca.status === "protocolada");
   const [modal, setModal] = useState<"baixar" | "protocolar" | null>(null);
-  const [versoes, setVersoes] = useState<VersaoPeca[]>([]);
-  const conteudos = useRef(new Map<number, JSONContent>());
+  const [versoes, setVersoes] = useState(peca.versoes);
+  const [alterado, setAlterado] = useState(false);
+  const [salvando, iniciar] = useTransition();
 
   const editor = useEditor({
     immediatelyRender: false,
-    editable: peca.status !== "protocolado",
+    editable: peca.status !== "protocolada",
     extensions: [StarterKit.configure({ heading: { levels: [2, 3] } }), ExtensaoPendencias],
-    content: peca.conteudo,
+    content: peca.documento,
     editorProps: {
       attributes: { class: "editor-peca", "aria-label": "Texto da peça" },
       scrollMargin: 96,
       scrollThreshold: 96,
     },
-    onCreate: ({ editor: criado }) => {
-      setPendencias(encontrarPendencias(criado.state.doc));
-      conteudos.current.set(1, criado.getJSON());
-      setVersoes([{ numero: 1, rotulo: "Versão 1, escrita pela Lia" }]);
+    onCreate: ({ editor: criado }) => setPendencias(encontrarPendencias(criado.state.doc)),
+    onUpdate: ({ editor: atual }) => {
+      setPendencias(encontrarPendencias(atual.state.doc));
+      setAlterado(true);
     },
-    onUpdate: ({ editor: atual }) => setPendencias(encontrarPendencias(atual.state.doc)),
   });
+
+  useEffect(() => {
+    if (!alterado) return;
+    const avisar = (evento: BeforeUnloadEvent) => evento.preventDefault();
+    window.addEventListener("beforeunload", avisar);
+    return () => window.removeEventListener("beforeunload", avisar);
+  }, [alterado]);
 
   function irParaPendencia({ de, ate }: Pendencia) {
     setAba("peca");
@@ -78,19 +85,40 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
     });
   }
 
-  function salvarVersao() {
+  function salvar() {
     if (!editor) return;
-    const numero = versoes.length + 1;
-    conteudos.current.set(numero, editor.getJSON());
-    setVersoes((atuais) => [...atuais, { numero, rotulo: `Versão ${numero}, salva por você` }]);
-    toast.success(`Versão ${numero} guardada nesta página.`);
+    const documento = editor.getJSON();
+    iniciar(async () => {
+      const resultado = await salvarVersao(peca.id, documento);
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+      const agora = new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date());
+      setVersoes((atuais) => [
+        ...atuais,
+        { numero: resultado.versao, origem: "usuario", data: agora },
+      ]);
+      setAlterado(false);
+      toast.success(`Versão ${resultado.versao} salva.`);
+    });
   }
 
   function restaurar(numero: number) {
-    const conteudo = conteudos.current.get(numero);
-    if (!editor || !conteudo) return;
-    editor.commands.setContent(conteudo, { emitUpdate: true });
-    toast.success(`Versão ${numero} restaurada.`);
+    iniciar(async () => {
+      const resultado = await buscarVersao(peca.id, numero);
+      if ("erro" in resultado || !editor) {
+        toast.error("erro" in resultado ? resultado.erro : "Editor indisponível.");
+        return;
+      }
+      editor.commands.setContent(resultado.documento, { emitUpdate: true });
+      toast.success(`Versão ${numero} carregada. Salve para manter este texto.`);
+    });
   }
 
   function baixar() {
@@ -104,24 +132,35 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
   }
 
   function mudarProtocolo(valor: boolean) {
-    setProtocolada(valor);
-    editor?.setEditable(!valor);
-    setModal(null);
-    if (valor) toast.success("Peça marcada como protocolada.");
+    if (valor && alterado) {
+      toast.error("Salve a versão antes de marcar como protocolada.");
+      setModal(null);
+      return;
+    }
+    iniciar(async () => {
+      const resultado = await marcarProtocolada(peca.id, valor);
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+      setProtocolada(valor);
+      editor?.setEditable(!valor);
+      setModal(null);
+      toast.success(valor ? "Peça marcada como protocolada." : "Peça reaberta para edição.");
+    });
   }
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link href={temAnalise ? `/app/intimacoes/${peca.id}` : "/app/pecas"}>
+        <Link href={peca.intimacaoId ? `/app/intimacoes/${peca.intimacaoId}` : "/app/pecas"}>
           <ArrowLeft aria-hidden />
-          {temAnalise ? "Voltar à análise" : "Voltar às peças"}
+          {peca.intimacaoId ? "Voltar à análise" : "Voltar às peças"}
         </Link>
       </Button>
       <header className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h1 className="text-2xl font-semibold text-titulo md:text-3xl">{peca.tipo}</h1>
-          <Badge variant="secondary">Dados de exemplo</Badge>
           {protocolada ? (
             <Badge className="border-transparent bg-sucesso-fundo text-sucesso">Protocolada</Badge>
           ) : (
@@ -129,7 +168,13 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
           )}
         </div>
         <p className="text-sm text-texto-secundario">
-          {peca.partes} · <span className="whitespace-nowrap tabular-nums">{peca.cnj}</span>
+          {peca.partes}
+          {peca.cnj && (
+            <>
+              {" "}
+              · <span className="whitespace-nowrap tabular-nums">{peca.cnj}</span>
+            </>
+          )}
         </p>
         <p className="text-sm">
           {peca.vencimento && (
@@ -138,10 +183,17 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
               <span className="text-texto-secundario"> · </span>
             </>
           )}
-          <span className="text-texto-secundario">Demonstração: as edições não são salvas.</span>
+          <span className="text-texto-secundario">
+            {alterado ? "Alterações não salvas" : "Tudo salvo"}
+          </span>
         </p>
       </header>
       <BalaoLia className="text-sm">{falaLia(pendencias.length, protocolada)}</BalaoLia>
+      {peca.aviso && (
+        <p role="note" className="rounded-md bg-atencao-fundo p-3 text-sm text-atencao">
+          {peca.aviso}
+        </p>
+      )}
       <p className="flex items-center gap-2 text-sm text-texto-secundario">
         <ShieldAlert aria-hidden className="size-4 shrink-0" />
         Rascunho gerado por IA. Revise antes de protocolar.
@@ -151,8 +203,13 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
           <Download aria-hidden />
           Baixar .docx
         </Button>
+        {!protocolada && (
+          <Button variant="outline" onClick={salvar} disabled={salvando || !alterado}>
+            {salvando ? "Salvando..." : "Salvar versão"}
+          </Button>
+        )}
         {protocolada ? (
-          <Button variant="outline" onClick={() => mudarProtocolo(false)}>
+          <Button variant="outline" onClick={() => mudarProtocolo(false)} disabled={salvando}>
             Reabrir peça
           </Button>
         ) : (
@@ -180,7 +237,7 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
           <TabsContent value="painel" forceMount className={conteudoAba}>
             <div className="flex flex-col gap-4">
               <PainelPendencias pendencias={pendencias} aoEscolher={irParaPendencia} />
-              <PainelFontes peca={peca} temAnalise={temAnalise} />
+              <PainelFontes fontes={peca.fontes} intimacaoId={peca.intimacaoId} />
               {recursosPro ? (
                 <PainelAjuste desativado={protocolada} />
               ) : (
@@ -192,7 +249,9 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
               <PainelVersoes
                 versoes={versoes}
                 desativado={protocolada}
-                aoSalvar={salvarVersao}
+                salvando={salvando}
+                podeSalvar={alterado}
+                aoSalvar={salvar}
                 aoRestaurar={restaurar}
               />
             </div>
@@ -228,7 +287,9 @@ export function TelaEditor({ peca, temAnalise }: { peca: PecaExemplo; temAnalise
             {modal === "baixar" ? (
               <Button onClick={baixar}>Baixar assim mesmo</Button>
             ) : (
-              <Button onClick={() => mudarProtocolo(true)}>Confirmar</Button>
+              <Button onClick={() => mudarProtocolo(true)} disabled={salvando}>
+                Confirmar
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>

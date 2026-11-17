@@ -7,6 +7,7 @@ import {
   opcoesParaIa,
   regraDaPeca,
   ritoParaRegra,
+  corrigirRito,
   competenciaEmBrasilia,
   textoBuscaEstilo,
   siglaTribunal,
@@ -126,6 +127,15 @@ describe("ritoParaRegra", () => {
   it("trata rito não identificado como procedimento comum", () => {
     expect(ritoParaRegra("outro")).toBe("comum");
     expect(ritoParaRegra("jef")).toBe("jef");
+  });
+});
+
+describe("corrigirRito", () => {
+  it("usa o segmento da justiça no número CNJ para separar JEF de JEC", () => {
+    expect(corrigirRito("1044555-66.2026.4.01.3400", "jec")).toBe("jef");
+    expect(corrigirRito("0712345-67.2026.8.07.0001", "jef")).toBe("jec");
+    expect(corrigirRito("1044555-66.2026.4.01.3400", "comum")).toBe("comum");
+    expect(corrigirRito(null, "jec")).toBe("jec");
   });
 });
 

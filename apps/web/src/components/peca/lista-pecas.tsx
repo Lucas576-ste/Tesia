@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { LinhaPeca } from "@/lib/pecas-exemplo";
+import type { LinhaPeca } from "@/lib/linha-peca";
 import { cn } from "@/lib/utils";
 import { MenuAcoesPeca } from "./menu-acoes-peca";
 

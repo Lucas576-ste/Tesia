@@ -12,6 +12,7 @@ import { z } from "zod";
 import { buscarCalendario, buscarOpcoes, gravarAnalise, registrarUso } from "../analise/banco.js";
 import {
   calcularPrazoSugerido,
+  corrigirRito,
   hojeEmBrasilia,
   montarCalendario,
   motivoSemPrazo,
@@ -90,7 +91,13 @@ async function executar(job: Job, contexto: Contexto) {
 
   const extracao = await comIa(() => extrairDados(ia, texto));
   await registrarUso(db, job, { etapa: "extracao", ...extracao });
-  const dados = extracao.resultado;
+  const dados = {
+    ...extracao.resultado,
+    rito: corrigirRito(
+      extracao.resultado.numero_processo,
+      extracao.resultado.rito,
+    ) as typeof extracao.resultado.rito,
+  };
 
   const opcoes = await buscarOpcoes(db, dados.area, dados.rito, dados.tipo_ato);
   const escolha = await comIa(() => escolherPeca(ia, dados, opcoesParaIa(opcoes)));

@@ -4,11 +4,8 @@ import Link from "next/link";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { PecaGerando } from "@/components/peca/peca-gerando";
 import { TelaEditor } from "@/components/peca/tela-editor";
-import { VisualizacaoPeca } from "@/components/peca/visualizacao-peca";
 import { Button } from "@/components/ui/button";
-import { buscarAnalise } from "@/lib/analises-exemplo";
-import { buscarPecaGerada } from "@/lib/peca";
-import { buscarPeca } from "@/lib/pecas-exemplo";
+import { buscarPeca } from "@/lib/peca";
 
 export const metadata: Metadata = { title: "Peça · Tesia" };
 
@@ -36,14 +33,10 @@ function ErroGeracao({ intimacaoId }: { intimacaoId: string | null }) {
 
 export default async function PecaPage({ params }: PecaPageProps) {
   const { id } = await params;
-  const gerada = await buscarPecaGerada(id);
-  if (gerada?.status === "gerando") return <PecaGerando titulo={gerada.titulo} />;
-  if (gerada?.status === "erro") return <ErroGeracao intimacaoId={gerada.intimacaoId} />;
-  if (gerada) return <VisualizacaoPeca peca={gerada} />;
-
-  const exemplo = buscarPeca(id);
-  if (exemplo)
-    return <TelaEditor key={exemplo.id} peca={exemplo} temAnalise={Boolean(buscarAnalise(id))} />;
+  const estado = await buscarPeca(id);
+  if (estado?.status === "gerando") return <PecaGerando titulo={estado.titulo} />;
+  if (estado?.status === "erro") return <ErroGeracao intimacaoId={estado.intimacaoId} />;
+  if (estado) return <TelaEditor key={estado.peca.id} peca={estado.peca} />;
 
   return (
     <EstadoVazio
@@ -51,7 +44,7 @@ export default async function PecaPage({ params }: PecaPageProps) {
       descricao="Ela pode ter sido excluída ou pertencer a outro escritório."
       acao={
         <Button asChild variant="outline">
-          <Link href="/app/intimacoes">Ver intimações</Link>
+          <Link href="/app/pecas">Ver peças</Link>
         </Button>
       }
     />

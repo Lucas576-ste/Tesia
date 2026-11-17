@@ -1,40 +1,48 @@
-import { FileText, Scale } from "lucide-react";
+import { FileText } from "lucide-react";
 import Link from "next/link";
-import type { PecaExemplo } from "@/lib/pecas-exemplo";
 
-function ListaFontes({
-  titulo,
-  itens,
-  icone: Icone,
-}: {
-  titulo: string;
-  itens: string[];
-  icone: typeof FileText;
-}) {
-  return (
-    <div>
-      <h3 className="text-sm font-semibold">{titulo}</h3>
-      <ul className="mt-1 flex flex-col gap-1 text-sm text-texto-secundario">
-        {itens.map((item) => (
-          <li key={item} className="flex gap-2">
-            <Icone aria-hidden className="mt-0.5 size-4 shrink-0" />
-            <span className="min-w-0 break-words">{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+type PainelFontesProps = {
+  fontes: { documento: string; secao: string }[];
+  intimacaoId: string | null;
+};
 
-export function PainelFontes({ peca, temAnalise }: { peca: PecaExemplo; temAnalise: boolean }) {
+const ROTULOS_SECAO: Record<string, string> = {
+  enderecamento: "endereçamento",
+  qualificacao: "qualificação",
+  fatos: "fatos",
+  preliminares: "preliminares",
+  fundamentos: "fundamentos",
+  pedidos: "pedidos",
+  fechamento: "fechamento",
+  outra: "outro trecho",
+};
+
+export function PainelFontes({ fontes, intimacaoId }: PainelFontesProps) {
   return (
     <section className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs">
       <h2 className="text-lg font-semibold">Como foi montado</h2>
-      <ListaFontes titulo="Suas peças usadas como base" itens={peca.pecasBase} icone={FileText} />
-      <ListaFontes titulo="Documentos de origem" itens={peca.documentos} icone={Scale} />
-      {temAnalise && (
+      <div>
+        <h3 className="text-sm font-semibold">Suas peças usadas como base</h3>
+        {fontes.length === 0 ? (
+          <p className="mt-1 text-sm text-texto-secundario">
+            Nenhuma peça sua foi usada. Envie peças em Meu estilo.
+          </p>
+        ) : (
+          <ul className="mt-1 flex flex-col gap-1 text-sm text-texto-secundario">
+            {fontes.map(({ documento, secao }, indice) => (
+              <li key={indice} className="flex gap-2">
+                <FileText aria-hidden className="mt-0.5 size-4 shrink-0" />
+                <span className="min-w-0 break-words">
+                  {documento} · {ROTULOS_SECAO[secao] ?? secao}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      {intimacaoId && (
         <Link
-          href={`/app/intimacoes/${peca.id}`}
+          href={`/app/intimacoes/${intimacaoId}`}
           className="w-fit py-1 text-sm text-primaria underline"
         >
           Ver a análise da intimação

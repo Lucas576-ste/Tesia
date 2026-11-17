@@ -19,15 +19,22 @@ export type LinhaPrazo = {
   hora?: string;
   responsavel?: string;
   etapa?: EtapaPrazo;
+  pecaId?: string;
 };
 
 export type ColunaQuadro = "hoje" | "proximos" | "depois" | "rascunho" | "protocolado";
 
 const LIMITE_DIAS_CRITICOS = 3;
 
-export function destinoPrazo({ id, status, tipo }: Pick<LinhaPrazo, "id" | "status" | "tipo">) {
+export function destinoPrazo({
+  id,
+  status,
+  tipo,
+  pecaId,
+}: Pick<LinhaPrazo, "id" | "status" | "tipo" | "pecaId">) {
   if (tipo) return null;
-  return status === "nao_iniciado" ? `/app/intimacoes/${id}` : `/app/pecas/${id}`;
+  if (status !== "nao_iniciado" && pecaId) return `/app/pecas/${pecaId}`;
+  return `/app/intimacoes/${id}`;
 }
 
 function textoVencimento({ diasUteis, vencimento }: LinhaPrazo) {
