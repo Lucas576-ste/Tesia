@@ -3,7 +3,8 @@
 import { ArrowLeft, Quote, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { gerarRascunho } from "@/app/app/intimacoes/acoes";
 import { toast } from "sonner";
 import { BalaoLia } from "@/components/lia/balao-lia";
 import { AvisoPro } from "@/components/plano/aviso-pro";
@@ -12,6 +13,7 @@ import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Analise } from "@/lib/analise";
+import type { UsoPecas } from "@/lib/uso-pecas";
 import { BlocoPrazo } from "./bloco-prazo";
 import { DocumentoOriginal } from "./documento-original";
 import { EscolhaPeca } from "./escolha-peca";
@@ -23,12 +25,14 @@ function textoPontos(quantidade: number) {
 
 const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block";
 
-export function TelaAnalise({ analise }: { analise: Analise }) {
+export function TelaAnalise({ analise, uso }: { analise: Analise; uso: UsoPecas }) {
   const [aba, setAba] = useState("analise");
   const [destaque, setDestaque] = useState<string | null>(null);
   const [confirmado, setConfirmado] = useState(analise.confirmado);
   const router = useRouter();
-  const { plano, uso } = usePlanoDemo();
+  const { plano } = usePlanoDemo();
+  const [pecaEscolhida, setPecaEscolhida] = useState(analise.pecas[0]?.codigo);
+  const [gerando, iniciar] = useTransition();
   const [limiteAberto, setLimiteAberto] = useState(false);
   const restantes = uso.limite - uso.usadas;
 
@@ -38,6 +42,22 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
       .getElementById(`trecho-${destaque}`)
       ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [destaque, aba]);
+
+  function gerar() {
+    if (!pecaEscolhida) return;
+    iniciar(async () => {
+      const resultado = await gerarRascunho(analise.id, pecaEscolhida);
+      if ("limite" in resultado) {
+        setLimiteAberto(true);
+        return;
+      }
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+      router.push(`/app/pecas/${resultado.id}`);
+    });
+  }
 
   function verTrecho(trechoId: string) {
     setDestaque(trechoId);
@@ -130,15 +150,19 @@ export function TelaAnalise({ analise }: { analise: Analise }) {
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
               />
-              <EscolhaPeca pecas={plano.recursosPro ? analise.pecas : analise.pecas.slice(0, 1)} />
+              <EscolhaPeca
+                pecas={plano.recursosPro ? analise.pecas : analise.pecas.slice(0, 1)}
+                escolhida={pecaEscolhida}
+                aoEscolher={setPecaEscolhida}
+              />
               <section className="flex flex-col gap-2 rounded-xl bg-primaria-fundo p-4">
                 {confirmado && restantes <= 0 ? (
                   <Button size="lg" onClick={() => setLimiteAberto(true)}>
                     Gerar rascunho no meu estilo
                   </Button>
                 ) : confirmado ? (
-                  <Button asChild size="lg">
-                    <Link href={`/app/pecas/${analise.id}`}>Gerar rascunho no meu estilo</Link>
+                  <Button size="lg" onClick={gerar} disabled={gerando || !pecaEscolhida}>
+                    {gerando ? "Preparando o rascunho..." : "Gerar rascunho no meu estilo"}
                   </Button>
                 ) : (
                   <Button disabled size="lg">

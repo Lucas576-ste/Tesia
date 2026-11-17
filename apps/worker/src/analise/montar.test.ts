@@ -7,6 +7,8 @@ import {
   opcoesParaIa,
   regraDaPeca,
   ritoParaRegra,
+  competenciaEmBrasilia,
+  textoBuscaEstilo,
   siglaTribunal,
   type OpcaoBanco,
 } from "./montar.js";
@@ -130,5 +132,20 @@ describe("ritoParaRegra", () => {
 describe("hojeEmBrasilia", () => {
   it("usa o fuso de Brasília", () => {
     expect(hojeEmBrasilia(new Date("2026-11-12T02:00:00Z"))).toBe("2026-11-11");
+  });
+});
+
+describe("textoBuscaEstilo e competenciaEmBrasilia", () => {
+  it("junta peça, resumo e pontos para a busca", () => {
+    const texto = textoBuscaEstilo("Recurso inominado", "Sentença improcedente.", [
+      { titulo: "Atestado ignorado", explicacao: "Não analisou o atestado." },
+    ]);
+    expect(texto).toBe(
+      "Recurso inominado\nSentença improcedente.\nAtestado ignorado: Não analisou o atestado.",
+    );
+  });
+
+  it("usa o mês de Brasília", () => {
+    expect(competenciaEmBrasilia(new Date("2026-12-01T02:00:00Z"))).toBe("2026-11");
   });
 });

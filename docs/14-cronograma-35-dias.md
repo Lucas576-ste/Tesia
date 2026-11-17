@@ -201,10 +201,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-13:** perfil gerado pelo Sonnet sozinho quando as peças são lidas ou removidas (um único job para várias peças) e pelo botão "Atualizar meu estilo". Painel com as frases reais e "Ver detalhes". Testado ponta a ponta com o Claude: 6 frases fiéis às peças, sem dados pessoais, US$ 0,014 com 2 peças.
 
-### Dia 24 — Geração da peça
+### Dia 24 — Geração da peça ✅
 - Busca das peças parecidas no pgvector
 - Prompt de geração (Sonnet, com cache nas partes fixas)
 - Job de geração e contagem de uso
+
+**Feito em 2026-11-13:** "Gerar rascunho" cria a peça, o worker busca os 3 trechos mais parecidos e o Sonnet escreve no estilo do advogado, com `[CONFIRMAR]` nos dados que faltam. Contador real de peças e bloqueio no limite. Testado ponta a ponta com a IA real (recurso inominado com títulos "I – DOS FATOS" e "Nestes termos", baseado no recurso antigo do advogado, US$ 0,028). A visualização é só leitura; o editor real é o Dia 25.
 
 ### Dia 25 — Editor com dados reais
 - Carregar a peça gerada, destacar pendências, salvar versões

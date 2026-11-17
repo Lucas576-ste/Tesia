@@ -177,3 +177,22 @@ export function motivoSemPrazo(regra: RegraBanco | null, recebimento: DadosReceb
 export function hojeEmBrasilia(agora = new Date()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(agora);
 }
+
+export function textoBuscaEstilo(
+  nomePeca: string,
+  resumo: string | null,
+  pontos: { titulo: string; explicacao?: string }[],
+) {
+  return [
+    nomePeca,
+    resumo ?? "",
+    ...pontos.map((ponto) => [ponto.titulo, ponto.explicacao].filter(Boolean).join(": ")),
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .slice(0, 4000);
+}
+
+export function competenciaEmBrasilia(agora = new Date()) {
+  return hojeEmBrasilia(agora).slice(0, 7);
+}

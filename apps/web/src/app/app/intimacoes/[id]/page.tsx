@@ -6,6 +6,7 @@ import { AnaliseEmAndamento } from "@/components/intimacao/analise-em-andamento"
 import { TelaAnalise } from "@/components/intimacao/tela-analise";
 import { Button } from "@/components/ui/button";
 import { buscarIntimacao } from "@/lib/analise";
+import { buscarUsoPecas } from "@/lib/uso-pecas";
 
 export const metadata: Metadata = { title: "Análise da intimação · Tesia" };
 
@@ -53,5 +54,6 @@ export default async function AnalisePage({ params }: AnalisePageProps) {
   if (intimacao.status !== "analisada") {
     return <AnaliseEmAndamento lendo={intimacao.status === "processando"} />;
   }
-  return <TelaAnalise key={intimacao.analise.id} analise={intimacao.analise} />;
+  const uso = await buscarUsoPecas();
+  return <TelaAnalise key={intimacao.analise.id} analise={intimacao.analise} uso={uso} />;
 }

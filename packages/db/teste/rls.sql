@@ -297,4 +297,43 @@ begin
 end;
 $$;
 
+insert into pecas (escritorio_id, tipo_peca_id, titulo, status)
+select current_setting('teste.esc_a')::uuid, id, 'Apelação', 'gerando'
+from tipos_peca where codigo = 'apelacao' and area = 'civel';
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'gerar_peca'
+    and escritorio_id = current_setting('teste.esc_a')::uuid) = 1,
+    'Peça nova deveria criar o job de geração';
+end;
+$$;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+
+do $$
+declare
+  uso record;
+begin
+  select * into uso from uso_pecas_atual();
+  assert uso.usadas = 1, 'A deveria ter 1 peça em geração contada';
+  assert uso.limite = 5, 'O teste grátis deveria ter limite de 5 peças';
+end;
+$$;
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+
+do $$
+declare
+  uso record;
+begin
+  select * into uso from uso_pecas_atual();
+  assert uso.usadas = 0, 'B não deveria contar as peças de A';
+  assert (select count(*) from pecas) = 0, 'B não deveria ver as peças de A';
+end;
+$$;
+
+reset role;
+
 select 'RLS: todos os testes passaram' as resultado;

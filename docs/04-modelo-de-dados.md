@@ -108,7 +108,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | origem | enum | `intimacao`, `manual` |
 | tipo | enum | `prazo`, `audiencia`, `compromisso` |
 | hora | time | opcional, para audiências e compromissos |
-| responsavel_id | uuid | usuário responsável (plano Sociedade) |
+| responsavel_id | uuid | quem pediu; o rascunho usa o estilo dessa pessoa |
 | regra_prazo_id | uuid | regra usada no cálculo; vazio quando manual |
 | descricao | text | ex.: "Recurso inominado" |
 | dias | int | |
@@ -126,18 +126,20 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | Campo | Tipo | Observação |
 |---|---|---|
 | escritorio_id | uuid | |
-| processo_id | uuid | |
+| processo_id | uuid | opcional (a intimação pode não ter número identificado) |
 | intimacao_id | uuid | opcional |
 | prazo_id | uuid | opcional |
 | tipo_peca_id | uuid | |
 | responsavel_id | uuid | usuário responsável (plano Sociedade) |
 | titulo | text | |
-| conteudo | jsonb | documento em blocos/seções |
+| conteudo | jsonb | `{ secoes: [{ titulo, texto }], aviso }`; `aviso` quando saiu genérico (sem perfil ou sem peças) |
 | versao | int | |
-| pendencias | jsonb | lista de `[CONFIRMAR]` encontrados |
-| fontes | jsonb | trechos dos documentos usados |
+| pendencias | jsonb | `[{ secao, titulo, texto }]` de cada `[CONFIRMAR: ...]` |
+| fontes | jsonb | `[{ trecho_id, documento, secao }]`: trechos das peças do advogado usados como base |
 | ajustes_usados | int | até 3 sem contar como nova peça |
-| status | enum | `gerando`, `rascunho`, `revisada`, `protocolada` |
+| status | enum | `gerando`, `rascunho`, `revisada`, `protocolada`, `erro` |
+
+Peça nova com status `gerando` entra na `fila` como `gerar_peca` (gatilho). Peça com `erro` não conta no limite.
 
 ### pecas_versoes
 Histórico de cada versão da peça (`peca_id`, `versao`, `conteudo`, `origem`: `ia` ou `usuario`).
@@ -234,7 +236,9 @@ O job `gerar_perfil_estilo` é criado por gatilho quando uma peça vira `lido` o
 `escritorio_id`, `plano_codigo`, `addons` (text[], ex.: `plus`), `status` (`trial`, `ativa`, `inadimplente`, `cancelada`), `asaas_customer_id`, `asaas_subscription_id`, `periodo_inicio`, `periodo_fim`.
 
 ### uso_mensal
-`escritorio_id`, `competencia` (ex.: `2026-11`), `pecas_geradas`, `pecas_extras`, `posts_gerados`, `tokens_entrada`, `tokens_saida`, `custo_estimado`.
+`escritorio_id`, `competencia` (ex.: `2026-11`, no fuso de Brasília), `pecas_geradas`, `pecas_extras`, `posts_gerados`, `tokens_entrada`, `tokens_saida`, `custo_estimado`. Só o worker grava.
+
+`uso_pecas_atual()`: para o usuário logado, devolve `usadas` (geradas no mês + em geração) e `limite` (5 no teste grátis; senão o limite do plano + pacotes extras).
 
 ### uso_ia
 Uma linha por chamada: `escritorio_id`, `job_id`, `etapa`, `modelo`, `versao_prompt` (ex.: `transcricao@1`), `tokens_entrada`, `tokens_cache`, `tokens_saida`, `custo_estimado`, `duracao_ms`.

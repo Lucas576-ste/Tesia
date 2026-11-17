@@ -110,6 +110,13 @@ Regras do prompt:
 - Qualquer dado que falte vira `[CONFIRMAR: descrição do que falta]`.
 - Saída em seções, no formato definido, para o editor e o .docx.
 
+**Implementação (`packages/ia/src/geracao/`, prompt `geracao@2`):**
+- Sonnet 5.5 em streaming, esforço `medium` e fallback automático do servidor.
+- Sistema em 3 blocos com cache: instruções fixas, perfil de estilo e tipo de peça.
+- Os 3 trechos mais parecidos vêm do pgvector com o embedding de busca (Voyage, `input_type` `query`) montado a partir do nome da peça, do resumo e dos pontos a atacar.
+- Resposta em `<secao titulo="...">`, separada pelo código. Endereçamento, qualificação e fechamento vêm sem título, e os demais títulos seguem os do advogado (nunca os códigos internos); cada `[CONFIRMAR: ...]` vira pendência com a seção.
+- Sem perfil ou sem peças, gera mesmo assim e avisa que o rascunho saiu genérico.
+
 **Ajustes:** o pedido do advogado ("reforce o argumento da idade") é enviado junto com a peça atual. Retorna apenas as seções alteradas.
 
 ## 5. Revisão de citações

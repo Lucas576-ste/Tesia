@@ -29,7 +29,7 @@ export type Analise = {
   prazo: PrazoAnalise | null;
   motivoSemPrazo: string | null;
   confirmado: boolean;
-  pecas: { nome: string; justificativa: string }[];
+  pecas: { codigo: string; nome: string; justificativa: string }[];
   documento: TrechoDocumento[];
   hoje: string;
   recebimento: { forma: FormaRecebimento; disponibilizacao: string; envio: string };
@@ -219,7 +219,7 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       prazo: montarPrazo(prazo, gravada.data.prazo),
       motivoSemPrazo: gravada.data.motivo_sem_prazo,
       confirmado: prazo?.status === "confirmado" || prazo?.status === "cumprido",
-      pecas: pecas.map(({ nome, justificativa }) => ({ nome, justificativa })),
+      pecas: pecas.map(({ codigo, nome, justificativa }) => ({ codigo, nome, justificativa })),
       documento,
       hoje: hojeEmBrasilia(),
       recebimento: {

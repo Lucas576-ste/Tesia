@@ -1,10 +1,11 @@
 "use server";
 
-import { analiseGravadaSchema } from "@tesia/shared";
+import { analiseGravadaSchema, nomePartes } from "@tesia/shared";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { STATUS_INTIMACAO, idsSchema, registroSchema } from "@/lib/envio-intimacao";
 import { usuarioAtual } from "@/lib/sessao";
+import { buscarUsoPecas } from "@/lib/uso-pecas";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
 const statusSchema = z.array(z.object({ id: z.uuid(), status: z.enum(STATUS_INTIMACAO) }));
@@ -135,4 +136,69 @@ export async function confirmarPrazo(
 
   revalidatePath("/app");
   return { ok: true };
+}
+
+const tipoPecaSchema = z.object({ id: z.uuid(), nome: z.string(), area: z.string() });
+
+export async function gerarRascunho(
+  intimacaoId: string,
+  codigoPeca: string,
+): Promise<{ id: string } | { erro: string } | { limite: true }> {
+  const usuario = await usuarioAtual();
+  if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
+  if (!z.uuid().safeParse(intimacaoId).success || !/^[a-z_]{2,60}$/.test(codigoPeca)) {
+    return { erro: "Pedido inválido." };
+  }
+
+  const supabase = await criarClienteServidor();
+  const { data: linhaIntimacao } = await supabase
+    .from("intimacoes")
+    .select("processo_id, extracao")
+    .eq("id", intimacaoId)
+    .maybeSingle();
+  const intimacao = intimacaoSchema.safeParse(linhaIntimacao);
+  const analise = analiseGravadaSchema.safeParse(intimacao.data?.extracao);
+  if (!intimacao.success || !analise.success) return { erro: "Intimação não encontrada." };
+
+  const { data: prazos } = await supabase
+    .from("prazos")
+    .select("id")
+    .eq("intimacao_id", intimacaoId)
+    .in("status", ["confirmado", "cumprido"])
+    .limit(1);
+  const prazo = z.array(z.object({ id: z.uuid() })).safeParse(prazos).data?.[0];
+  if (!prazo) return { erro: "Confirme o prazo antes de gerar o rascunho." };
+
+  const { data: tipos } = await supabase
+    .from("tipos_peca")
+    .select("id, nome, area")
+    .eq("codigo", codigoPeca)
+    .eq("ativa", true);
+  const lista = z.array(tipoPecaSchema).safeParse(tipos).data ?? [];
+  const tipo =
+    lista.find((item) => item.area === analise.data.dados.area) ??
+    lista.find((item) => item.area === "geral") ??
+    lista[0];
+  if (!tipo) return { erro: "Tipo de peça não encontrado." };
+
+  const uso = await buscarUsoPecas();
+  if (uso.usadas >= uso.limite) return { limite: true };
+
+  const { data, error } = await supabase
+    .from("pecas")
+    .insert({
+      escritorio_id: usuario.escritorio_id,
+      processo_id: intimacao.data.processo_id,
+      intimacao_id: intimacaoId,
+      prazo_id: prazo.id,
+      tipo_peca_id: tipo.id,
+      responsavel_id: usuario.id,
+      titulo: `${tipo.nome} · ${nomePartes(analise.data.dados.partes)}`,
+      status: "gerando",
+    })
+    .select("id")
+    .single();
+  const linha = z.object({ id: z.uuid() }).safeParse(data);
+  if (error || !linha.success) return { erro: "Não foi possível começar o rascunho." };
+  return { id: linha.data.id };
 }
