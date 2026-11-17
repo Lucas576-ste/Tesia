@@ -1,5 +1,8 @@
 import {
+  acharPendencias,
   ehErroDefinitivoDaApi,
+  marcarProblemas,
+  revisarCitacoes,
   ErroEmbeddingsDefinitivo,
   gerarEmbeddings,
   gerarPeca,
@@ -158,11 +161,34 @@ async function executar(job: Job, contexto: Contexto) {
   );
   await registrarUso(db, job, { etapa: "geracao_peca", ...resultado });
 
+  let secoes = resultado.secoes;
+  try {
+    const revisao = await revisarCitacoes(ia, {
+      secoes,
+      textoIntimacao: intimacao.data.texto ?? "",
+      trechos: trechos.map(({ documento, secao, texto }) => ({ documento, secao, texto })),
+    });
+    await registrarUso(db, job, { etapa: "revisao_citacoes", ...revisao });
+    const marcadas = marcarProblemas(secoes, revisao.resultado);
+    secoes = marcadas.secoes;
+    registrar("citacoes_revisadas", {
+      job_id: job.id,
+      apontadas: revisao.resultado.length,
+      marcadas: marcadas.inseridos,
+    });
+  } catch (erro) {
+    registrar("revisao_falhou", {
+      job_id: job.id,
+      erro: erro instanceof Error ? erro.message : String(erro),
+    });
+  }
+  const pendencias = acharPendencias(secoes);
+
   const aviso =
     !perfil || trechos.length === 0
       ? "Rascunho genérico: envie suas peças em Meu estilo para eu escrever do seu jeito."
       : null;
-  const conteudo = { secoes: resultado.secoes, aviso };
+  const conteudo = { secoes, aviso };
   const fontes = trechos.map(({ id, documento, secao }) => ({ trecho_id: id, documento, secao }));
 
   const cliente = await db.connect();
@@ -175,7 +201,7 @@ async function executar(job: Job, contexto: Contexto) {
         pecaId,
         job.escritorio_id,
         JSON.stringify(conteudo),
-        JSON.stringify(resultado.pendencias),
+        JSON.stringify(pendencias),
         JSON.stringify(fontes),
       ],
     );
@@ -210,8 +236,8 @@ async function executar(job: Job, contexto: Contexto) {
 
   registrar("peca_gerada", {
     job_id: job.id,
-    secoes: resultado.secoes.length,
-    pendencias: resultado.pendencias.length,
+    secoes: secoes.length,
+    pendencias: pendencias.length,
     trechos: trechos.length,
     custo: resultado.uso.custoEstimado,
   });

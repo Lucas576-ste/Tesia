@@ -4,6 +4,7 @@ import pg from "pg";
 import { ambiente } from "./ambiente.js";
 import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from "./fila.js";
 import { analisarIntimacao } from "./tarefas/analisar-intimacao.js";
+import { ajustarPecaTarefa } from "./tarefas/ajustar-peca.js";
 import { gerarPecaTarefa } from "./tarefas/gerar-peca.js";
 import { gerarPerfilEstiloTarefa } from "./tarefas/gerar-perfil-estilo.js";
 import { processarPecaEstilo } from "./tarefas/processar-peca-estilo.js";
@@ -14,6 +15,7 @@ const tarefas: Record<string, Tarefa> = {
   processar_peca_estilo: processarPecaEstilo,
   gerar_perfil_estilo: gerarPerfilEstiloTarefa,
   gerar_peca: gerarPecaTarefa,
+  ajustar_peca: ajustarPecaTarefa,
 };
 
 function registrar(evento: string, dados: Record<string, unknown>) {

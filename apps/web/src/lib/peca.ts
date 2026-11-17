@@ -5,7 +5,18 @@ import { conteudoPecaSchema, documentoDoConteudo } from "@/lib/documento-peca";
 import { isoParaData } from "@/lib/prazo-interno";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
-export type VersaoSalva = { numero: number; origem: "ia" | "usuario"; data: string };
+export type VersaoSalva = {
+  numero: number;
+  origem: "ia" | "usuario";
+  data: string;
+  pedido?: string | null;
+};
+
+export type AjustePeca = {
+  usados: number;
+  status: "pendente" | "processando" | "concluido" | "erro" | null;
+  erro: string | null;
+};
 
 export type PecaEditor = {
   id: string;
@@ -19,6 +30,7 @@ export type PecaEditor = {
   intimacaoId: string | null;
   fontes: { documento: string; secao: string }[];
   versoes: VersaoSalva[];
+  ajuste: AjustePeca;
 };
 
 export type EstadoPeca =
@@ -43,10 +55,18 @@ const linhaSchema = z.object({
   processos: umOuNenhum(z.object({ numero_cnj: z.string() })),
   prazos: umOuNenhum(z.object({ data_vencimento: z.string() })),
   intimacoes: umOuNenhum(z.object({ extracao: z.unknown() })),
+  ajustes_usados: z.number().int(),
+  ajuste_status: z.enum(["pendente", "processando", "concluido", "erro"]).nullable(),
+  ajuste_erro: z.string().nullable(),
 });
 
 const versoesSchema = z.array(
-  z.object({ versao: z.number().int(), origem: z.enum(["ia", "usuario"]), criado_em: z.string() }),
+  z.object({
+    versao: z.number().int(),
+    origem: z.enum(["ia", "usuario"]),
+    criado_em: z.string(),
+    pedido: z.string().nullable(),
+  }),
 );
 const fontesSchema = z.array(z.object({ documento: z.string(), secao: z.string() }));
 
@@ -66,7 +86,7 @@ export async function buscarPeca(id: string): Promise<EstadoPeca | null> {
   const { data } = await supabase
     .from("pecas")
     .select(
-      "id, titulo, status, intimacao_id, conteudo, fontes, tipos_peca(nome), processos(numero_cnj), prazos(data_vencimento), intimacoes(extracao)",
+      "id, titulo, status, intimacao_id, conteudo, fontes, ajustes_usados, ajuste_status, ajuste_erro, tipos_peca(nome), processos(numero_cnj), prazos(data_vencimento), intimacoes(extracao)",
     )
     .eq("id", id)
     .is("excluido_em", null)
@@ -79,7 +99,7 @@ export async function buscarPeca(id: string): Promise<EstadoPeca | null> {
 
   const { data: versoes } = await supabase
     .from("pecas_versoes")
-    .select("versao, origem, criado_em")
+    .select("versao, origem, criado_em, pedido:conteudo->>pedido")
     .eq("peca_id", id)
     .order("versao");
   const analise = analiseGravadaSchema.safeParse(peca.intimacoes?.extracao);
@@ -98,12 +118,14 @@ export async function buscarPeca(id: string): Promise<EstadoPeca | null> {
       intimacaoId: peca.intimacao_id,
       fontes: fontesSchema.safeParse(peca.fontes).data ?? [],
       versoes: (versoesSchema.safeParse(versoes).data ?? []).map(
-        ({ versao, origem, criado_em }) => ({
+        ({ versao, origem, criado_em, pedido }) => ({
           numero: versao,
           origem,
           data: dataHora(criado_em),
+          pedido,
         }),
       ),
+      ajuste: { usados: peca.ajustes_usados, status: peca.ajuste_status, erro: peca.ajuste_erro },
     },
   };
 }

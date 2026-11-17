@@ -36,7 +36,10 @@ export default async function PecaPage({ params }: PecaPageProps) {
   const estado = await buscarPeca(id);
   if (estado?.status === "gerando") return <PecaGerando titulo={estado.titulo} />;
   if (estado?.status === "erro") return <ErroGeracao intimacaoId={estado.intimacaoId} />;
-  if (estado) return <TelaEditor key={estado.peca.id} peca={estado.peca} />;
+  if (estado)
+    return (
+      <TelaEditor key={`${estado.peca.id}-${estado.peca.versoes.length}`} peca={estado.peca} />
+    );
 
   return (
     <EstadoVazio

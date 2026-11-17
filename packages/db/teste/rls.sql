@@ -336,4 +336,24 @@ $$;
 
 reset role;
 
+update pecas set status = 'rascunho' where escritorio_id = current_setting('teste.esc_a')::uuid;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+update pecas set ajuste_pedido = 'invasão', ajuste_status = 'pendente';
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+update pecas set ajuste_pedido = 'reforce os atestados', ajuste_status = 'pendente';
+
+reset role;
+
+do $$
+begin
+  assert (select count(*) from fila where tipo = 'ajustar_peca') = 1,
+    'Só o pedido de ajuste do próprio escritório deveria criar job';
+  assert (select ajuste_pedido from pecas where escritorio_id = current_setting('teste.esc_a')::uuid) = 'reforce os atestados',
+    'B não deveria conseguir pedir ajuste na peça de A';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

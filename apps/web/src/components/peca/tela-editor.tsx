@@ -239,7 +239,17 @@ export function TelaEditor({ peca }: { peca: PecaEditor }) {
               <PainelPendencias pendencias={pendencias} aoEscolher={irParaPendencia} />
               <PainelFontes fontes={peca.fontes} intimacaoId={peca.intimacaoId} />
               {recursosPro ? (
-                <PainelAjuste desativado={protocolada} />
+                <PainelAjuste
+                  pecaId={peca.id}
+                  ajuste={peca.ajuste}
+                  desativado={protocolada}
+                  alterado={alterado}
+                  aoAtingirLimite={() =>
+                    toast.error(
+                      "Você chegou ao limite de peças do mês. Este ajuste contaria como peça nova.",
+                    )
+                  }
+                />
               ) : (
                 <AvisoPro
                   titulo="Ajustes pela Lia"

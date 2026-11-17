@@ -118,6 +118,8 @@ Regras do prompt:
 - Resposta em `<secao titulo="...">`, separada pelo código. Endereçamento, qualificação e fechamento vêm sem título, e os demais títulos seguem os do advogado (nunca os códigos internos); cada `[CONFIRMAR: ...]` vira pendência com a seção.
 - Sem perfil ou sem peças, gera mesmo assim e avisa que o rascunho saiu genérico.
 
+**Ajustes (`packages/ia/src/geracao/ajuste.ts`, prompt `ajuste@1`):** Sonnet com o perfil de estilo e a peça em seções numeradas; devolve só as seções alteradas (`<secao indice="N">`), juntadas pelo código. Até 3 ajustes por peça sem custo; do 4º em diante, cada ajuste conta 1 peça no mês. Recurso do Pro (e do teste grátis).
+
 **Ajustes:** o pedido do advogado ("reforce o argumento da idade") é enviado junto com a peça atual. Retorna apenas as seções alteradas.
 
 ## 5. Revisão de citações
@@ -125,6 +127,8 @@ Regras do prompt:
 **Modelo:** Haiku.
 **Entrada:** peça gerada + documentos.
 **Saída:** lista de afirmações e citações sem sustentação nos documentos. Cada item vira uma pendência destacada no editor.
+
+Implementação (`packages/ia/src/geracao/revisao.ts`, prompt `revisao@1`): roda dentro da geração, logo depois do Sonnet. O Haiku devolve `{ trecho_exato, motivo }`; o código insere ` [CONFIRMAR: motivo]` logo depois do trecho, sem duplicar marcação existente. Se a revisão falhar, a peça é gravada mesmo assim.
 
 ## Conteúdo para Instagram (Plus)
 

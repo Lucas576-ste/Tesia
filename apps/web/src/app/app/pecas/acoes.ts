@@ -10,6 +10,7 @@ import {
   TAMANHO_MAXIMO_DOCUMENTO,
 } from "@/lib/documento-peca";
 import { usuarioAtual } from "@/lib/sessao";
+import { buscarUsoPecas } from "@/lib/uso-pecas";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
 type Resultado<T> = ({ ok: true } & T) | { erro: string };
@@ -116,6 +117,71 @@ export async function marcarProtocolada(
       .in("status", ["confirmado", "cumprido"]);
   }
   revalidatePath("/app");
+  revalidatePath(`/app/pecas/${id}`);
+  return { ok: true };
+}
+
+const AJUSTES_SEM_CUSTO = 3;
+
+const ajusteSchema = z.object({
+  status: z.string(),
+  ajuste_status: z.string().nullable(),
+  ajustes_usados: z.number().int(),
+});
+
+const assinaturaSchema = z.object({
+  status: z.string(),
+  planos: z
+    .union([z.object({ recursos: z.unknown() }), z.array(z.object({ recursos: z.unknown() }))])
+    .nullable()
+    .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor)),
+});
+
+export async function pedirAjuste(
+  id: string,
+  pedido: string,
+): Promise<Resultado<object> | { limite: true }> {
+  const usuario = await usuarioAtual();
+  const texto = pedido.trim();
+  if (!usuario || !z.uuid().safeParse(id).success) return { erro: "Peça não encontrada." };
+  if (texto.length < 5) return { erro: "Descreva o ajuste em pelo menos algumas palavras." };
+  if (texto.length > 500) return { erro: "O pedido pode ter no máximo 500 caracteres." };
+
+  const supabase = await criarClienteServidor();
+  const { data } = await supabase
+    .from("pecas")
+    .select("status, ajuste_status, ajustes_usados")
+    .eq("id", id)
+    .maybeSingle();
+  const peca = ajusteSchema.safeParse(data);
+  if (!peca.success) return { erro: "Peça não encontrada." };
+  if (peca.data.status !== "rascunho") return { erro: "Reabra a peça para pedir ajustes." };
+  if (peca.data.ajuste_status === "pendente" || peca.data.ajuste_status === "processando") {
+    return { erro: "Já existe um ajuste em andamento nesta peça." };
+  }
+
+  const { data: linhaAssinatura } = await supabase
+    .from("assinaturas")
+    .select("status, planos(recursos)")
+    .maybeSingle();
+  const assinatura = assinaturaSchema.safeParse(linhaAssinatura).data;
+  const recursos = z
+    .object({ ajustes_ia: z.boolean().optional() })
+    .safeParse(assinatura?.planos?.recursos).data;
+  if (assinatura?.status !== "trial" && !recursos?.ajustes_ia) {
+    return { erro: "Ajustes pela Lia fazem parte do plano Pro." };
+  }
+
+  if (peca.data.ajustes_usados >= AJUSTES_SEM_CUSTO) {
+    const uso = await buscarUsoPecas();
+    if (uso.usadas >= uso.limite) return { limite: true };
+  }
+
+  const { error } = await supabase
+    .from("pecas")
+    .update({ ajuste_pedido: texto, ajuste_status: "pendente", ajuste_erro: null })
+    .eq("id", id);
+  if (error) return { erro: "Não foi possível pedir o ajuste agora." };
   revalidatePath(`/app/pecas/${id}`);
   return { ok: true };
 }

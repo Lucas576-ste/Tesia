@@ -11,7 +11,9 @@ type PainelVersoesProps = {
   aoRestaurar: (numero: number) => void;
 };
 
-function rotulo({ numero, origem, data }: VersaoSalva) {
+function rotulo({ numero, origem, data, pedido }: VersaoSalva) {
+  if (origem === "ia" && pedido)
+    return `Versão ${numero}, ajustada pela Lia: "${pedido}" · ${data}`;
   return `Versão ${numero}, ${origem === "ia" ? "escrita pela Lia" : "salva por você"} · ${data}`;
 }
 

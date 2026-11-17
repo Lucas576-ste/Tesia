@@ -137,6 +137,9 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | pendencias | jsonb | `[{ secao, titulo, texto }]` de cada `[CONFIRMAR: ...]` |
 | fontes | jsonb | `[{ trecho_id, documento, secao }]`: trechos das peças do advogado usados como base |
 | ajustes_usados | int | até 3 sem contar como nova peça |
+| ajuste_pedido | text | último pedido de ajuste à Lia |
+| ajuste_status | text | `pendente`, `processando`, `concluido`, `erro`; `pendente` põe o job `ajustar_peca` na fila (gatilho) |
+| ajuste_erro | text | mensagem mostrada no editor quando o ajuste falha (não é contado) |
 | status | enum | `gerando`, `rascunho`, `revisada`, `protocolada`, `erro` |
 
 Peça nova com status `gerando` entra na `fila` como `gerar_peca` (gatilho). Peça com `erro` não conta no limite.

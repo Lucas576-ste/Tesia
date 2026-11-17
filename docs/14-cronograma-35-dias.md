@@ -215,9 +215,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Pronto quando:** intimação → análise → rascunho no estilo do advogado funciona com dados reais.
 
-### Dia 26 — Revisão e ajustes
+### Dia 26 — Revisão e ajustes ✅
 - Revisão automática de citações (vira pendência no editor)
 - Pedir ajuste à IA (até 3 por peça)
+
+**Feito em 2026-11-17:** o Haiku revisa a peça logo depois da geração e marca com [CONFIRMAR] o que não tem base nos documentos; "Pedir ajuste à Lia" reescreve só as seções afetadas, grava nova versão e conta a partir do 4º ajuste. Testado ponta a ponta com a IA real (revisão US$ 0,002, ajuste US$ 0,026).
 
 ### Dia 27 — Download em .docx
 - Preencher o modelo .docx do advogado (docxtemplater)
