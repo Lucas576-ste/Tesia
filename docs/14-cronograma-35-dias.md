@@ -221,10 +221,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-17:** o Haiku revisa a peça logo depois da geração e marca com [CONFIRMAR] o que não tem base nos documentos; "Pedir ajuste à Lia" reescreve só as seções afetadas, grava nova versão e conta a partir do 4º ajuste. Testado ponta a ponta com a IA real (revisão US$ 0,002, ajuste US$ 0,026).
 
-### Dia 27 — Download em .docx
+### Dia 27 — Download em .docx ✅
 - Preencher o modelo .docx do advogado (docxtemplater)
 - Modelo padrão para quem não enviou o seu
 - Aviso de pendências antes de baixar
+
+**Feito em 2026-11-17:** "Baixar .docx" monta o arquivo na hora com o timbrado do advogado (cabeçalho, rodapé e margens mantidos, corpo trocado) ou com o modelo padrão (A4, Times 12, espaçamento 1,5). Pendências saem em amarelo. Envio do timbrado real no onboarding e em Configurações. Usamos pizzip em vez do docxtemplater (decisão em `11-decisoes.md`). Testado ponta a ponta e aberto no LibreOffice.
 
 ### Dia 28 — Folga para atrasos
 - Se não houver atraso: agenda sincronizada (link iCal com prazos confirmados, audiências e compromissos) e aba Agenda nas configurações

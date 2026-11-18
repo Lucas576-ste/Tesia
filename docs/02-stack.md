@@ -19,7 +19,7 @@ Linguagem principal: **TypeScript de ponta a ponta**. A escala e a estabilidade 
 | IA (texto) | API do Claude: Haiku para extração e resumo, Sonnet para gerar peças | Qualidade de escrita e leitura de PDF, inclusive escaneado |
 | Embeddings | Voyage AI, modelo `voyage-law-2` (1024 dimensões) | Treinado em textos jurídicos; a API do Claude não gera embeddings |
 | Extração de texto | Leitura direta do PDF com `unpdf`; se vier quase vazio (escaneado), o Claude Haiku transcreve o PDF | Muitos PDFs de tribunal já têm texto, e o OCR pelo Claude dispensa outra conta (AWS Textract) |
-| Documentos | docxtemplater | Preenche o .docx modelo do próprio advogado (timbrado, fonte, margens) |
+| Documentos | pizzip, em `packages/documentos` | Abre o .docx do advogado, mantém cabeçalho, rodapé, fontes e margens e troca só o corpo pela peça |
 | Pagamentos | Asaas | Pix, boleto, cartão recorrente e nota fiscal no Brasil |
 | E-mail | Resend | Alertas de prazo e e-mails do sistema |
 | WhatsApp | API oficial do WhatsApp (fase intermediária) | Alertas de prazo. Exige verificação no Meta e templates aprovados |

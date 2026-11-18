@@ -49,7 +49,7 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | areas | text[] | áreas de atuação escolhidas |
 | papel | enum | `dono`, `advogado`, `estagiario` (multiusuário futuro) |
 | whatsapp | text | para alertas |
-| modelo_docx_path | text | modelo .docx com timbrado do advogado |
+| modelo_docx_path | text | `escritorio_id/usuario_id/modelo.docx` no bucket privado `modelos` (até 5 MB, só .docx); vazio = modelo padrão da Tesia |
 | calendario_token | text | token secreto do link de agenda (iCal); pode ser renovado |
 | termos_aceitos_em | timestamptz | quando aceitou os termos e a política no cadastro |
 

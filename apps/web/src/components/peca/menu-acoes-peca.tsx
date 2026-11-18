@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, MoreHorizontal } from "lucide-react";
+import { Download, FileText, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,12 @@ export function MenuAcoesPeca({ peca }: { peca: LinhaPeca }) {
             <FileText aria-hidden />
             Abrir
           </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <a href={`/app/pecas/${peca.id}/docx`} download>
+            <Download aria-hidden />
+            Baixar .docx
+          </a>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -163,6 +163,19 @@ exception
 end;
 $$;
 
+insert into storage.objects (bucket_id, name)
+select 'modelos', current_setting('teste.esc_a') || '/u/modelo.docx';
+
+do $$
+begin
+  insert into storage.objects (bucket_id, name)
+  values ('modelos', current_setting('teste.esc_b') || '/u/modelo.docx');
+  raise exception 'A não pode enviar modelo na pasta de B';
+exception
+  when insufficient_privilege then null;
+end;
+$$;
+
 insert into estilo_documentos (escritorio_id, usuario_id, arquivo_path, nome_arquivo)
 select escritorio_id, id, escritorio_id || '/u/peca.docx', 'peca.docx'
 from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
@@ -183,7 +196,7 @@ select escritorio_id, id, 'fatos', 'Trecho de teste' from estilo_documentos;
 
 do $$
 begin
-  assert (select count(*) from storage.objects) = 2, 'A deveria ver só os próprios arquivos';
+  assert (select count(*) from storage.objects) = 3, 'A deveria ver só os próprios arquivos';
   perform 1 from fila;
   raise exception 'Usuário logado não pode ler a fila';
 exception

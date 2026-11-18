@@ -123,10 +123,17 @@ export function TelaEditor({ peca }: { peca: PecaEditor }) {
 
   function baixar() {
     setModal(null);
-    toast.info("Demonstração: o arquivo .docx ainda não é gerado.");
+    const link = document.createElement("a");
+    link.href = `/app/pecas/${peca.id}/docx`;
+    link.download = "";
+    link.click();
   }
 
   function aoClicarBaixar() {
+    if (alterado) {
+      toast.error("Salve a versão antes de baixar. O .docx usa o texto salvo.");
+      return;
+    }
     if (pendencias.length > 0) setModal("baixar");
     else baixar();
   }

@@ -73,6 +73,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-10 | PDF enviado direto do navegador ao Storage, na pasta do escritório | Evita o limite de tamanho das funções da Vercel; o RLS do Storage impede pasta alheia |
 | 2026-11-11 | OCR de PDF escaneado pelo Claude Haiku, no lugar do AWS Textract | Uma conta a menos; o Haiku já lê PDF e custa menos de um centavo por intimação |
 | 2026-11-12 | Trechos citados pela IA são conferidos no texto do documento pelo código, e os que não existem são descartados | A IA não pode apontar como base da decisão algo que o documento não diz |
+| 2026-11-17 | .docx montado no site com pizzip, trocando o corpo do modelo do advogado, sem docxtemplater e sem fila | O timbrado não tem marcações para preencher; montar na hora leva menos de 1 segundo e dispensa o worker |
 | 2026-11-13 | Embeddings com Voyage `voyage-law-2` | Modelo treinado em textos jurídicos, 1024 dimensões, recomendado pela Anthropic; centavos por mês |
 | 2026-11-13 | Peças de estilo só em PDF ou DOCX | O .doc antigo não tem extração de texto confiável |
 | 2026-11-12 | Visão de crescer de solo e dupla até o nível corporativo; MVP segue focado em solo e dupla | Ideias de todos os níveis guardadas no banco de ideias de `08-roadmap.md`, sem descartar nenhuma |

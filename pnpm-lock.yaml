@@ -227,6 +227,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.119.0
         version: 2.119.0(@opentelemetry/api@1.10.0)
+      '@tesia/documentos':
+        specifier: workspace:*
+        version: link:../../packages/documentos
       '@tesia/prazos':
         specifier: workspace:*
         version: link:../../packages/prazos
@@ -352,6 +355,25 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+
+  packages/documentos:
+    dependencies:
+      '@tesia/shared':
+        specifier: workspace:*
+        version: link:../shared
+      pizzip:
+        specifier: 3.2.0
+        version: 3.2.0
+    devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@22.20.5)(vite@8.3.6(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/ia:
     dependencies:
@@ -3483,6 +3505,9 @@ packages:
   pako@1.0.11:
     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
 
+  pako@2.2.0:
+    resolution: {integrity: sha512-zJq6RP/5q+TO2OpFV3FHzlPnFjmkb7Nc99a5SNjJE+uu/PkpChs+NIZSSzbBoD+6kjiISXjfYdwj1ZRQ81dz/w==}
+
   path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
@@ -3538,6 +3563,9 @@ packages:
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
+
+  pizzip@3.2.0:
+    resolution: {integrity: sha512-X4NPNICxCfIK8VYhF6wbksn81vTiziyLbvKuORVAmolvnUzl1A1xmz9DAWKxPRq9lZg84pJOOAMq3OE61bD8IQ==}
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -7198,6 +7226,8 @@ snapshots:
 
   pako@1.0.11: {}
 
+  pako@2.2.0: {}
+
   path-exists@4.0.0: {}
 
   path-key@3.1.1: {}
@@ -7244,6 +7274,10 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.7: {}
+
+  pizzip@3.2.0:
+    dependencies:
+      pako: 2.2.0
 
   possible-typed-array-names@1.1.0: {}
 

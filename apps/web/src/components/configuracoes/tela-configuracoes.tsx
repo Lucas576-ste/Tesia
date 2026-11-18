@@ -12,19 +12,24 @@ import { AbaAlertas } from "./aba-alertas";
 import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
+import type { DadosModelo } from "@/components/modelo/envio-modelo";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
 import { AbaSeguranca } from "./aba-seguranca";
 
-const conteudos: Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> = {
-  alertas: <AbaAlertas />,
-  agenda: <AbaAgenda />,
-  equipe: <AbaEquipe />,
-  modelo: <AbaModelo />,
-  calendario: <AbaCalendario />,
-  seguranca: <AbaSeguranca />,
-  dados: <AbaDados />,
-};
+function conteudosDasAbas(
+  modelo: DadosModelo,
+): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
+  return {
+    alertas: <AbaAlertas />,
+    agenda: <AbaAgenda />,
+    equipe: <AbaEquipe />,
+    modelo: <AbaModelo modelo={modelo} />,
+    calendario: <AbaCalendario />,
+    seguranca: <AbaSeguranca />,
+    dados: <AbaDados />,
+  };
+}
 
 const atalhos = [
   { rotulo: "Plano e uso", href: "/app/plano" },
@@ -33,7 +38,14 @@ const atalhos = [
 
 const todasAbas = Object.keys(ABAS_CONFIGURACOES) as AbaConfiguracoes[];
 
-export function TelaConfiguracoes({ abaInicial }: { abaInicial: AbaConfiguracoes }) {
+export function TelaConfiguracoes({
+  abaInicial,
+  modelo,
+}: {
+  abaInicial: AbaConfiguracoes;
+  modelo: DadosModelo;
+}) {
+  const conteudos = conteudosDasAbas(modelo);
   const { id, plano } = usePlanoDemo();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);

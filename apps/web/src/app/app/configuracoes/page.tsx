@@ -3,6 +3,7 @@ import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { TelaConfiguracoes } from "@/components/configuracoes/tela-configuracoes";
 import { Badge } from "@/components/ui/badge";
 import { abaConfiguracoesSchema } from "@/lib/conta-exemplo";
+import { exigirUsuario } from "@/lib/sessao";
 
 export const metadata: Metadata = { title: "Configurações · Tesia" };
 
@@ -12,6 +13,7 @@ type ConfiguracoesPageProps = {
 
 export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesPageProps) {
   const { aba } = await searchParams;
+  const usuario = await exigirUsuario();
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
@@ -22,7 +24,14 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
           <BotaoSair />
         </div>
       </header>
-      <TelaConfiguracoes abaInicial={abaConfiguracoesSchema.parse(aba)} />
+      <TelaConfiguracoes
+        abaInicial={abaConfiguracoesSchema.parse(aba)}
+        modelo={{
+          escritorioId: usuario.escritorio_id,
+          usuarioId: usuario.id,
+          temModelo: Boolean(usuario.modelo_docx_path),
+        }}
+      />
     </div>
   );
 }

@@ -38,7 +38,7 @@
 4. A tela da intimação consulta a cada 3 segundos enquanto ela está na fila ou em leitura, e mostra a análise quando termina.
 5. O advogado confirma o prazo e pede o rascunho. Um novo job de geração entra na fila.
 6. O worker gera a peça (Sonnet + perfil de estilo + RAG + documentos do processo), roda a revisão de citações e grava a peça com status `rascunho`.
-7. No download, o worker preenche o .docx modelo do advogado.
+7. No download, o site monta o .docx na hora (`/app/pecas/[id]/docx`): abre o modelo do advogado (ou o padrão da Tesia), mantém cabeçalho, rodapé e margens e troca o corpo pelo texto salvo da peça. Pendências `[CONFIRMAR]` saem destacadas em amarelo.
 
 ## Por que fila e worker
 
