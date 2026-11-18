@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { criarProcesso } from "@/app/app/processos/acoes";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { SeloStatus } from "@/components/selo-status";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { normalizarBusca } from "@/lib/busca";
-import type { DadosProcesso, Processo } from "@/lib/processos-exemplo";
+import type { DadosProcesso, Processo } from "@/lib/processo-tipos";
 import { FormularioProcesso } from "./formulario-processo";
 
 const linkLinha =
@@ -119,7 +120,7 @@ type ListaProcessosProps = {
 
 export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcessosProps) {
   const router = useRouter();
-  const [processos, setProcessos] = useState(processosIniciais);
+  const processos = processosIniciais;
   const [busca, setBusca] = useState("");
   const termo = normalizarBusca(busca.trim());
   const visiveis = processos.filter(({ cnj, partes }) =>
@@ -130,18 +131,15 @@ export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcess
     router.replace("/app/processos", { scroll: false });
   }
 
-  function salvarNovo(dados: DadosProcesso) {
-    const novo: Processo = {
-      ...dados,
-      id: `${PREFIXO_NOVO}${crypto.randomUUID()}`,
-      proximoPrazo: null,
-      prazos: [],
-      status: "nao_iniciado",
-      eventos: [],
-    };
-    setProcessos((atuais) => [novo, ...atuais]);
+  async function salvarNovo(dados: DadosProcesso) {
+    const resultado = await criarProcesso(dados);
+    if ("erro" in resultado) {
+      toast.error(resultado.erro);
+      return;
+    }
     fecharNovo();
-    toast.success("Processo adicionado neste exemplo. Nada foi enviado.");
+    toast.success("Processo cadastrado.");
+    router.refresh();
   }
 
   return (

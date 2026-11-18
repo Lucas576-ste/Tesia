@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SelectNativo } from "@/components/ui/select-nativo";
 import { AREAS_ATUACAO } from "@/lib/onboarding";
-import { dadosProcessoSchema, type DadosProcesso } from "@/lib/processos-exemplo";
+import { dadosProcessoSchema, type DadosProcesso } from "@/lib/processo-tipos";
 
 type CampoTextoProps = {
   control: Control<DadosProcesso>;
@@ -43,7 +43,7 @@ function CampoTexto({ control, nome, rotulo }: CampoTextoProps) {
 
 type FormularioProcessoProps = {
   dados: DadosProcesso;
-  aoSalvar: (dados: DadosProcesso) => void;
+  aoSalvar: (dados: DadosProcesso) => void | Promise<void>;
 };
 
 export function FormularioProcesso({ dados, aoSalvar }: FormularioProcessoProps) {
@@ -84,7 +84,9 @@ export function FormularioProcesso({ dados, aoSalvar }: FormularioProcessoProps)
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="submit">Salvar</Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Salvando..." : "Salvar"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>

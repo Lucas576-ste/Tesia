@@ -23,7 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { SelectNativo } from "@/components/ui/select-nativo";
 import {
-  prazoManualSchema,
+  esquemaPrazoManual,
+  hojeBrasilia,
   TIPOS_MANUAIS,
   type PrazoManual,
   type ProcessoResumo,
@@ -44,7 +45,7 @@ type ModalPrazoManualProps = {
   aberto: boolean;
   processos: ProcessoResumo[];
   aoFechar: () => void;
-  aoSalvar: (dados: PrazoManual) => void;
+  aoSalvar: (dados: PrazoManual) => void | Promise<void>;
 };
 
 function FormularioPrazoManual({
@@ -52,7 +53,7 @@ function FormularioPrazoManual({
   aoSalvar,
 }: Pick<ModalPrazoManualProps, "processos" | "aoSalvar">) {
   const form = useForm<PrazoManual>({
-    resolver: zodResolver(prazoManualSchema),
+    resolver: zodResolver(esquemaPrazoManual(hojeBrasilia())),
     defaultValues: valoresIniciais,
   });
   const ehPrazo = useWatch({ control: form.control, name: "tipo" }) === "prazo";
@@ -183,7 +184,9 @@ function FormularioPrazoManual({
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="submit">Adicionar</Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting ? "Salvando..." : "Adicionar"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>

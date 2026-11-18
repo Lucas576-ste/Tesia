@@ -77,6 +77,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | rito | enum | `comum`, `jef`, `jec`, `trabalhista`, `criminal`, `outro` |
 | polo | enum | `ativo`, `passivo` |
 | parte_contraria | text | |
+| partes | text | Texto mostrado nas listas, ex.: "José x INSS" (migration 0013) |
 | status | enum | `ativo`, `arquivado` |
 | sistema | text | fase 2; ex.: PJe, eproc |
 | fase | text | fase 2; estimada pela última intimação ou corrigida pelo advogado |

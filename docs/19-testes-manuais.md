@@ -34,6 +34,12 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [x] Baixar o .ics e importar no Google Agenda: prazo fatal com "[Peça] · [Partes]" e link para a Tesia
 - [ ] Assinar o link no Google Agenda (só depois do deploy, com endereço público)
 
+## Processos e prazos manuais
+- [ ] "Novo processo" grava e aparece na lista; número repetido é recusado
+- [ ] Detalhe do processo mostra intimações, prazos e peças reais
+- [ ] Painel → "Novo prazo": prazo, audiência com hora e compromisso aparecem no painel e na agenda
+- [ ] "Marcar como protocolado" tira o prazo dos abertos; "Desfazer" volta
+
 ## Análise
 - [ ] Partes, número do processo e órgão estão certos
 - [ ] O resumo ("O que aconteceu") está correto e sem invenção

@@ -25,7 +25,8 @@ import {
 } from "@/components/ui/dialog";
 import { filtrarPrazos, type FiltroPrazos } from "@/lib/filtros-prazos";
 import { contarIndicadores, ordenarPrazos, prazoCritico, type LinhaPrazo } from "@/lib/prazo";
-import { criarPrazoManual, type PrazoManual, type ProcessoResumo } from "@/lib/prazo-manual";
+import { alterarPrazoInterno, concluirPrazo, criarPrazoManual } from "@/app/app/acoes-prazos";
+import type { PrazoManual, ProcessoResumo } from "@/lib/prazo-manual";
 import { etapasExemplo } from "@/lib/planos-exemplo";
 import { assumirEtapas, etapasPadrao, proximaEtapa, ROTULOS_ETAPA } from "@/lib/etapas-prazo";
 import { AlternarVisao } from "./alternar-visao";
@@ -132,7 +133,16 @@ export function PainelPrazos({
     setPrazos((atuais) => atuais.map((prazo) => (prazo.id === id ? { ...prazo, status } : prazo)));
   }
 
-  function salvarPrazoInterno(id: string, prazoInterno: string) {
+  async function salvarPrazoInterno(id: string, prazoInterno: string) {
+    const prazoId = prazos.find((prazo) => prazo.id === id)?.prazoId;
+    const [dia, mes, ano] = prazoInterno.split("/");
+    if (prazoId) {
+      const resultado = await alterarPrazoInterno(prazoId, `${ano}-${mes}-${dia}`);
+      if ("erro" in resultado) {
+        toast.error(resultado.erro);
+        return;
+      }
+    }
     setPrazos((atuais) =>
       atuais.map((prazo) => (prazo.id === id ? { ...prazo, prazoInterno } : prazo)),
     );
@@ -160,11 +170,15 @@ export function PainelPrazos({
     router.replace(urlSemNovo, { scroll: false });
   }
 
-  function salvarPrazoManual(dados: PrazoManual) {
-    const novo = criarPrazoManual(crypto.randomUUID(), dados, processos);
-    setPrazos((atuais) => [...atuais, novo]);
+  async function salvarPrazoManual(dados: PrazoManual) {
+    const resultado = await criarPrazoManual(dados);
+    if ("erro" in resultado) {
+      toast.error(resultado.erro);
+      return;
+    }
     fecharNovoPrazo();
-    toast.success("Adicionado ao painel neste exemplo. Nada foi enviado.");
+    toast.success("Adicionado ao painel e à sua agenda.");
+    router.refresh();
   }
 
   const acoes = (prazo: LinhaPrazo) => (
@@ -178,13 +192,26 @@ export function PainelPrazos({
     />
   );
 
-  function confirmarProtocolo() {
+  async function mudarConclusao(prazo: LinhaPrazo, concluido: boolean) {
+    if (!prazo.prazoId) return false;
+    const resultado = await concluirPrazo(prazo.prazoId, concluido);
+    if ("erro" in resultado) toast.error(resultado.erro);
+    return !("erro" in resultado);
+  }
+
+  async function confirmarProtocolo() {
     if (!aConfirmar) return;
-    const { id, status, tipo } = aConfirmar;
-    trocarStatus(id, "protocolado");
+    const prazo = aConfirmar;
     setAConfirmar(null);
-    toast.success(tipo ? "Marcado como cumprido." : "Prazo marcado como protocolado.", {
-      action: { label: "Desfazer", onClick: () => trocarStatus(id, status) },
+    if (!(await mudarConclusao(prazo, true))) return;
+    trocarStatus(prazo.id, "protocolado");
+    toast.success(prazo.tipo ? "Marcado como cumprido." : "Prazo marcado como protocolado.", {
+      action: {
+        label: "Desfazer",
+        onClick: async () => {
+          if (await mudarConclusao(prazo, false)) trocarStatus(prazo.id, prazo.status);
+        },
+      },
     });
   }
 

@@ -20,6 +20,7 @@ export type LinhaPrazo = {
   responsavel?: string;
   etapa?: EtapaPrazo;
   pecaId?: string;
+  prazoId?: string;
 };
 
 export type ColunaQuadro = "hoje" | "proximos" | "depois" | "rascunho" | "protocolado";

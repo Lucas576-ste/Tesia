@@ -3,7 +3,7 @@ import Link from "next/link";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { TelaProcesso } from "@/components/processo/tela-processo";
 import { Button } from "@/components/ui/button";
-import { buscarProcesso } from "@/lib/processos-exemplo";
+import { buscarProcesso } from "@/lib/processos";
 
 export const metadata: Metadata = { title: "Detalhe do processo · Tesia" };
 
@@ -13,13 +13,13 @@ type ProcessoPageProps = {
 
 export default async function ProcessoPage({ params }: ProcessoPageProps) {
   const { id } = await params;
-  const processo = buscarProcesso(id);
+  const processo = await buscarProcesso(id);
   if (processo) return <TelaProcesso key={processo.id} processo={processo} />;
 
   return (
     <EstadoVazio
       titulo="Processo não encontrado"
-      descricao="Este processo não faz parte da demonstração."
+      descricao="Ele pode ter sido excluído ou pertencer a outro escritório."
       acao={
         <Button asChild variant="outline">
           <Link href="/app/processos">Ver os processos</Link>

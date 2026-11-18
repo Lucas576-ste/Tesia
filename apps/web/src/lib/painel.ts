@@ -18,11 +18,16 @@ const processoSchema = z.object({
   numero_cnj: z.string(),
   area: z.string().nullable(),
   parte_contraria: z.string().nullable(),
+  partes: z.string().nullable(),
 });
 
 const linhaPrazoSchema = z.object({
   id: z.uuid(),
   intimacao_id: z.uuid().nullable(),
+  processo_id: z.uuid().nullable(),
+  origem: z.enum(["intimacao", "manual"]),
+  tipo: z.enum(["prazo", "audiencia", "compromisso"]),
+  hora: z.string().nullable(),
   descricao: z.string(),
   data_inicio: z.string().nullable(),
   data_vencimento: z.string(),
@@ -56,7 +61,7 @@ function statusDoPrazo(linha: z.infer<typeof linhaPrazoSchema>): LinhaPrazo["sta
   return peca ? "rascunho_pronto" : "nao_iniciado";
 }
 
-function rotuloArea(codigo: string | null | undefined) {
+export function rotuloArea(codigo: string | null | undefined) {
   if (!codigo) return "Sem área";
   return (
     areasPorCodigo([codigo])[0] ??
@@ -68,25 +73,28 @@ function rotuloArea(codigo: string | null | undefined) {
 function partesDaIntimacao(extracao: unknown, processo: z.infer<typeof processoSchema> | null) {
   const analise = analiseGravadaSchema.safeParse(extracao);
   if (analise.success) return nomePartes(analise.data.dados.partes);
-  return processo?.parte_contraria ?? "Partes não identificadas";
+  return processo?.partes ?? processo?.parte_contraria ?? "Sem processo";
 }
 
-export async function listarPrazosConfirmados(): Promise<LinhaPrazo[]> {
+export async function listarPrazosConfirmados(processoId?: string): Promise<LinhaPrazo[]> {
   const supabase = await criarClienteServidor();
-  const { data } = await supabase
+  let consulta = supabase
     .from("prazos")
     .select(
-      "id, intimacao_id, descricao, status, data_inicio, data_vencimento, data_prazo_interno, processos(id, numero_cnj, area, parte_contraria), intimacoes(extracao), pecas(id, status, criado_em, excluido_em)",
+      "id, intimacao_id, processo_id, origem, tipo, hora, descricao, status, data_inicio, data_vencimento, data_prazo_interno, processos(id, numero_cnj, area, parte_contraria, partes), intimacoes(extracao), pecas(id, status, criado_em, excluido_em)",
     )
     .in("status", ["confirmado", "cumprido"])
-    .eq("tipo", "prazo")
     .order("data_vencimento");
+  if (processoId) consulta = consulta.eq("processo_id", processoId);
+  const { data } = await consulta;
   const linhas = z.array(linhaPrazoSchema).safeParse(data);
   if (!linhas.success) return [];
   const hoje = hojeEmBrasilia();
 
   return linhas.data.map((linha) => ({
     id: linha.intimacao_id ?? linha.id,
+    prazoId: linha.id,
+    ...(linha.origem === "manual" && { tipo: linha.tipo, hora: linha.hora?.slice(0, 5) }),
     partes: partesDaIntimacao(linha.intimacoes?.extracao, linha.processos),
     cnj: linha.processos?.numero_cnj ?? "Sem número",
     peca: linha.descricao,
@@ -95,7 +103,10 @@ export async function listarPrazosConfirmados(): Promise<LinhaPrazo[]> {
     inicio: linha.data_inicio ? isoParaData(linha.data_inicio) : undefined,
     prazoInterno: linha.data_prazo_interno ? isoParaData(linha.data_prazo_interno) : undefined,
     diasUteis: diasUteisAte(linha.data_vencimento, hoje),
-    status: statusDoPrazo(linha),
+    status:
+      linha.origem === "manual" && linha.status === "cumprido"
+        ? "protocolado"
+        : statusDoPrazo(linha),
     pecaId: pecaDoPrazo(linha)?.id,
   }));
 }
@@ -104,7 +115,7 @@ export async function listarProcessosResumo(): Promise<ProcessoResumo[]> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("processos")
-    .select("id, numero_cnj, area, parte_contraria")
+    .select("id, numero_cnj, area, parte_contraria, partes")
     .is("excluido_em", null)
     .order("criado_em", { ascending: false });
   const linhas = z.array(processoSchema).safeParse(data);
@@ -112,7 +123,7 @@ export async function listarProcessosResumo(): Promise<ProcessoResumo[]> {
   return linhas.data.map((processo) => ({
     id: processo.id,
     cnj: processo.numero_cnj,
-    partes: processo.parte_contraria ?? processo.numero_cnj,
+    partes: processo.partes ?? processo.parte_contraria ?? processo.numero_cnj,
     area: rotuloArea(processo.area),
   }));
 }

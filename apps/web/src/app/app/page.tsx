@@ -31,10 +31,11 @@ export default async function PainelPage({ searchParams }: PainelPageProps) {
 
   return (
     <PainelPrazos
+      key={prazos.map((prazo) => `${prazo.prazoId}:${prazo.status}:${prazo.prazoInterno}`).join()}
       nome={usuario.nome.split(" ")[0] ?? ""}
       prazosIniciais={prazos}
       filtro={filtroPrazosSchema.parse(parametros)}
-      idsComAnalise={prazos.map(({ id }) => id)}
+      idsComAnalise={prazos.filter((prazo) => prazo.id !== prazo.prazoId).map(({ id }) => id)}
       processos={processos}
       novoPrazo={parametros.novo === "prazo"}
       urlSemNovo={urlSemNovo(parametros)}

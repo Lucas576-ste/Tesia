@@ -23,7 +23,7 @@ function dataParaIso(data: string) {
 type ModalPrazoInternoProps = {
   prazo: LinhaPrazo | null;
   aoFechar: () => void;
-  aoSalvar: (id: string, prazoInterno: string) => void;
+  aoSalvar: (id: string, prazoInterno: string) => void | Promise<void>;
 };
 
 function FormularioPrazoInterno({

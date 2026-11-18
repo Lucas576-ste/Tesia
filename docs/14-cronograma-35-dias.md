@@ -237,10 +237,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 ## Semana 5 — Finalização e lançamento beta (dias 29 a 35)
 
-### Dia 29 — Telas com dados reais
+### Dia 29 — Telas com dados reais ✅
 - Processos, detalhe do processo e peças
 - Marcar como protocolado conclui o prazo
 - Novo prazo manual salvando de verdade e aparecendo no painel e nos alertas
+
+**Feito em 2026-11-18:** Processos e detalhe com dados reais (cadastro e edição, CNJ repetido recusado, linha do tempo com intimações, prazos e peças); prazo manual, audiência e compromisso gravados e no painel, no detalhe e na agenda iCal; editar prazo interno grava; "Marcar como protocolado/cumprido" conclui o prazo e a peça, com "Desfazer". Os alertas por e-mail ficam no Dia 30.
 
 ### Dia 30 — Alertas e limites
 - Alertas de prazo por e-mail (job agendado diário), incluindo o aviso no dia do prazo interno

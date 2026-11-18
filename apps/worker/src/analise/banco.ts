@@ -1,5 +1,5 @@
 import type { UsoIa } from "@tesia/ia";
-import type { AnaliseGravada, MemoriaCalculo } from "@tesia/shared";
+import { nomePartes, type AnaliseGravada, type MemoriaCalculo } from "@tesia/shared";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
 import type { Job } from "../fila.js";
@@ -162,8 +162,8 @@ async function salvarProcesso(
     .map((parte) => parte.nome)
     .join(", ");
   const { rows } = await cliente.query(
-    `insert into processos (escritorio_id, numero_cnj, tribunal, orgao, uf, municipio, area, rito, polo, parte_contraria)
-     values ($1, $2, $3, $4, $5, $6, $7, $8::rito_processo, $9::polo_processo, $10)
+    `insert into processos (escritorio_id, numero_cnj, tribunal, orgao, uf, municipio, area, rito, polo, parte_contraria, partes)
+     values ($1, $2, $3, $4, $5, $6, $7, $8::rito_processo, $9::polo_processo, $10, $11)
      on conflict (escritorio_id, numero_cnj) do update set
        tribunal = coalesce(processos.tribunal, excluded.tribunal),
        orgao = coalesce(processos.orgao, excluded.orgao),
@@ -172,7 +172,8 @@ async function salvarProcesso(
        area = coalesce(processos.area, excluded.area),
        rito = coalesce(processos.rito, excluded.rito),
        polo = coalesce(processos.polo, excluded.polo),
-       parte_contraria = coalesce(processos.parte_contraria, excluded.parte_contraria)
+       parte_contraria = coalesce(processos.parte_contraria, excluded.parte_contraria),
+       partes = coalesce(processos.partes, excluded.partes)
      returning id`,
     [
       escritorioId,
@@ -185,6 +186,7 @@ async function salvarProcesso(
       dados.rito,
       dados.polo_cliente,
       contraria || null,
+      dados.partes.length ? nomePartes(dados.partes) : null,
     ],
   );
   return z.object({ id: z.uuid() }).parse(rows[0]).id;
