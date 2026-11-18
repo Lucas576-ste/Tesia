@@ -13,6 +13,7 @@ const usuarioSchema = z.object({
   areas: z.array(z.string()),
   whatsapp: z.string().nullable(),
   modelo_docx_path: z.string().nullable(),
+  calendario_token: z.string(),
 });
 
 export type UsuarioSessao = z.infer<typeof usuarioSchema>;
@@ -24,7 +25,9 @@ export const usuarioAtual = cache(async (): Promise<UsuarioSessao | null> => {
 
   const { data: linha } = await supabase
     .from("usuarios")
-    .select("id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path")
+    .select(
+      "id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path, calendario_token",
+    )
     .eq("auth_user_id", data.user.id)
     .maybeSingle();
 

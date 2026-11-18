@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { TelaConfiguracoes } from "@/components/configuracoes/tela-configuracoes";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,10 @@ type ConfiguracoesPageProps = {
 export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesPageProps) {
   const { aba } = await searchParams;
   const usuario = await exigirUsuario();
+  const cabecalhos = await headers();
+  const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host") ?? "localhost:3000";
+  const protocolo =
+    cabecalhos.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
@@ -26,6 +31,7 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
       </header>
       <TelaConfiguracoes
         abaInicial={abaConfiguracoesSchema.parse(aba)}
+        agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
         modelo={{
           escritorioId: usuario.escritorio_id,
           usuarioId: usuario.id,

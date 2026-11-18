@@ -115,7 +115,9 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 - Todo usuário tem um link secreto de agenda, que pode ser assinado no Google Agenda, Apple Calendário ou Outlook.
 - O link traz prazos confirmados, audiências e compromissos, com título "[Peça] Partes" e o link para abrir na Tesia. Nenhum dado sensível além do necessário.
 - O advogado pode gerar um link novo a qualquer momento, o que desativa o anterior.
-- Disponível do plano Pro em diante.
+- Disponível do plano Pro em diante (e no teste grátis).
+- Como funciona: o link é `/agenda/<token>.ics`, público e sem login, porque os aplicativos de agenda não fazem login. Cada prazo confirmado vira um evento de dia inteiro no prazo fatal e outro no prazo interno. Prazos sugeridos, descartados ou cumpridos não entram.
+- Com o site em `localhost`, o Google Agenda não consegue assinar; a assinatura funciona com o endereço público depois do deploy.
 
 ## Plano Sociedade
 

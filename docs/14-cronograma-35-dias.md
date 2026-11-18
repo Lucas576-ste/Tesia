@@ -228,8 +228,10 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-17:** "Baixar .docx" monta o arquivo na hora com o timbrado do advogado (cabeçalho, rodapé e margens mantidos, corpo trocado) ou com o modelo padrão (A4, Times 12, espaçamento 1,5). Pendências saem em amarelo. Envio do timbrado real no onboarding e em Configurações. Usamos pizzip em vez do docxtemplater (decisão em `11-decisoes.md`). Testado ponta a ponta e aberto no LibreOffice.
 
-### Dia 28 — Folga para atrasos
+### Dia 28 — Folga para atrasos ✅
 - Se não houver atraso: agenda sincronizada (link iCal com prazos confirmados, audiências e compromissos) e aba Agenda nas configurações
+
+**Feito em 2026-11-18:** link iCal real em Configurações → Agenda, com prazo fatal, prazo interno e link para a Tesia em cada evento; "Gerar novo link" desativa o anterior; só Pro, Sociedade, Fundador e teste grátis. Testado ponta a ponta. A assinatura no Google Agenda só funciona depois do deploy, com endereço público.
 
 ---
 

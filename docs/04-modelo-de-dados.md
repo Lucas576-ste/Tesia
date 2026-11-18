@@ -50,8 +50,8 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | papel | enum | `dono`, `advogado`, `estagiario` (multiusuário futuro) |
 | whatsapp | text | para alertas |
 | modelo_docx_path | text | `escritorio_id/usuario_id/modelo.docx` no bucket privado `modelos` (até 5 MB, só .docx); vazio = modelo padrão da Tesia |
-| calendario_token | text | token secreto do link de agenda (iCal); pode ser renovado |
 | termos_aceitos_em | timestamptz | quando aceitou os termos e a política no cadastro |
+| calendario_token | text | token secreto do link da agenda (48 caracteres hexadecimais); `gerar_novo_link_agenda()` troca, `agenda_valida(token)` e `agenda_por_token(token)` atendem a rota pública `/agenda/<token>.ics` |
 
 O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cria o escritório, o usuário dono e a assinatura em teste de 7 dias no Pro.
 

@@ -29,6 +29,11 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [x] Baixar de novo com cabeçalho, rodapé e fonte do timbrado
 - [x] "Remover meu timbrado" pede confirmação antes de apagar
 
+## Agenda (testado em 2026-11-18)
+- [x] Configurações → Agenda mostra o link real
+- [x] Baixar o .ics e importar no Google Agenda: prazo fatal com "[Peça] · [Partes]" e link para a Tesia
+- [ ] Assinar o link no Google Agenda (só depois do deploy, com endereço público)
+
 ## Análise
 - [ ] Partes, número do processo e órgão estão certos
 - [ ] O resumo ("O que aconteceu") está correto e sem invenção

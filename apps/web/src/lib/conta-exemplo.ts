@@ -51,8 +51,6 @@ export const sessoesExemplo = [
   { id: "2", dispositivo: "Safari no celular", local: "Brasília, DF", atual: false },
 ];
 
-export const LINK_AGENDA_EXEMPLO = "https://exemplo.tesia/agenda/token-de-exemplo.ics";
-
 export const passosAgenda = [
   { nome: "Google Agenda", passo: "Outras agendas → Do URL → cole o link." },
   { nome: "Apple Calendário", passo: "Arquivo → Nova assinatura de calendário → cole o link." },

@@ -369,4 +369,65 @@ begin
 end;
 $$;
 
+insert into prazos (escritorio_id, origem, descricao, data_vencimento, status)
+values (current_setting('teste.esc_a')::uuid, 'manual', 'Audiência de teste', '2026-12-10', 'confirmado'),
+       (current_setting('teste.esc_a')::uuid, 'manual', 'Prazo descartado', '2026-12-11', 'descartado');
+
+set role anon;
+select set_config('request.jwt.claim.sub', '', false);
+
+do $$
+declare
+  token_a text;
+begin
+  reset role;
+  select calendario_token into token_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  set role anon;
+  assert (select count(*) from agenda_por_token(token_a)) = 1,
+    'A agenda deveria trazer só os prazos confirmados de A (teste grátis)';
+  assert (select count(*) from agenda_por_token(token_a) where descricao = 'Prazo descartado') = 0,
+    'Prazo descartado não deveria ir para a agenda';
+  assert (select count(*) from agenda_por_token('token-invalido')) = 0, 'Token inválido não deveria trazer nada';
+  assert agenda_valida(token_a), 'Token de A deveria ser válido';
+  assert not agenda_valida(repeat('a', 48)), 'Token inexistente não deveria ser válido';
+  assert (select count(*) from agenda_por_token(repeat('a', 48))) = 0, 'Token inexistente não deveria trazer nada';
+end;
+$$;
+
+reset role;
+update assinaturas set status = 'ativa', plano_codigo = 'start' where escritorio_id = current_setting('teste.esc_a')::uuid;
+
+do $$
+declare
+  token_a text;
+begin
+  select calendario_token into token_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  assert (select count(*) from agenda_por_token(token_a)) = 0, 'Plano Start não deveria ter agenda';
+  assert not agenda_valida(token_a), 'Plano Start não deveria ter agenda válida';
+end;
+$$;
+
+update assinaturas set status = 'trial', plano_codigo = 'pro' where escritorio_id = current_setting('teste.esc_a')::uuid;
+
+do $$
+declare
+  antigo text;
+  token_b text;
+  novo text;
+begin
+  select calendario_token into antigo from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  select calendario_token into token_b from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000b1';
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+  novo := gerar_novo_link_agenda();
+  assert novo ~ '^[0-9a-f]{48}$', 'Novo token deveria ter 48 caracteres hexadecimais';
+  assert novo <> antigo, 'Novo token deveria ser diferente';
+  assert (select count(*) from agenda_por_token(antigo)) = 0, 'Token antigo deveria parar de funcionar';
+  assert (select count(*) from agenda_por_token(novo)) = 1, 'Token novo deveria funcionar';
+  reset role;
+  assert (select calendario_token from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000b1') = token_b,
+    'Trocar o link de A não deveria mexer no de B';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

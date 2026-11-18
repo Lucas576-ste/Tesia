@@ -5,7 +5,7 @@ import Link from "next/link";
 import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { itemEstaAtivo, itemIndicar, itensMenu } from "./itens-menu";
+import { itemConfiguracoes, itemEstaAtivo, itemIndicar, itensMenu } from "./itens-menu";
 import { SimboloTesia } from "./simbolo-tesia";
 
 type MenuLateralProps = {
@@ -25,7 +25,7 @@ export function MenuLateral({ conta }: MenuLateralProps) {
         Tesia
       </Link>
       <nav aria-label="Menu principal" className="flex flex-1 flex-col gap-1 px-3">
-        {[...itensMenu, itemIndicar].map(({ rotulo, href, icone: Icone }) => {
+        {[...itensMenu, itemIndicar, itemConfiguracoes].map(({ rotulo, href, icone: Icone }) => {
           const ativo = itemEstaAtivo(href, caminho);
           return (
             <Link

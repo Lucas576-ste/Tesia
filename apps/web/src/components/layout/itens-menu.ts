@@ -6,6 +6,7 @@ import {
   Gift,
   LayoutDashboard,
   PenLine,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,13 @@ function corresponde(href: string, caminho: string) {
   if (href === "/app") return caminho === href;
   return caminho === href || caminho.startsWith(`${href}/`);
 }
+
+export const itemConfiguracoes: ItemMenu = {
+  rotulo: "Configurações",
+  rotuloCurto: "Config.",
+  href: "/app/configuracoes",
+  icone: Settings,
+};
 
 export function itemEstaAtivo(href: string, caminho: string) {
   if (!corresponde(href, caminho)) return false;
