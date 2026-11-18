@@ -23,6 +23,12 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [x] "Gerar rascunho no meu estilo" cria a peça com pontos [CONFIRMAR]
 - [ ] Revisão da escrita do rascunho por um advogado (estilo, erros jurídicos e posição dos [CONFIRMAR])
 
+## Download em .docx (testado em 2026-11-18)
+- [x] Baixar a peça no modelo padrão (A4, Times 12, pendências em amarelo)
+- [x] Enviar o timbrado em Configurações → Modelo e ver "Seu timbrado está ativo"
+- [x] Baixar de novo com cabeçalho, rodapé e fonte do timbrado
+- [x] "Remover meu timbrado" pede confirmação antes de apagar
+
 ## Análise
 - [ ] Partes, número do processo e órgão estão certos
 - [ ] O resumo ("O que aconteceu") está correto e sem invenção
