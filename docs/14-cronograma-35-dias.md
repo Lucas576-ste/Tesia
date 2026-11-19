@@ -265,9 +265,11 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-19:** termos e privacidade atualizados como rascunho para revisão; landing com capturas reais (conta fictícia); worker pronto para o Railway (Dockerfile testado); correção do rótulo "vence hoje" em fim de semana ou feriado e do prazo interno vencido, que usava data fixa. Falta você criar o serviço no Railway e cadastrar as variáveis na Vercel. Vercel Pro fica para o Dia 34.
 
-### Dia 33 — Teste de ponta a ponta
+### Dia 33 — Teste de ponta a ponta ✅
 - Rodar o fluxo completo com intimações reais de cada área
 - Conferir prazos à mão e corrigir erros
+
+**Feito em 2026-11-19:** 4 intimações fictícias conferidas com a conta à mão: apelação TJDFT (09/12), recurso inominado JEF (26/11), recurso inominado JEC (01/12, depois de corrigir o catálogo, que só oferecia embargos) e recurso ordinário TRT10 via portal (03/12, com ciência automática). Pendente: confirmar se o TJDFT suspende prazos em 08/12.
 
 ### Dia 34 — Primeiros clientes fundadores
 - Onboarding de 2 ou 3 advogados, junto com eles

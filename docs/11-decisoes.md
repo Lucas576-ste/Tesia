@@ -119,3 +119,4 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Revisão de advogado dos termos e da política de privacidade (rascunho de 18/11) | Lucas | Antes de divulgar |
 | Conferir os termos da Anthropic e da Voyage sobre treino com dados e tirar o [CONFIRMAR] da privacidade | Lucas | Antes de divulgar |
 | Assinar o Railway Hobby (US$ 5/mês) e subir o worker; até lá, o worker roda na máquina do Lucas | Lucas | Dia 34, antes do 1º cliente |
+| Confirmar com o advogado parceiro se o TJDFT suspende prazos em 08/12 (Dia da Justiça); o banco só tem para TRF1 e TRT10 | Lucas | Antes do Dia 34 |

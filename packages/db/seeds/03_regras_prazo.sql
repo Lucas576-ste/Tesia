@@ -5,6 +5,8 @@ insert into regras_prazo (area, rito, tipo_ato, tipo_peca_codigo, dias, contagem
   ('civel', 'comum', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'CPC, art. 1.023', 2),
   ('civel', 'comum', 'decisao_interlocutoria', 'embargos_declaracao', 5, 'uteis', 'CPC, art. 1.023', 2),
   ('civel', 'comum', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º', 3),
+  ('civel', 'jec', 'sentenca', 'recurso_inominado', 10, 'uteis', 'Lei 9.099/1995, arts. 12-A e 42', 1),
+  ('civel', 'jec', 'recurso', 'contrarrazoes', 10, 'uteis', 'Lei 9.099/1995, art. 42, §2º', 1),
   ('civel', 'jec', 'sentenca', 'embargos_declaracao', 5, 'uteis', 'Lei 9.099/1995, arts. 12-A e 49', 2),
   ('civel', 'jec', 'despacho', 'manifestacao_simples', 5, 'uteis', 'CPC, art. 218, §3º, c/c Lei 9.099/1995, art. 12-A', 3),
   ('trabalhista', 'trabalhista', 'sentenca', 'recurso_ordinario', 8, 'uteis', 'CLT, arts. 775 e 895, I', 1),

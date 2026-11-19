@@ -54,7 +54,7 @@ begin
   assert (select count(*) from feriados where escritorio_id is not null) = 0, 'A não deveria ver feriado de B';
   assert (select count(*) from feriados where tribunal = 'TRF1') = 10, 'A deveria ver os feriados do TRF1';
   assert (select count(*) from areas) = 6, 'A deveria ler as áreas';
-  assert (select count(*) from regras_prazo) = 20, 'A deveria ler as regras de prazo';
+  assert (select count(*) from regras_prazo) = 22, 'A deveria ler as regras de prazo';
   assert (select count(*) from planos) = 5, 'A deveria ler os planos';
 
   update processos set parte_contraria = 'invadido' where id = '00000000-0000-0000-0000-0000000000b3';
@@ -472,6 +472,15 @@ begin
     'Escritório deveria continuar o mesmo';
   assert consumir_limite('teste', 2, 60) and consumir_limite('teste', 2, 60) and not consumir_limite('teste', 2, 60),
     'O terceiro uso deveria estourar o limite de 2';
+end;
+$$;
+
+do $$
+begin
+  assert exists (
+    select 1 from regras_prazo r join tipos_peca t on t.codigo = r.tipo_peca_codigo and t.area in (r.area, 'geral')
+    where r.area = 'civel' and r.rito = 'jec' and r.tipo_ato = 'sentenca' and r.tipo_peca_codigo = 'recurso_inominado' and r.prioridade = 1
+  ), 'Sentença do JEC cível deveria ter recurso inominado como peça principal';
 end;
 $$;
 

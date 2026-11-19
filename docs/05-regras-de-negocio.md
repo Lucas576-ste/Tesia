@@ -12,7 +12,7 @@
 
 | Área | Peças |
 |---|---|
-| Cível/consumidor | Petição inicial, contestação, réplica, apelação, cumprimento de sentença |
+| Cível/consumidor | Petição inicial, contestação, réplica, apelação, recurso inominado e contrarrazões (JEC), cumprimento de sentença |
 | Trabalhista | Reclamação trabalhista, contestação, recurso ordinário, manifestação sobre cálculos |
 | Previdenciário | Petição inicial, recurso inominado, manifestação sobre laudo, contrarrazões |
 | Família | Divórcio, alimentos, guarda, contestação |

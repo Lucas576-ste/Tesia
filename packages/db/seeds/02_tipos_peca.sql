@@ -3,6 +3,8 @@ insert into tipos_peca (area, codigo, nome, estrutura, minutos_economizados) val
   ('civel', 'contestacao', 'Contestação', '["enderecamento", "sintese_inicial", "preliminares", "merito", "pedidos", "fechamento"]', 150),
   ('civel', 'replica', 'Réplica', '["enderecamento", "sintese_contestacao", "preliminares", "merito", "pedidos", "fechamento"]', 90),
   ('civel', 'apelacao', 'Apelação', '["peticao_interposicao", "sintese", "preliminares", "razoes", "pedidos", "fechamento"]', 180),
+  ('civel', 'recurso_inominado', 'Recurso inominado', '["peticao_interposicao", "sintese", "razoes", "pedidos", "fechamento"]', 120),
+  ('civel', 'contrarrazoes', 'Contrarrazões', '["peticao", "sintese_recurso", "razoes", "pedidos", "fechamento"]', 90),
   ('civel', 'cumprimento_sentenca', 'Cumprimento de sentença', '["enderecamento", "titulo", "calculo", "pedidos", "fechamento"]', 60),
   ('trabalhista', 'reclamacao_trabalhista', 'Reclamação trabalhista', '["enderecamento", "qualificacao", "contrato", "fatos_e_fundamentos", "pedidos", "valor_causa", "fechamento"]', 180),
   ('trabalhista', 'contestacao', 'Contestação', '["enderecamento", "sintese_inicial", "preliminares", "merito", "pedidos", "fechamento"]', 150),
