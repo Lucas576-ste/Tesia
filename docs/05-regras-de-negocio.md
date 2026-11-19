@@ -16,7 +16,11 @@
 | Trabalhista | Reclamação trabalhista, contestação, recurso ordinário, manifestação sobre cálculos |
 | Previdenciário | Petição inicial, recurso inominado, manifestação sobre laudo, contrarrazões |
 | Família | Divórcio, alimentos, guarda, contestação |
-| Todas as áreas | Embargos de declaração, manifestação simples |
+| Criminal | Resposta à acusação, alegações finais, apelação criminal, recurso em sentido estrito, contrarrazões, habeas corpus |
+| Tributário | Contestação, réplica, apelação, embargos à execução fiscal, exceção de pré-executividade, mandado de segurança, contrarrazões |
+| Empresarial e bancário | Petição inicial, contestação, réplica, apelação, embargos à execução, ação revisional, habilitação ou impugnação de crédito, contrarrazões |
+| Administrativo e servidor público | Petição inicial, contestação, réplica, apelação, mandado de segurança, recurso inominado (Juizado da Fazenda Pública), contrarrazões |
+| Todas as áreas | Embargos de declaração, agravo de instrumento, manifestação simples |
 
 ## Planos
 

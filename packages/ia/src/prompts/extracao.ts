@@ -1,4 +1,4 @@
-export const VERSAO_EXTRACAO = "extracao@4";
+export const VERSAO_EXTRACAO = "extracao@5";
 
 export const INSTRUCOES_EXTRACAO = `Você extrai dados de intimações judiciais brasileiras para um advogado conferir.
 Use apenas o que está escrito no documento. Não deduza nem complete nada.
@@ -14,8 +14,9 @@ Regras:
 - data_envio_portal: só quando forma_intimacao for "portal" e a data de envio ou expedição do expediente estiver escrita, no formato AAAA-MM-DD. Nunca use a data de assinatura da decisão.
 - numero_processo: no formato CNJ, como aparece no documento.
 - rito: "jef" é o Juizado Especial Federal (Justiça Federal, inclusive quando a classe se chama "Procedimento do Juizado Especial Cível"); "jec" é o Juizado Especial Cível estadual (Tribunal de Justiça).
+- area: "criminal" para processo penal (denúncia, réu, Ministério Público como autor, CPP, inquérito, habeas corpus), e nesse caso rito "criminal"; "tributario" para execução fiscal, CDA, Fazenda Nacional ou Pública cobrando tributo, ou discussão de tributo; "empresarial" para contratos empresariais, bancos, cobrança, revisional, falência e recuperação judicial; "administrativo" para servidor público, concurso, licitação, atos do poder público e Juizado Especial da Fazenda Pública (nesse juizado, o rito é "jec"); "civel" para as demais causas cíveis e de consumo.
 - area, rito e tipo_ato: escolha a opção da lista que corresponde ao documento; se nenhuma servir, use "outro" (ou null para área).
-- tipo_ato descreve o conteúdo sobre o qual a parte precisa agir, não o nome formal do ato. Um ato ordinatório ou despacho que intima para falar sobre laudo pericial é "laudo"; sobre cálculos é "calculos"; sobre contestação é "contestacao"; sobre recurso da outra parte é "recurso". Use "despacho" só quando o ato não se encaixar em nenhuma dessas opções.
+- tipo_ato descreve o conteúdo sobre o qual a parte precisa agir, não o nome formal do ato. Um ato ordinatório ou despacho que intima para falar sobre laudo pericial é "laudo"; sobre cálculos é "calculos"; sobre contestação é "contestacao"; sobre recurso da outra parte é "recurso". No processo penal, a decisão que recebe a denúncia e manda citar o réu para responder à acusação é "citacao". Use "despacho" só quando o ato não se encaixar em nenhuma dessas opções.
 - polo_cliente: o polo da parte intimada, quando o documento deixar claro.
 - resultado: uma frase curta com o que o ato decidiu ou determinou.
 - pontos: os pontos centrais da decisão. Cada um com um título curto e o trecho copiado literalmente do documento, sem alterar nenhuma palavra.`;

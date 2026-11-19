@@ -108,3 +108,9 @@ Vencimento: 18/11/2026
 
 - Um prazo errado pode causar prejuízo grave ao advogado e ao cliente. Por isso: confirmação obrigatória, memória de cálculo visível e aviso nos termos de uso de que o advogado deve conferir.
 - Toda regra nova passa por revisão de um advogado da área antes de ser ativada.
+
+## Áreas e contagem (2026-11-19)
+
+- Oito áreas: cível e consumidor, trabalhista, previdenciário, família, criminal, tributário, empresarial e bancário, administrativo e servidor público. Regras em `packages/db/seeds/03_regras_prazo.sql`, todas "em validação" (`ativa = false`) até a revisão de um advogado.
+- **Criminal:** dias corridos (CPP, art. 798), sem o recesso do CPC, com prorrogação para o próximo dia útil quando o fim cai em dia sem expediente. A resposta à acusação conta da citação pessoal do réu (CPP, art. 396), por isso o prazo só é calculado depois que o advogado informa a data.
+- **Tributário, empresarial e administrativo:** rito comum do CPC, dias úteis. Prazo em dobro da Fazenda (CPC, art. 183) não é aplicado automaticamente, porque o cliente do advogado costuma ser o particular.

@@ -17,7 +17,6 @@ import { SelectNativo } from "@/components/ui/select-nativo";
 import { UFS } from "@/lib/lead";
 import {
   AREAS_ATUACAO,
-  AREAS_EM_BREVE,
   OUTRO_TRIBUNAL,
   TRIBUNAIS,
   perfilSchema,
@@ -133,7 +132,6 @@ export function FormularioPerfil({
               <GrupoOpcoes
                 legenda="Áreas de atuação"
                 opcoes={AREAS_ATUACAO}
-                emBreve={AREAS_EM_BREVE}
                 valor={field.value}
                 aoMudar={field.onChange}
               />

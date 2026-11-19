@@ -35,6 +35,10 @@ export const AREAS = [
   "Trabalhista",
   "Previdenciário",
   "Família",
+  "Criminal",
+  "Tributário",
+  "Empresarial e bancário",
+  "Administrativo e servidor público",
   "Outra",
   "Plano Sociedade (lista de espera)",
 ] as const;

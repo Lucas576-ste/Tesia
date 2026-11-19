@@ -6,6 +6,10 @@ export const AREAS_ATUACAO = [
   "Trabalhista",
   "Previdenciário",
   "Família",
+  "Criminal",
+  "Tributário",
+  "Empresarial e bancário",
+  "Administrativo e servidor público",
 ] as const;
 
 export const CODIGO_AREA: Record<(typeof AREAS_ATUACAO)[number], string> = {
@@ -13,13 +17,15 @@ export const CODIGO_AREA: Record<(typeof AREAS_ATUACAO)[number], string> = {
   Trabalhista: "trabalhista",
   Previdenciário: "previdenciario",
   Família: "familia",
+  Criminal: "criminal",
+  Tributário: "tributario",
+  "Empresarial e bancário": "empresarial",
+  "Administrativo e servidor público": "administrativo",
 };
 
 export function areasPorCodigo(codigos: string[]) {
   return AREAS_ATUACAO.filter((area) => codigos.includes(CODIGO_AREA[area]));
 }
-
-export const AREAS_EM_BREVE = ["Criminal", "Tributário"];
 
 export const OUTRO_TRIBUNAL = "Outro tribunal";
 

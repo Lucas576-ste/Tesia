@@ -53,8 +53,8 @@ begin
   assert (select count(*) from assinaturas) = 1, 'A deveria ver só a própria assinatura';
   assert (select count(*) from feriados where escritorio_id is not null) = 0, 'A não deveria ver feriado de B';
   assert (select count(*) from feriados where tribunal = 'TRF1') = 10, 'A deveria ver os feriados do TRF1';
-  assert (select count(*) from areas) = 6, 'A deveria ler as áreas';
-  assert (select count(*) from regras_prazo) = 22, 'A deveria ler as regras de prazo';
+  assert (select count(*) from areas) = 8, 'A deveria ler as áreas';
+  assert (select count(*) from regras_prazo) = 58, 'A deveria ler as regras de prazo';
   assert (select count(*) from planos) = 5, 'A deveria ler os planos';
 
   update processos set parte_contraria = 'invadido' where id = '00000000-0000-0000-0000-0000000000b3';
@@ -494,6 +494,26 @@ begin
     'O script deveria ativar o fundador por 15 dias';
   assert (select plano_codigo from assinaturas where escritorio_id = current_setting('teste.esc_a')::uuid) <> 'fundador',
     'O script não deveria mexer em outra conta';
+end;
+$$;
+
+do $$
+begin
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+  update usuarios set djen_ativo = false where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  begin
+    update usuarios set djen_buscado_ate = current_date where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+    assert false, 'Usuário não deveria mexer na data da busca do DJEN';
+  exception when insufficient_privilege then null;
+  end;
+  reset role;
+  assert (select not djen_ativo from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1'),
+    'Usuário deveria conseguir desligar a busca no DJEN';
+  insert into intimacoes (escritorio_id, origem, texto, djen_id) values (current_setting('teste.esc_a')::uuid, 'djen', 'x', 42);
+  insert into intimacoes (escritorio_id, origem, texto, djen_id) values (current_setting('teste.esc_a')::uuid, 'djen', 'x', 42)
+    on conflict (escritorio_id, djen_id) where djen_id is not null do nothing;
+  assert (select count(*) from intimacoes where djen_id = 42) = 1, 'A mesma comunicação do DJEN não deveria entrar duas vezes';
 end;
 $$;
 
