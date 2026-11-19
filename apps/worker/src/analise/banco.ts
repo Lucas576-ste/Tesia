@@ -1,4 +1,5 @@
 import type { UsoIa } from "@tesia/ia";
+import { atualizarFase, ligarCliente } from "./cliente-fase";
 import { nomePartes, type AnaliseGravada, type MemoriaCalculo } from "@tesia/shared";
 import type { Pool, PoolClient } from "pg";
 import { z } from "zod";
@@ -240,6 +241,16 @@ export async function gravarAnalise(
         analise.dados.data_disponibilizacao,
       ],
     );
+    if (processoId) {
+      await ligarCliente(cliente, job.escritorio_id, processoId, analise);
+      await atualizarFase(
+        cliente,
+        job.escritorio_id,
+        processoId,
+        intimacaoId,
+        analise.dados.tipo_ato,
+      );
+    }
     await cliente.query("commit");
   } catch (erro) {
     await cliente.query("rollback");

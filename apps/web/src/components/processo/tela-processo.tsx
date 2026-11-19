@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { editarProcesso } from "@/app/app/processos/acoes";
+import { faseDoProcesso } from "@tesia/shared";
+import { AcoesFase } from "@/components/clientes/acoes-fase";
+import { BarraFases } from "@/components/clientes/barra-fases";
+import { EscolherCliente } from "@/components/clientes/escolher-cliente";
 import { SeloStatus } from "@/components/selo-status";
 import { PrazoInterno } from "@/components/tabela-prazos";
 import { Button } from "@/components/ui/button";
@@ -29,7 +33,16 @@ function Dado({ rotulo, valor }: { rotulo: string; valor: string }) {
   );
 }
 
-export function TelaProcesso({ processo }: { processo: Processo }) {
+export function TelaProcesso({
+  processo,
+  clientes,
+}: {
+  processo: Processo;
+  clientes: { id: string; nome: string }[];
+}) {
+  const proximoPasso = processo.encerrado
+    ? null
+    : faseDoProcesso(processo.rito, processo.fase)?.proximo;
   const [dados, setDados] = useState<DadosProcesso>({
     cnj: processo.cnj,
     partes: processo.partes,
@@ -53,9 +66,15 @@ export function TelaProcesso({ processo }: { processo: Processo }) {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link href="/app/processos">
+        <Link
+          href={
+            processo.cliente
+              ? `/app/clientes/${processo.cliente.id}`
+              : "/app/clientes?aba=processos"
+          }
+        >
           <ArrowLeft aria-hidden />
-          Voltar aos processos
+          {processo.cliente ? `Voltar a ${processo.cliente.nome}` : "Voltar aos processos"}
         </Link>
       </Button>
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -79,6 +98,48 @@ export function TelaProcesso({ processo }: { processo: Processo }) {
           </Link>
         </Button>
       </header>
+      <Card className="gap-4 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs text-texto-secundario">Cliente</span>
+            {processo.cliente ? (
+              <Link
+                href={`/app/clientes/${processo.cliente.id}`}
+                className="text-lg font-semibold text-primaria underline-offset-2 hover:underline"
+              >
+                {processo.cliente.nome}
+              </Link>
+            ) : (
+              <span className="text-lg font-semibold text-atencao">Sem cliente definido</span>
+            )}
+          </div>
+          <EscolherCliente
+            processoId={processo.id}
+            clienteAtual={processo.cliente?.id ?? null}
+            clientes={clientes}
+            rotulo={processo.cliente ? "Trocar cliente" : "Escolher cliente"}
+          />
+        </div>
+        <BarraFases rito={processo.rito} fase={processo.fase} encerrado={processo.encerrado} />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-semibold">{processo.nomeFase}</span>
+            <span className="text-xs text-texto-secundario">{processo.origemFase}</span>
+            {proximoPasso && (
+              <p className="mt-1 text-sm">
+                <span className="font-medium">Próximo passo provável: </span>
+                {proximoPasso}
+              </p>
+            )}
+          </div>
+          <AcoesFase
+            processoId={processo.id}
+            rito={processo.rito}
+            fase={processo.fase}
+            encerrado={processo.encerrado}
+          />
+        </div>
+      </Card>
       <Card className="gap-3 p-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-lg font-semibold">Dados do processo</h2>
@@ -94,7 +155,6 @@ export function TelaProcesso({ processo }: { processo: Processo }) {
           <Dado rotulo="Tribunal" valor={dados.tribunal} />
           <Dado rotulo="Vara" valor={dados.vara} />
         </dl>
-        <p className="text-xs text-texto-secundario">Demonstração: as edições não são salvas.</p>
       </Card>
       {processo.prazos.length > 0 && (
         <Card className="gap-3 p-4">

@@ -137,7 +137,7 @@ Pesquisar e comparar DJEN e APIs pagas:
 
 ### Fase do processo
 
-**Etapa 1, sem integração nova:**
+**Etapa 1, sem integração nova (feita em 2026-11-19):**
 
 - O código converte o `tipo_ato` da última intimação em uma fase. Exemplo: sentença vira "Sentenciado".
 - A tela informa de onde veio: "Estimada pela última intimação, em 04/11/2026".

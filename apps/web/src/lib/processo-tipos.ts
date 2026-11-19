@@ -30,4 +30,10 @@ export type Processo = Omit<DadosProcesso, "area"> & {
   status: StatusPrazo;
   prazos: LinhaPrazo[];
   eventos: EventoProcesso[];
+  cliente: { id: string; nome: string } | null;
+  rito: string | null;
+  fase: string | null;
+  nomeFase: string;
+  origemFase: string;
+  encerrado: boolean;
 };

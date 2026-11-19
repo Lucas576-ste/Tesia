@@ -56,24 +56,29 @@ function LinkProcesso({ id, children }: { id: string; children: string }) {
 function CartoesProcessos({ processos }: { processos: Processo[] }) {
   return (
     <ul className="flex flex-col md:hidden">
-      {processos.map(({ id, cnj, partes, area, tribunal, proximoPrazo, status }) => (
-        <li
-          key={id}
-          className="relative flex flex-col gap-1 border-b p-3 text-sm transition-colors last:border-b-0 hover:bg-muted/50"
-        >
-          <LinkProcesso id={id}>{partes}</LinkProcesso>
-          <span className="text-xs break-all text-texto-secundario tabular-nums">{cnj}</span>
-          <span>
-            {area} · {tribunal}
-          </span>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="tabular-nums">
-              {proximoPrazo ? `Próximo prazo: ${proximoPrazo}` : "Sem prazo em aberto"}
+      {processos.map(
+        ({ id, cnj, partes, area, tribunal, proximoPrazo, status, cliente, nomeFase }) => (
+          <li
+            key={id}
+            className="relative flex flex-col gap-1 border-b p-3 text-sm transition-colors last:border-b-0 hover:bg-muted/50"
+          >
+            <LinkProcesso id={id}>{partes}</LinkProcesso>
+            <span className="text-xs break-all text-texto-secundario tabular-nums">{cnj}</span>
+            <span>
+              {cliente?.nome ?? "Sem cliente"} · {nomeFase}
             </span>
-            <SeloStatus status={status} />
-          </div>
-        </li>
-      ))}
+            <span className="text-xs text-texto-secundario">
+              {area} · {tribunal}
+            </span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="tabular-nums">
+                {proximoPrazo ? `Próximo prazo: ${proximoPrazo}` : "Sem prazo em aberto"}
+              </span>
+              <SeloStatus status={status} />
+            </div>
+          </li>
+        ),
+      )}
     </ul>
   );
 }
@@ -86,21 +91,23 @@ function TabelaProcessos({ processos }: { processos: Processo[] }) {
           <TableRow>
             <TableHead>Número</TableHead>
             <TableHead>Partes</TableHead>
+            <TableHead>Cliente</TableHead>
+            <TableHead>Fase</TableHead>
             <TableHead>Área</TableHead>
-            <TableHead>Tribunal</TableHead>
             <TableHead>Próximo prazo</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {processos.map(({ id, cnj, partes, area, tribunal, proximoPrazo, status }) => (
+          {processos.map(({ id, cnj, partes, area, proximoPrazo, status, cliente, nomeFase }) => (
             <TableRow key={id} className="relative">
               <TableCell className="tabular-nums">
                 <LinkProcesso id={id}>{cnj}</LinkProcesso>
               </TableCell>
               <TableCell>{partes}</TableCell>
+              <TableCell>{cliente?.nome ?? "—"}</TableCell>
+              <TableCell>{nomeFase}</TableCell>
               <TableCell>{area}</TableCell>
-              <TableCell>{tribunal}</TableCell>
               <TableCell className="tabular-nums">{proximoPrazo ?? "—"}</TableCell>
               <TableCell>
                 <SeloStatus status={status} />
@@ -128,7 +135,7 @@ export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcess
   );
 
   function fecharNovo() {
-    router.replace("/app/processos", { scroll: false });
+    router.replace("/app/clientes?aba=processos", { scroll: false });
   }
 
   async function salvarNovo(dados: DadosProcesso) {

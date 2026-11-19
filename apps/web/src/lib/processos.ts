@@ -3,6 +3,8 @@ import { listarPrazosConfirmados, rotuloArea } from "@/lib/painel";
 import type { LinhaPrazo, StatusPrazo } from "@/lib/prazo";
 import { chaveData } from "@/lib/prazo";
 import type { EventoProcesso, Processo } from "@/lib/processo-tipos";
+import { faseDoProcesso } from "@tesia/shared";
+import { textoOrigem } from "@/lib/clientes";
 import { isoParaData } from "@/lib/prazo-interno";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -14,6 +16,18 @@ const processoSchema = z.object({
   area: z.string().nullable(),
   tribunal: z.string().nullable(),
   orgao: z.string().nullable(),
+  rito: z.string().nullable(),
+  fase: z.string().nullable(),
+  fase_origem: z.string().nullable(),
+  fase_atualizada_em: z.string().nullable(),
+  encerrado_em: z.string().nullable(),
+  clientes: z
+    .union([
+      z.object({ id: z.uuid(), nome: z.string() }),
+      z.array(z.object({ id: z.uuid(), nome: z.string() })),
+    ])
+    .nullable()
+    .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor)),
 });
 
 const intimacaoSchema = z.object({
@@ -48,6 +62,20 @@ function resumoDoProcesso(prazos: LinhaPrazo[]): {
   return { proximoPrazo: null, status: prazos.length ? "protocolado" : "nao_iniciado" };
 }
 
+function acompanhamento(processo: z.infer<typeof processoSchema>) {
+  const encerrado = Boolean(processo.encerrado_em);
+  return {
+    cliente: processo.clientes,
+    rito: processo.rito,
+    fase: processo.fase,
+    nomeFase: encerrado
+      ? "Encerrado"
+      : (faseDoProcesso(processo.rito, processo.fase)?.nome ?? "Fase não identificada"),
+    origemFase: textoOrigem(processo.fase_origem, processo.fase_atualizada_em),
+    encerrado,
+  };
+}
+
 function nomeDoProcesso(processo: z.infer<typeof processoSchema>) {
   return processo.partes ?? processo.parte_contraria ?? "Partes não informadas";
 }
@@ -56,7 +84,9 @@ export async function listarProcessos(): Promise<Processo[]> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("processos")
-    .select("id, numero_cnj, partes, parte_contraria, area, tribunal, orgao")
+    .select(
+      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome)",
+    )
     .is("excluido_em", null)
     .order("criado_em", { ascending: false });
   const linhas = z.array(processoSchema).safeParse(data);
@@ -74,6 +104,7 @@ export async function listarProcessos(): Promise<Processo[]> {
       prazos: doProcesso,
       eventos: [],
       ...resumoDoProcesso(doProcesso),
+      ...acompanhamento(processo),
     };
   });
 }
@@ -91,7 +122,9 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("processos")
-    .select("id, numero_cnj, partes, parte_contraria, area, tribunal, orgao")
+    .select(
+      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome)",
+    )
     .eq("id", id)
     .is("excluido_em", null)
     .maybeSingle();
@@ -150,5 +183,6 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
     prazos,
     eventos,
     ...resumoDoProcesso(prazos),
+    ...acompanhamento(processo.data),
   };
 }

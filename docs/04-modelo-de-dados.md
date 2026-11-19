@@ -51,6 +51,8 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | whatsapp | text | para alertas |
 | alerta_email | boolean | alertas por e-mail ligados (padrão: sim) |
 | alerta_dias | text[] | quando avisar: `5_uteis`, `2_uteis`, `fatal`, `interno` |
+| djen_ativo | boolean | busca automática no DJEN ligada (contas novas: sim; contas anteriores a 19/11/2026 começam desligadas) |
+| djen_buscado_ate | date | até que data as publicações já foram buscadas (só o worker altera) |
 | modelo_docx_path | text | `escritorio_id/usuario_id/modelo.docx` no bucket privado `modelos` (até 5 MB, só .docx); vazio = modelo padrão da Tesia |
 | termos_aceitos_em | timestamptz | quando aceitou os termos e a política no cadastro |
 | calendario_token | text | token secreto do link da agenda (48 caracteres hexadecimais); `gerar_novo_link_agenda()` troca, `agenda_valida(token)` e `agenda_por_token(token)` atendem a rota pública `/agenda/<token>.ics` |
@@ -295,3 +297,7 @@ Registro de cada aviso mandado, para nunca repetir (migration 0014). Só o worke
 | prazo_id | uuid | prazo avisado |
 | momento | text | `5_uteis`, `2_uteis`, `fatal` ou `interno` |
 | data | date | dia do envio; único com usuário, prazo e momento |
+
+Em `intimacoes`, `djen_id` (bigint) guarda o id da comunicação no DJEN, único por escritório, para não importar duas vezes (migration 0016).
+
+Em `processos` (migration 0017): `fase` (código da fase do rito, ver `packages/shared/src/fases.ts`), `fase_origem` (`intimacao`, `djen` ou `manual`), `fase_atualizada_em` e `encerrado_em`. Em `clientes`: `nome_normalizado`, para ligar o mesmo cliente sem diferença de acento ou maiúscula. O worker liga o processo ao cliente pela parte do polo do cliente e atualiza a fase a cada intimação, sem sobrescrever a correção manual mais recente.
