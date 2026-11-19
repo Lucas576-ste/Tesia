@@ -63,7 +63,7 @@ export function ListaIntimacoes({ itens, soPendentes }: ListaIntimacoesProps) {
         descricao="Envie o PDF da intimação e eu leio, resumo e calculo o prazo."
         acao={
           <Button asChild>
-            <Link href="/app/intimacoes/nova">Nova intimação</Link>
+            <Link href="/app/intimacoes/nova">Enviar intimação</Link>
           </Button>
         }
       />
@@ -72,20 +72,27 @@ export function ListaIntimacoes({ itens, soPendentes }: ListaIntimacoesProps) {
 
   return (
     <ul className="flex flex-col divide-y rounded-xl border bg-card shadow-xs">
-      {visiveis.map(({ id, enviadaEm, partes, cnj, peca, situacao }) => (
+      {visiveis.map(({ id, enviadaEm, partes, cnj, peca, situacao, djen }) => (
         <li key={id}>
           <Link
             href={`/app/intimacoes/${id}`}
             className="flex flex-wrap items-center gap-x-4 gap-y-1 p-4 text-sm hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
           >
             <span className="flex min-w-0 flex-1 basis-64 flex-col">
-              <span className="font-medium">{partes}</span>
+              <span className="flex flex-wrap items-center gap-2 font-medium">
+                {partes}
+                {djen && (
+                  <span className="rounded-sm bg-primaria-fundo px-1.5 py-0.5 text-[10px] font-semibold text-primaria">
+                    DJEN
+                  </span>
+                )}
+              </span>
               <span className="text-xs text-texto-secundario tabular-nums">
                 {[cnj, peca].filter(Boolean).join(" · ") || "Processo ainda não identificado"}
               </span>
             </span>
             <span className="text-xs text-texto-secundario tabular-nums">
-              Enviada em {enviadaEm}
+              {djen ? "Encontrada no DJEN em" : "Enviada em"} {enviadaEm}
             </span>
             <span
               className={cn(

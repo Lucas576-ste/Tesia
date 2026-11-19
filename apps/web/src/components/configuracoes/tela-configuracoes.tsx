@@ -13,7 +13,7 @@ import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
 import type { DadosModelo } from "@/components/modelo/envio-modelo";
-import type { PreferenciasAlerta } from "@/lib/alertas";
+import type { DadosDjen, PreferenciasAlerta } from "@/lib/alertas";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
 import { AbaSeguranca } from "./aba-seguranca";
@@ -22,9 +22,10 @@ function conteudosDasAbas(
   modelo: DadosModelo,
   agenda: DadosAgenda,
   alertas: PreferenciasAlerta,
+  djen: DadosDjen,
 ): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
   return {
-    alertas: <AbaAlertas alertas={alertas} />,
+    alertas: <AbaAlertas alertas={alertas} djen={djen} />,
     agenda: <AbaAgenda agenda={agenda} />,
     equipe: <AbaEquipe />,
     modelo: <AbaModelo modelo={modelo} />,
@@ -46,13 +47,15 @@ export function TelaConfiguracoes({
   modelo,
   agenda,
   alertas,
+  djen,
 }: {
   abaInicial: AbaConfiguracoes;
   modelo: DadosModelo;
   agenda: DadosAgenda;
   alertas: PreferenciasAlerta;
+  djen: DadosDjen;
 }) {
-  const conteudos = conteudosDasAbas(modelo, agenda, alertas);
+  const conteudos = conteudosDasAbas(modelo, agenda, alertas, djen);
   const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);

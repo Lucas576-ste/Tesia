@@ -15,4 +15,5 @@ export type ItemIntimacao = {
   cnj: string | null;
   peca: string | null;
   situacao: SituacaoIntimacao;
+  djen: boolean;
 };

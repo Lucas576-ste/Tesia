@@ -8,6 +8,7 @@ import { criarClienteServidor } from "@/lib/supabase/servidor";
 const linhaSchema = z.object({
   id: z.uuid(),
   status: z.enum(STATUS_INTIMACAO),
+  origem: z.string(),
   criado_em: z.string(),
   extracao: z.unknown(),
   prazos: z.array(z.object({ status: z.string() })).nullable(),
@@ -34,7 +35,7 @@ export async function listarIntimacoes(): Promise<ItemIntimacao[]> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("intimacoes")
-    .select("id, status, criado_em, extracao, prazos(status)")
+    .select("id, status, origem, criado_em, extracao, prazos(status)")
     .is("excluido_em", null)
     .order("criado_em", { ascending: false })
     .limit(200);
@@ -50,6 +51,7 @@ export async function listarIntimacoes(): Promise<ItemIntimacao[]> {
       cnj: analise.data?.dados.numero_processo ?? null,
       peca: analise.data?.pecas.find((peca) => peca.recomendada)?.nome ?? null,
       situacao: situacao(linha),
+      djen: linha.origem === "djen",
     };
   });
 }

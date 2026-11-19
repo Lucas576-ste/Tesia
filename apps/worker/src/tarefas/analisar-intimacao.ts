@@ -25,7 +25,7 @@ import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ intimacao_id: z.uuid() });
-const linhaSchema = z.object({ arquivo_path: z.string(), texto: z.string().nullable() });
+const linhaSchema = z.object({ arquivo_path: z.string().nullable(), texto: z.string().nullable() });
 
 function intimacaoDoJob(job: Job) {
   const resultado = dadosSchema.safeParse(job.dados);
@@ -55,6 +55,7 @@ async function obterTexto(job: Job, intimacaoId: string, contexto: Contexto) {
   const linha = linhaSchema.safeParse(rows[0]);
   if (!linha.success) throw new ErroDefinitivo("Intimação ou arquivo não encontrado");
   if (linha.data.texto) return linha.data.texto;
+  if (!linha.data.arquivo_path) throw new ErroDefinitivo("Intimação sem texto e sem arquivo");
 
   const { data, error } = await supabase.storage
     .from("intimacoes")

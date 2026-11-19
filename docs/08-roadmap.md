@@ -33,7 +33,7 @@ Aqui, um item só é marcado quando funciona com dados reais. O andamento das te
 
 ## Fase 1.5 — Logo após o MVP (nesta ordem)
 1. [ ] Cobrança pelo Asaas (antes do fim dos 15 dias grátis do primeiro fundador)
-2. [ ] Busca automática de intimações pela OAB (DJEN ou API paga), com cards sugeridos no Quadro e status visível em Processos. É a maior lacuna em relação à concorrência.
+2. [~] Busca automática de intimações pela OAB. **Primeira versão feita em 2026-11-19 pelo DJEN** (API pública, grátis): o worker busca a cada 3 horas, das 6h às 22h, e a intimação entra no fluxo normal de análise. Falta: cards sugeridos no Quadro, status em Processos e um provedor pago com webhook (Judit ou Escavador) se faltar cobertura.
 3. [ ] Agenda sincronizada por link iCal (Google, Apple, Outlook), se não entrou no MVP
 4. [ ] Plano Sociedade: 2 advogados, convite, etapas por prazo, divisão por área, rede de segurança, filtros da dupla e notas internas. Depois: pendências, carga de cada um, ausência e estilo comum (`17-planos-e-sociedade.md`)
 5. [ ] Relatório do mês (prazos cumpridos, peças geradas, horas economizadas) e honorários simples
@@ -122,3 +122,4 @@ A Tesia começa rápido com solo e dupla e cresce até o nível corporativo. Nen
 | Gestão de correspondentes: contratar, enviar guias e pagar parceiros em outras cidades | 3+ | |
 | Permissões finas (RBAC): quem vê processos sigilosos, financeiro ou altera prazos críticos | 3 | Base para escritórios maiores |
 
+- [ ] DataJud para atualizar a fase com movimentações que não geram intimação (próxima etapa do acompanhamento por cliente).

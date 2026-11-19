@@ -7,7 +7,13 @@ import { GrupoOpcoes } from "@/components/onboarding/grupo-opcoes";
 import { usePlano } from "@/components/plano/provedor-plano";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { MOMENTOS_ALERTA, type MomentoAlerta, type PreferenciasAlerta } from "@/lib/alertas";
+import {
+  MOMENTOS_ALERTA,
+  type DadosDjen,
+  type MomentoAlerta,
+  type PreferenciasAlerta,
+} from "@/lib/alertas";
+import { BuscaDjen } from "./busca-djen";
 
 const CANAIS = ["E-mail"] as const;
 const ROTULOS = Object.values(MOMENTOS_ALERTA);
@@ -16,7 +22,7 @@ const codigoDoRotulo = Object.fromEntries(
   Object.entries(MOMENTOS_ALERTA).map(([codigo, rotulo]) => [rotulo, codigo]),
 ) as Record<Rotulo, MomentoAlerta>;
 
-export function AbaAlertas({ alertas }: { alertas: PreferenciasAlerta }) {
+export function AbaAlertas({ alertas, djen }: { alertas: PreferenciasAlerta; djen: DadosDjen }) {
   const [canais, setCanais] = useState<(typeof CANAIS)[number][]>(alertas.email ? ["E-mail"] : []);
   const [dias, setDias] = useState<Rotulo[]>(alertas.dias.map((codigo) => MOMENTOS_ALERTA[codigo]));
   const [salvando, iniciar] = useTransition();
@@ -36,34 +42,37 @@ export function AbaAlertas({ alertas }: { alertas: PreferenciasAlerta }) {
   }
 
   return (
-    <Card className="flex flex-col gap-5 p-4">
-      <GrupoOpcoes
-        legenda="Canais"
-        opcoes={CANAIS}
-        emBreve={planoStart ? [] : ["WhatsApp"]}
-        valor={canais}
-        aoMudar={setCanais}
-      />
-      {planoStart && (
-        <p className="text-sm text-texto-secundario">
-          Alertas por WhatsApp fazem parte do plano Pro.
-        </p>
-      )}
-      <GrupoOpcoes legenda="Quando avisar" opcoes={ROTULOS} valor={dias} aoMudar={setDias} />
-      {plano.equipe && (
-        <p className="rounded-md bg-primaria-fundo px-3 py-2 text-sm">
-          Rede de segurança: se um prazo seguir aberto na véspera do prazo fatal, os dois advogados
-          são avisados.
-        </p>
-      )}
-      {semAlerta && (
-        <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
-          Sem canal ou antecedência, você não recebe aviso de prazo.
-        </p>
-      )}
-      <Button className="w-full sm:w-auto sm:self-end" onClick={salvar} disabled={salvando}>
-        {salvando ? "Salvando..." : "Salvar"}
-      </Button>
-    </Card>
+    <div className="flex flex-col gap-4">
+      <BuscaDjen djen={djen} />
+      <Card className="flex flex-col gap-5 p-4">
+        <GrupoOpcoes
+          legenda="Canais"
+          opcoes={CANAIS}
+          emBreve={planoStart ? [] : ["WhatsApp"]}
+          valor={canais}
+          aoMudar={setCanais}
+        />
+        {planoStart && (
+          <p className="text-sm text-texto-secundario">
+            Alertas por WhatsApp fazem parte do plano Pro.
+          </p>
+        )}
+        <GrupoOpcoes legenda="Quando avisar" opcoes={ROTULOS} valor={dias} aoMudar={setDias} />
+        {plano.equipe && (
+          <p className="rounded-md bg-primaria-fundo px-3 py-2 text-sm">
+            Rede de segurança: se um prazo seguir aberto na véspera do prazo fatal, os dois
+            advogados são avisados.
+          </p>
+        )}
+        {semAlerta && (
+          <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
+            Sem canal ou antecedência, você não recebe aviso de prazo.
+          </p>
+        )}
+        <Button className="w-full sm:w-auto sm:self-end" onClick={salvar} disabled={salvando}>
+          {salvando ? "Salvando..." : "Salvar"}
+        </Button>
+      </Card>
+    </div>
   );
 }

@@ -33,6 +33,12 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
       <TelaConfiguracoes
         abaInicial={abaConfiguracoesSchema.parse(aba)}
         agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
+        djen={{
+          ativo: usuario.djen_ativo,
+          buscadoAte: usuario.djen_buscado_ate,
+          oab:
+            usuario.oab_numero && usuario.oab_uf ? `${usuario.oab_numero}/${usuario.oab_uf}` : null,
+        }}
         alertas={preferenciasAlertaSchema.parse({
           email: usuario.alerta_email,
           dias: usuario.alerta_dias,
