@@ -484,4 +484,17 @@ begin
 end;
 $$;
 
+\set email 'B@Exemplo.com'
+\i scripts/ativar-fundador.sql
+
+do $$
+begin
+  assert (select plano_codigo || '/' || status::text || '/' || (periodo_fim - current_date)::text
+          from assinaturas where escritorio_id = current_setting('teste.esc_b')::uuid) = 'fundador/ativa/15',
+    'O script deveria ativar o fundador por 15 dias';
+  assert (select plano_codigo from assinaturas where escritorio_id = current_setting('teste.esc_a')::uuid) <> 'fundador',
+    'O script não deveria mexer em outra conta';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

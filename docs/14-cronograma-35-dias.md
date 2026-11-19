@@ -275,6 +275,8 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 - Onboarding de 2 ou 3 advogados, junto com eles
 - Anotar todos os problemas
 
+**Preparado em 2026-11-19:** guia do dia em `20-dia-34-fundadores.md` (checklist de produção, roteiro da sessão e tabela de problemas) e script `packages/db/scripts/ativar-fundador.sql` (fundador por 15 dias, com 50 peças). Falta o dia em si, com os advogados.
+
 ### Dia 35 — Correções e próximos passos
 - Corrigir o que apareceu no dia 34
 - Atualizar `11-decisoes.md`

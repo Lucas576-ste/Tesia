@@ -87,6 +87,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-18 | Rate limit no próprio Postgres, sem Redis | Simples e suficiente para o volume do MVP |
 | 2026-11-19 | Worker no Railway com Dockerfile próprio; Vercel Pro só antes do 1º cliente; sem domínio por enquanto (`.vercel.app`) | Decisão de Lucas no Dia 32 |
 | 2026-11-19 | Landing com capturas reais de uma conta de demonstração fictícia, em `apps/web/public/telas` | Substitui as mini telas feitas em código |
+| 2026-11-19 | Fundador ativado por script (`ativar-fundador.sql`): plano `fundador`, status `ativa`, 15 dias, 50 peças | O teste grátis padrão só dá 5 peças; a cobrança ainda não existe |
 
 ## Pendências
 
