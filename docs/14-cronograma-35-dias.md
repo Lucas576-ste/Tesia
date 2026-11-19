@@ -258,10 +258,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-18:** permissões por coluna em `usuarios` (papel e escritório travados), rate limit no Postgres (login, envio, IA, agenda e .docx), Sentry no web e no worker sem coletar conteúdo, backup diário criptografado por GitHub Action (falta cadastrar os Secrets), testes de acesso entre escritórios ampliados.
 
-### Dia 32 — Produção
+### Dia 32 — Produção ✅
 - Termos de uso e política de privacidade (rascunho, enviar para revisão)
 - Landing final conforme `15-landing.md`, com as capturas reais das telas
 - Deploy de produção: Vercel Pro (web) e Railway ou Render (worker)
+
+**Feito em 2026-11-19:** termos e privacidade atualizados como rascunho para revisão; landing com capturas reais (conta fictícia); worker pronto para o Railway (Dockerfile testado); correção do rótulo "vence hoje" em fim de semana ou feriado e do prazo interno vencido, que usava data fixa. Falta você criar o serviço no Railway e cadastrar as variáveis na Vercel. Vercel Pro fica para o Dia 34.
 
 ### Dia 33 — Teste de ponta a ponta
 - Rodar o fluxo completo com intimações reais de cada área

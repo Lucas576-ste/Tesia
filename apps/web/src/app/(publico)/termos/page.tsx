@@ -19,9 +19,17 @@ const secoes = [
     ],
   },
   {
+    titulo: "Alertas por e-mail",
+    paragrafos: [
+      "A Tesia envia um resumo diário por e-mail com os prazos confirmados nos momentos escolhidos pelo advogado em Configurações. O envio depende de provedores externos e pode atrasar ou falhar; por isso o alerta é um apoio, não uma garantia.",
+    ],
+  },
+  {
     titulo: "Planos e limites",
     paragrafos: [
-      "Plano Start: 10 peças por mês. Plano Pro: 50 peças por mês. Os valores e condições vigentes são os exibidos na contratação.",
+      "Plano Start: 10 peças por mês. Plano Pro: 50 peças por mês. Plano Sociedade: 100 peças por mês, compartilhadas. Teste grátis: 7 dias, até 5 peças. Os valores e condições vigentes são os exibidos na contratação.",
+      "Ao chegar em 80% das peças do mês, o sistema avisa; em 100%, novos rascunhos ficam bloqueados até o mês seguinte, a compra de um pacote extra ou a troca de plano. Análise de intimações, prazos e alertas continuam funcionando.",
+      "Para proteger o serviço, há limites de tentativas por período (por exemplo, no login e na geração de peças).",
     ],
   },
   {

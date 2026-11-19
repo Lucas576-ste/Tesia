@@ -1,10 +1,11 @@
 import { z } from "zod";
+import { criarCalendario, ehDiaUtil } from "@tesia/prazos";
+import { hojeBrasilia } from "@/lib/hoje";
 import { chaveData, type LinhaPrazo } from "@/lib/prazo";
 
-export const DATA_BASE_EXEMPLO = "2026-11-04";
 export const DIAS_PRAZO_INTERNO = 2;
 
-const FERIADOS_EXEMPLO = ["2026-11-02", "2026-11-15", "2026-11-20", "2026-12-25", "2027-01-01"];
+const calendario = criarCalendario();
 
 export function isoParaData(iso: string) {
   return iso.split("-").reverse().join("/");
@@ -15,10 +16,10 @@ function textoIso(dia: Date) {
 }
 
 function diaUtil(dia: Date) {
-  return dia.getUTCDay() % 6 !== 0 && !FERIADOS_EXEMPLO.includes(textoIso(dia));
+  return ehDiaUtil(textoIso(dia), calendario);
 }
 
-export function calcularPrazoInterno(fatalIso: string, hojeIso = DATA_BASE_EXEMPLO) {
+export function calcularPrazoInterno(fatalIso: string, hojeIso = hojeBrasilia()) {
   const dia = new Date(`${fatalIso}T00:00:00Z`);
   let restantes = DIAS_PRAZO_INTERNO;
   while (restantes > 0) {
@@ -41,5 +42,5 @@ export function prazoInternoVencido({
   status,
 }: Pick<LinhaPrazo, "prazoInterno" | "status">) {
   if (!prazoInterno || status === "protocolado") return false;
-  return chaveData(prazoInterno) < DATA_BASE_EXEMPLO.replaceAll("-", "");
+  return chaveData(prazoInterno) < hojeBrasilia().replaceAll("-", "");
 }

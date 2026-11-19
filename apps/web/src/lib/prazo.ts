@@ -1,4 +1,5 @@
 import type { EtapaPrazo } from "@/lib/etapas-prazo";
+import { hojeBrasilia } from "@/lib/hoje";
 
 export type StatusPrazo = "nao_iniciado" | "rascunho_pronto" | "protocolado";
 
@@ -40,7 +41,9 @@ export function destinoPrazo({
 
 function textoVencimento({ diasUteis, vencimento }: LinhaPrazo) {
   const data = vencimento.slice(0, 5);
-  if (diasUteis === 0) return `hoje (${data})`;
+  const hoje = hojeBrasilia().split("-").reverse().join("/");
+  if (vencimento === hoje) return `hoje (${data})`;
+  if (diasUteis === 0) return `em ${data}, sem dia útil antes`;
   if (diasUteis === 1) return `amanhã (${data})`;
   return `em ${diasUteis} dias úteis (${data})`;
 }

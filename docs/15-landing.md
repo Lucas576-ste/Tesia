@@ -24,7 +24,7 @@ Estes ajustes prevalecem sobre os textos abaixo:
 - **Contato:** WhatsApp e e-mail vêm de `NEXT_PUBLIC_WHATSAPP` e `NEXT_PUBLIC_CONTATO_EMAIL`, ocultos enquanto vazios.
 - **Tabela comparativa no celular:** cartões empilhados, um por recurso, em vez de rolagem lateral.
 - **Cabeçalho:** mantém "Entrar", para `/login` continuar acessível.
-- **Imagens de "Como funciona":** mini telas feitas em código, com dados fictícios e legenda "Exemplo ilustrativo", no lugar dos blocos cinza. Trocar por capturas reais depois dos Dias 5 a 7.
+- **Imagens de "Como funciona" e do hero:** capturas reais (2026-11-19) de uma conta de demonstração com dados fictícios, em `apps/web/public/telas/`, com a legenda "Tela real, com dados fictícios". Para refazer, recriar a conta de demonstração e capturar em 1280×820.
 
 ## Ajustes de produto (2026-11-05)
 

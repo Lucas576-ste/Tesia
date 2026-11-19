@@ -68,6 +68,11 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Depois de confirmar, o aviso some e o prazo aparece no painel com os dias úteis certos
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
+## Produção
+- [ ] Site publicado abre a landing com as capturas e o login funciona
+- [ ] Worker no Railway mostra "worker_iniciado" nos logs e analisa uma intimação enviada pelo site publicado
+- [ ] E-mail de confirmação de cadastro aponta para o endereço publicado
+
 ## Segurança
 - [ ] Errar a senha 11 vezes seguidas mostra "Muitas tentativas"
 - [ ] Backup: rodar o workflow no GitHub e baixar o arquivo do dia

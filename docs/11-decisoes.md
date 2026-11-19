@@ -85,6 +85,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-18 | Plano e uso lidos da assinatura real; saiu o seletor de plano de demonstração | Dia 30 |
 | 2026-11-18 | Backup diário por GitHub Action (`pg_dump` criptografado, 30 dias) em vez do Supabase Pro | Custo zero no início; reavaliar o Pro no lançamento |
 | 2026-11-18 | Rate limit no próprio Postgres, sem Redis | Simples e suficiente para o volume do MVP |
+| 2026-11-19 | Worker no Railway com Dockerfile próprio; Vercel Pro só antes do 1º cliente; sem domínio por enquanto (`.vercel.app`) | Decisão de Lucas no Dia 32 |
+| 2026-11-19 | Landing com capturas reais de uma conta de demonstração fictícia, em `apps/web/public/telas` | Substitui as mini telas feitas em código |
 
 ## Pendências
 
@@ -113,3 +115,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Deixar a cobrança pelo Asaas pronta antes do fim dos 15 dias grátis do primeiro fundador | Lucas | Até 15 dias após o dia 34 |
 | Verificar um domínio no Resend e trocar `ALERTA_REMETENTE` | Lucas | Antes do lançamento |
 | Cadastrar `BACKUP_DATABASE_URL` e `BACKUP_SENHA` nos Secrets do GitHub e rodar o backup uma vez | Lucas | Depois do push |
+| Passar a Vercel para o plano Pro | Lucas | Dia 34, antes do 1º cliente pagar |
+| Revisão de advogado dos termos e da política de privacidade (rascunho de 18/11) | Lucas | Antes de divulgar |
+| Conferir os termos da Anthropic e da Voyage sobre treino com dados e tirar o [CONFIRMAR] da privacidade | Lucas | Antes de divulgar |
+| Assinar o Railway Hobby (US$ 5/mês) e subir o worker; até lá, o worker roda na máquina do Lucas | Lucas | Dia 34, antes do 1º cliente |

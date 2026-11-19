@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Confirmar } from "./confirmar";
-import { MiniAnalise, MiniPainel, MiniRascunho, MiniUpload } from "./mini-telas";
+import { CapturaTela } from "./captura-tela";
 import { MolduraNavegador } from "./moldura-navegador";
 import { SecaoLanding } from "./secao-landing";
 
@@ -16,8 +16,8 @@ const passos: {
     chave: "envie",
     titulo: "Envie a intimação",
     texto: "Mande o PDF da intimação ou da decisão. Uma ou várias de uma vez.",
-    legenda: "Exemplo ilustrativo: tela de envio da intimação",
-    tela: <MiniUpload />,
+    legenda: "Tela real, com dados fictícios: envio da intimação",
+    tela: <CapturaTela tela="envio" />,
   },
   {
     chave: "entenda",
@@ -28,23 +28,23 @@ const passos: {
     ),
     texto:
       "A Lia entrega o resumo do que aconteceu, os pontos que podem ser atacados e o prazo calculado com a conta passo a passo: publicação, início da contagem, dias úteis, feriados e vencimento. Você confere e confirma.",
-    legenda: "Exemplo ilustrativo: tela de análise da intimação",
-    tela: <MiniAnalise />,
+    legenda: "Tela real, com dados fictícios: análise da intimação",
+    tela: <CapturaTela tela="analise" />,
   },
   {
     chave: "revise",
     titulo: "Revise o rascunho no seu estilo",
     texto:
       "A Lia escreve a peça com a sua estrutura, o seu jeito de argumentar e os fatos do processo. O que precisa da sua atenção aparece destacado para conferir. Baixe em .docx, já no seu papel timbrado.",
-    legenda: "Exemplo ilustrativo: editor com pendências destacadas",
-    tela: <MiniRascunho />,
+    legenda: "Tela real, com dados fictícios: editor com pendências destacadas",
+    tela: <CapturaTela tela="editor" />,
   },
   {
     chave: "controle",
     titulo: "Tudo sob controle",
     texto: "Todos os prazos confirmados num painel, e a Lia avisa por e-mail antes do vencimento.",
-    legenda: "Exemplo ilustrativo: painel de prazos",
-    tela: <MiniPainel />,
+    legenda: "Tela real, com dados fictícios: painel de prazos",
+    tela: <CapturaTela tela="painel" />,
   },
 ];
 

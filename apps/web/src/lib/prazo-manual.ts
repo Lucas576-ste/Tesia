@@ -9,9 +9,7 @@ export const TIPOS_MANUAIS: Record<TipoManual, string> = {
 
 const dataOpcional = z.union([z.iso.date("Informe uma data válida."), z.literal("")]);
 
-export function hojeBrasilia() {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
-}
+export { hojeBrasilia } from "@/lib/hoje";
 
 export function esquemaPrazoManual(hoje: string) {
   return z

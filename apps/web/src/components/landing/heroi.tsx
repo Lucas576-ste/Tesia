@@ -1,7 +1,7 @@
 import { AnimacaoFluxo } from "./animacao-fluxo";
 import { BotaoRastreado } from "./botao-rastreado";
 import { ExemploPrazo } from "./exemplo-prazo";
-import { MiniAnalise } from "./mini-telas";
+import { CapturaTela } from "./captura-tela";
 import { MolduraNavegador } from "./moldura-navegador";
 
 export function Heroi() {
@@ -44,8 +44,8 @@ export function Heroi() {
           <div className="flex justify-center pb-3">
             <AnimacaoFluxo />
           </div>
-          <MolduraNavegador legenda="Exemplo ilustrativo">
-            <MiniAnalise comConta={false} />
+          <MolduraNavegador legenda="Tela real, com dados fictícios">
+            <CapturaTela tela="analise" prioridade />
           </MolduraNavegador>
           <div className="relative md:mt-3 md:ml-auto md:w-full lg:-mt-6 lg:w-72">
             <ExemploPrazo />

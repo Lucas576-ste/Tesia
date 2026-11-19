@@ -79,7 +79,7 @@ Do projeto atual de conteúdo (Next.js + Supabase), reaproveitar: autenticação
 
 | Fase | Web | Worker | Banco e storage |
 |---|---|---|---|
-| MVP | Vercel Pro | Railway ou Render | Supabase Pro (São Paulo) |
+| MVP | Vercel (Pro antes do 1º cliente) | Railway, imagem Docker em `apps/worker/Dockerfile` e `railway.json` | Supabase (São Paulo); backup diário por GitHub Action |
 | Escala | Vercel ou container | AWS/GCP com containers e autoescala de workers | Supabase ou Postgres gerenciado |
 
 ## Observabilidade
