@@ -31,11 +31,11 @@ export default async function IntimacoesPage({ searchParams }: IntimacoesPagePro
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-semibold text-titulo">Intimações</h1>
           <p className="text-sm text-texto-secundario">
-            Tudo o que você enviou, com a situação de cada análise.
+            O que chegou: enviado por você ou encontrado no DJEN, com a situação de cada análise.
           </p>
         </div>
         <Button asChild>
-          <Link href="/app/intimacoes/nova">Nova intimação</Link>
+          <Link href="/app/intimacoes/nova">Enviar intimação</Link>
         </Button>
       </header>
       <nav aria-label="Filtro das intimações" className="flex flex-wrap gap-1">

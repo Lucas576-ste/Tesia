@@ -1,11 +1,16 @@
-import { CalendarClock, CircleCheck, FilePen } from "lucide-react";
+import { AlertTriangle, CalendarClock, FilePen, Inbox } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const tipos = {
-  vencimento: { icone: CalendarClock, cor: "text-erro" },
-  rascunho: { icone: FilePen, cor: "text-atencao" },
-  protocolado: { icone: CircleCheck, cor: "text-sucesso" },
+  vencido: { icone: AlertTriangle, cor: "text-erro", ativo: "border-erro bg-erro-fundo" },
+  vencimento: {
+    icone: CalendarClock,
+    cor: "text-atencao",
+    ativo: "border-atencao bg-atencao-fundo",
+  },
+  rascunho: { icone: FilePen, cor: "text-primaria", ativo: "border-primary bg-primaria-fundo" },
+  intimacao: { icone: Inbox, cor: "text-primaria", ativo: "border-primary bg-primaria-fundo" },
 };
 
 type CardIndicadorProps = {
@@ -13,24 +18,27 @@ type CardIndicadorProps = {
   rotulo: string;
   valor: number;
   href: string;
+  ativo?: boolean;
 };
 
-export function CardIndicador({ tipo, rotulo, valor, href }: CardIndicadorProps) {
-  const { icone: Icone, cor } = tipos[tipo];
+export function CardIndicador({ tipo, rotulo, valor, href, ativo = false }: CardIndicadorProps) {
+  const { icone: Icone, cor, ativo: estiloAtivo } = tipos[tipo];
 
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded-xl border bg-card px-4 py-2.5 shadow-xs transition-colors outline-none hover:border-primaria focus-visible:ring-[3px] focus-visible:ring-ring/50"
+      aria-current={ativo ? "true" : undefined}
+      className={cn(
+        "flex items-center gap-3 rounded-xl border bg-card px-4 py-3 shadow-xs transition-colors outline-none hover:bg-muted/60 focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        ativo && estiloAtivo,
+      )}
     >
-      <Icone aria-hidden className="size-5 shrink-0 text-texto-secundario" />
+      <Icone
+        aria-hidden
+        className={cn("size-5 shrink-0", valor > 0 ? cor : "text-texto-secundario")}
+      />
       <span className="min-w-0 flex-1 text-sm text-texto-secundario">{rotulo}</span>
-      <span
-        className={cn(
-          "font-serif text-2xl font-semibold tabular-nums",
-          valor > 0 ? cor : "text-texto",
-        )}
-      >
+      <span className={cn("text-2xl font-bold tabular-nums", valor > 0 ? cor : "text-texto")}>
         {valor}
       </span>
     </Link>

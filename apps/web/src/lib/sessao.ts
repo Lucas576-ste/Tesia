@@ -16,6 +16,8 @@ const usuarioSchema = z.object({
   calendario_token: z.string(),
   alerta_email: z.boolean(),
   alerta_dias: z.array(z.string()),
+  djen_ativo: z.boolean(),
+  djen_buscado_ate: z.string().nullable(),
 });
 
 export type UsuarioSessao = z.infer<typeof usuarioSchema>;
@@ -28,7 +30,7 @@ export const usuarioAtual = cache(async (): Promise<UsuarioSessao | null> => {
   const { data: linha } = await supabase
     .from("usuarios")
     .select(
-      "id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path, calendario_token, alerta_email, alerta_dias",
+      "id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path, calendario_token, alerta_email, alerta_dias, djen_ativo, djen_buscado_ate",
     )
     .eq("auth_user_id", data.user.id)
     .maybeSingle();
@@ -45,5 +47,7 @@ export async function exigirUsuario() {
 
 export function rotuloOab(usuario: UsuarioSessao) {
   if (!usuario.oab_numero) return "OAB pendente";
-  return `OAB/${usuario.oab_uf ?? ""} ${usuario.oab_numero}`;
+  const numero = usuario.oab_numero.replace(/\D/g, "");
+  const formatado = numero ? Number(numero).toLocaleString("pt-BR") : usuario.oab_numero;
+  return `OAB/${usuario.oab_uf ?? ""} ${formatado}`;
 }

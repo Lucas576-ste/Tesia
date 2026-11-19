@@ -11,29 +11,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ROTULOS_ETAPA } from "@/lib/etapas-prazo";
-import { destinoPrazo, type LinhaPrazo, type StatusPrazo } from "@/lib/prazo";
+import { SeloUrgencia } from "@/components/selo-urgencia";
+import { nomeCurto } from "@/lib/nome-curto";
+import { destinoPrazo, type LinhaPrazo } from "@/lib/prazo";
 import { prazoInternoVencido } from "@/lib/prazo-interno";
 import { TIPOS_MANUAIS } from "@/lib/prazo-manual";
-import { cn } from "@/lib/utils";
-
-export function diasRestantes(diasUteis: number, status: StatusPrazo) {
-  if (status === "protocolado") return { texto: "—", cor: "text-texto-secundario" };
-  if (diasUteis === 0) return { texto: "Hoje", cor: "font-medium text-erro" };
-  if (diasUteis === 1) return { texto: "Amanhã", cor: "font-medium text-erro" };
-  if (diasUteis <= 3) return { texto: `${diasUteis} dias úteis`, cor: "font-medium text-atencao" };
-  return { texto: `${diasUteis} dias úteis`, cor: "text-texto" };
-}
 
 export function TituloPrazo({ prazo }: { prazo: LinhaPrazo }) {
   const href = destinoPrazo(prazo);
-  if (!href) return <span className="font-medium">{prazo.partes}</span>;
+  if (!href)
+    return (
+      <span className="font-medium" title={prazo.partes}>
+        {nomeCurto(prazo.partes)}
+      </span>
+    );
   return (
     <Link
       href={href}
       draggable={false}
+      title={prazo.partes}
       className="font-medium outline-none after:absolute after:inset-0 focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-inset"
     >
-      {prazo.partes}
+      {nomeCurto(prazo.partes)}
     </Link>
   );
 }
@@ -107,8 +106,7 @@ function ListaPrazos({ prazos, acoes }: TabelaPrazosProps) {
   return (
     <ul className="flex flex-col xl:hidden">
       {prazos.map((prazo) => {
-        const { id, cnj, diasUteis, status, tipo } = prazo;
-        const dias = diasRestantes(diasUteis, status);
+        const { id, cnj, status, tipo } = prazo;
         return (
           <li
             key={id}
@@ -116,12 +114,12 @@ function ListaPrazos({ prazos, acoes }: TabelaPrazosProps) {
           >
             <TituloPrazo prazo={prazo} />
             {cnj && (
-              <span className="text-xs break-all text-texto-secundario tabular-nums">{cnj}</span>
+              <span className="font-mono text-[11px] break-all text-texto-secundario">{cnj}</span>
             )}
             <DescricaoPrazo prazo={prazo} />
             <DatasPrazo prazo={prazo} />
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className={cn("tabular-nums", dias.cor)}>{dias.texto}</span>
+              <SeloUrgencia prazo={prazo} />
               <SeloStatus status={status} manual={Boolean(tipo)} />
             </div>
             {acoes && <div className="absolute top-2 right-2 z-10">{acoes(prazo)}</div>}
@@ -144,7 +142,7 @@ export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
               <TableHead>Peça</TableHead>
               <TableHead>Prazo fatal</TableHead>
               <TableHead>Prazo interno</TableHead>
-              <TableHead>Dias restantes</TableHead>
+              <TableHead>Urgência</TableHead>
               <TableHead>Status</TableHead>
               {acoes && (
                 <TableHead>
@@ -155,13 +153,12 @@ export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
           </TableHeader>
           <TableBody>
             {prazos.map((prazo) => {
-              const { id, cnj, diasUteis, status, tipo } = prazo;
-              const dias = diasRestantes(diasUteis, status);
+              const { id, cnj, status, tipo } = prazo;
               return (
                 <TableRow key={id} className="relative">
                   <TableCell>
                     <TituloPrazo prazo={prazo} />
-                    <span className="block text-xs text-texto-secundario tabular-nums">{cnj}</span>
+                    <span className="block font-mono text-[11px] text-texto-secundario">{cnj}</span>
                   </TableCell>
                   <TableCell>
                     <DescricaoPrazo prazo={prazo} />
@@ -172,7 +169,9 @@ export function TabelaPrazos({ prazos, acoes }: TabelaPrazosProps) {
                   <TableCell>
                     <PrazoInterno prazo={prazo} />
                   </TableCell>
-                  <TableCell className={cn("tabular-nums", dias.cor)}>{dias.texto}</TableCell>
+                  <TableCell>
+                    <SeloUrgencia prazo={prazo} />
+                  </TableCell>
                   <TableCell>
                     <SeloStatus status={status} manual={Boolean(tipo)} />
                   </TableCell>

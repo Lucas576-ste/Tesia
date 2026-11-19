@@ -73,12 +73,7 @@ export default function ComponentesPage() {
             valor={2}
             href="/app?status=rascunho_pronto"
           />
-          <CardIndicador
-            tipo="protocolado"
-            rotulo="Protocolados no mês"
-            valor={12}
-            href="/app?status=protocolado"
-          />
+          <CardIndicador tipo="vencido" rotulo="Vencidos" valor={1} href="/app?urgencia=vencido" />
         </div>
       </Secao>
 

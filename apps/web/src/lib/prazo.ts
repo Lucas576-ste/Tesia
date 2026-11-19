@@ -1,5 +1,4 @@
 import type { EtapaPrazo } from "@/lib/etapas-prazo";
-import { hojeBrasilia } from "@/lib/hoje";
 
 export type StatusPrazo = "nao_iniciado" | "rascunho_pronto" | "protocolado";
 
@@ -22,11 +21,10 @@ export type LinhaPrazo = {
   etapa?: EtapaPrazo;
   pecaId?: string;
   prazoId?: string;
+  diasAtraso?: number;
 };
 
-export type ColunaQuadro = "hoje" | "proximos" | "depois" | "rascunho" | "protocolado";
-
-const LIMITE_DIAS_CRITICOS = 3;
+export type ColunaQuadro = "vencido" | "hoje" | "ate3" | "mais3" | "concluido";
 
 export function destinoPrazo({
   id,
@@ -37,42 +35,6 @@ export function destinoPrazo({
   if (tipo) return null;
   if (status !== "nao_iniciado" && pecaId) return `/app/pecas/${pecaId}`;
   return `/app/intimacoes/${id}`;
-}
-
-function textoVencimento({ diasUteis, vencimento }: LinhaPrazo) {
-  const data = vencimento.slice(0, 5);
-  const hoje = hojeBrasilia().split("-").reverse().join("/");
-  if (vencimento === hoje) return `hoje (${data})`;
-  if (diasUteis === 0) return `em ${data}, sem dia útil antes`;
-  if (diasUteis === 1) return `amanhã (${data})`;
-  return `em ${diasUteis} dias úteis (${data})`;
-}
-
-export function prazoCritico(prazos: LinhaPrazo[]) {
-  const criticos = prazos.filter(
-    ({ status, diasUteis }) => status !== "protocolado" && diasUteis <= LIMITE_DIAS_CRITICOS,
-  );
-  if (criticos.length === 0) return null;
-
-  const maisUrgente = criticos.reduce((atual, prazo) =>
-    prazo.diasUteis < atual.diasUteis ? prazo : atual,
-  );
-
-  return {
-    variante: maisUrgente.diasUteis === 0 ? ("hoje" as const) : ("padrao" as const),
-    peca: maisUrgente.peca,
-    partes: maisUrgente.partes,
-    prazo: textoVencimento(maisUrgente),
-    verbo: maisUrgente.tipo && maisUrgente.tipo !== "prazo" ? "é" : "vence",
-    href: destinoPrazo(maisUrgente),
-  };
-}
-
-export function colunaPrazo({ status, diasUteis }: LinhaPrazo): ColunaQuadro {
-  if (status === "protocolado") return "protocolado";
-  if (status === "rascunho_pronto") return "rascunho";
-  if (diasUteis === 0) return "hoje";
-  return diasUteis <= LIMITE_DIAS_CRITICOS ? "proximos" : "depois";
 }
 
 export function chaveData(data: string) {
@@ -86,14 +48,4 @@ export function ordenarPrazos(prazos: LinhaPrazo[]) {
     if (protocoladoA !== protocoladoB) return protocoladoA - protocoladoB;
     return chaveData(a.vencimento).localeCompare(chaveData(b.vencimento));
   });
-}
-
-export function contarIndicadores(prazos: LinhaPrazo[]) {
-  const abertos = prazos.filter(({ status }) => status !== "protocolado");
-  return {
-    abertos: abertos.length,
-    vencendo: abertos.filter(({ diasUteis }) => diasUteis <= LIMITE_DIAS_CRITICOS).length,
-    rascunhos: prazos.filter(({ status }) => status === "rascunho_pronto").length,
-    protocolados: prazos.length - abertos.length,
-  };
 }

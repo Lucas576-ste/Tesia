@@ -103,6 +103,13 @@ export async function listarPrazosConfirmados(processoId?: string): Promise<Linh
     inicio: linha.data_inicio ? isoParaData(linha.data_inicio) : undefined,
     prazoInterno: linha.data_prazo_interno ? isoParaData(linha.data_prazo_interno) : undefined,
     diasUteis: diasUteisAte(linha.data_vencimento, hoje),
+    diasAtraso: Math.max(
+      0,
+      Math.round(
+        (Date.parse(`${hoje}T00:00:00Z`) - Date.parse(`${linha.data_vencimento}T00:00:00Z`)) /
+          86_400_000,
+      ),
+    ),
     status:
       linha.origem === "manual" && linha.status === "cumprido"
         ? "protocolado"

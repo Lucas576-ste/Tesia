@@ -88,6 +88,13 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-19 | Worker no Railway com Dockerfile próprio; Vercel Pro só antes do 1º cliente; sem domínio por enquanto (`.vercel.app`) | Decisão de Lucas no Dia 32 |
 | 2026-11-19 | Landing com capturas reais de uma conta de demonstração fictícia, em `apps/web/public/telas` | Substitui as mini telas feitas em código |
 | 2026-11-19 | Fundador ativado por script (`ativar-fundador.sql`): plano `fundador`, status `ativa`, 15 dias, 50 peças | O teste grátis padrão só dá 5 peças; a cobrança ainda não existe |
+| 2026-11-19 | Novo visual: paleta Dourado + Plus Jakarta Sans no app e na landing, com animações leves que respeitam "reduzir movimento" | Briefing da landing com análise competitiva; Lucas pediu um dourado forte e mais vida na página |
+| 2026-11-19 | Landing com objetivo único: teste grátis (`/cadastro`); fundador vira oferta secundária | Princípio do briefing: um só objetivo de conversão |
+| 2026-11-19 | Monitoramento de intimações começa pela API pública do DJEN (`comunicaapi.pje.jus.br`), grátis, por OAB; provedor pago com webhook só se faltar cobertura | A API não tem documentação oficial e limita a 20 chamadas por janela; o cliente fica isolado e avisa o Sentry se o formato mudar |
+| 2026-11-19 | Acompanhamento por cliente: menu "Clientes", cada cliente com os seus processos e a fase de cada um; fase e cliente vêm das intimações (e do DJEN), e a correção manual tem prioridade | Pedido de Lucas: acompanhar o processo de cada cliente até o fim, de forma intuitiva |
+| 2026-11-19 | Menu com 5 itens (Painel, Intimações, Clientes, Peças, Meu estilo) + Configurações; Processos dentro de Clientes; Indicar no rodapé | Tirar repetições (Nova intimação e + Adicionar; Processos e Clientes) e seguir o caminho intimação → prazo → peça → cliente |
+| 2026-11-19 | MVP com 8 áreas (inclui criminal, tributário, empresarial e bancário, administrativo e servidor público) e agravo de instrumento em todas; regras novas "em validação" | Decisão de Lucas; o advogado sempre confirma o prazo |
+| 2026-11-19 | Status "Vencido" e uma única regra de urgência para cards, quadro, lista e alertas do painel; o quadro passa a ser por urgência e "Rascunho pronto" vira selo | Os números precisam bater, e prazo passado aparecia como "vence hoje" |
 
 ## Pendências
 
@@ -121,3 +128,6 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Conferir os termos da Anthropic e da Voyage sobre treino com dados e tirar o [CONFIRMAR] da privacidade | Lucas | Antes de divulgar |
 | Assinar o Railway Hobby (US$ 5/mês) e subir o worker; até lá, o worker roda na máquina do Lucas | Lucas | Dia 34, antes do 1º cliente |
 | Confirmar com o advogado parceiro se o TJDFT suspende prazos em 08/12 (Dia da Justiça); o banco só tem para TRF1 e TRT10 | Lucas | Antes do Dia 34 |
+| Trocar os números e depoimentos de exemplo (`content/proof.ts`) pelos reais, com autorização dos advogados | Lucas | Depois dos primeiros fundadores |
+| Validar com o advogado parceiro as fases de cada rito e os nomes usados no dia a dia (`packages/shared/src/fases.ts`) | Lucas | Antes de divulgar |
+| Validar com advogados as regras de prazo das áreas novas (criminal, tributário, empresarial, administrativo) | Lucas | Antes de divulgar essas áreas |

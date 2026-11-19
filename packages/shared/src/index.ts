@@ -18,3 +18,22 @@ export {
   type NoDocumento,
   type SecaoDocumento,
 } from "./documento";
+export {
+  ETAPAS,
+  etapaDaFase,
+  faseDoAto,
+  faseDoProcesso,
+  fasesDoRito,
+  normalizarNome,
+  type CodigoEtapa,
+  type Fase,
+} from "./fases";
+export {
+  contarUrgencias,
+  LIMITE_DIAS_URGENTES,
+  pesoUrgencia,
+  textoUrgencia,
+  urgencia,
+  type EntradaUrgencia,
+  type NivelUrgencia,
+} from "./urgencia";

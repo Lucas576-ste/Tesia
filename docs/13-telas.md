@@ -4,6 +4,24 @@ Este documento lista todas as telas do produto, a rota de cada uma, a fase em qu
 
 Protótipo visual das telas principais: canvas "Protótipo Agente Jurídico" (Meu estilo, Painel de prazos, Nova intimação, Rascunho da peça, Conteúdo).
 
+
+## Painel e menu (revisados em 2026-11-19)
+
+- **Urgência única** (`packages/shared/src/urgencia.ts`): Vencido ("Venceu há X dias"), Vence hoje, Até 3 dias úteis e Mais de 3 dias. A mesma regra alimenta os cards, as colunas do quadro, a lista e o bloco "Atenção agora", para os números sempre baterem. Data passada nunca aparece como "vence em".
+- **Painel (`/app`):** bloco "Atenção agora" (até 3 itens, com ação direta); cards clicáveis Vencidos, Vencem em até 3 dias, Rascunhos para revisar e Intimações novas; quadro com Vencidos, Vence hoje, Próximos 3 dias, Mais de 3 dias e Protocolado ("Rascunho pronto" virou selo no card); filtros em chips; conteúdo alinhado ao menu, até 1280px.
+- **Prazos (`/app/prazos`):** a lista completa, com os mesmos cards, chips e quadro, sem o "Atenção agora".
+- **Topo:** botão "Nova intimação" (com ⌄ para prazo manual, processo e cliente); o uso de peças foi para o rodapé do menu.
+- **Menu:** Painel, Intimações (badge), Prazos, Peças (badge), Clientes, Meu estilo; embaixo, Configurações e Indicar a Tesia; card "Peças: X de Y" com o plano; perfil com menu (Configurações, Plano e uso, Sair); botão para recolher, salvo no navegador.
+
+## Menu do app (reorganizado em 2026-11-19)
+
+Segue o caminho do advogado: a intimação chega, vira prazo, vira peça, e tudo fica no processo do cliente.
+
+- **Principais (iguais no computador e no menu de baixo do celular):** Painel · Intimações · Clientes · Peças · Meu estilo.
+- **Embaixo:** Configurações. **Rodapé da conta:** Indicar a Tesia.
+- "Nova intimação" saiu do menu: fica no botão "Enviar intimação" de Intimações e no "+ Adicionar" do topo.
+- "Processos" virou a aba "Todos os processos" de Clientes; `/app/processos` redireciona para lá, e o detalhe continua em `/app/processos/:id`.
+
 ## Resumo
 
 | Fase | Quantidade de telas |
@@ -264,8 +282,8 @@ Abas:
 | Tela | Rota | Conteúdo |
 |---|---|---|
 | Agenda | `/app/agenda` | Calendário com prazos internos, prazos fatais e audiências dentro da Tesia, com filtro por área |
-| Clientes | `/app/clientes` | Lista de clientes |
-| Detalhe do cliente | `/app/clientes/:id` | Dados, processos (com tribunal, sistema e fase) e honorários |
+| Clientes (**feito em 2026-11-19**) | `/app/clientes` | Abas "Por cliente" (cada cliente com os seus processos e a fase de cada um) e "Por fase" (quadro com Início, Defesa e instrução, Sentença, Recurso, Cumprimento e Encerrado); aviso de processos sem cliente; novo cliente |
+| Detalhe do cliente (**feito em 2026-11-19**) | `/app/clientes/:id` | Dados editáveis, processos em andamento e encerrados com a barra de fases, juntar cadastros duplicados. Honorários ficam para depois |
 | Biblioteca de teses | `/app/teses` | Argumentações salvas, por área e assunto, para reaproveitar |
 
 ## Fase 3 (avançado)

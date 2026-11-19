@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import { CardIndicador } from "@/components/card-indicador";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { advogadoExemplo } from "@/components/layout/dados-exemplo";
-import { FaixaAlertaPrazo } from "@/components/layout/faixa-alerta-prazo";
-import { BalaoLia } from "@/components/lia/balao-lia";
 import { usePlano } from "@/components/plano/provedor-plano";
 import { TabelaPrazos } from "@/components/tabela-prazos";
 import { Button } from "@/components/ui/button";
@@ -23,14 +21,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { filtrarPrazos, type FiltroPrazos } from "@/lib/filtros-prazos";
-import { contarIndicadores, ordenarPrazos, prazoCritico, type LinhaPrazo } from "@/lib/prazo";
+import {
+  FILTRO_PADRAO,
+  filtrarPrazos,
+  filtroParaUrl,
+  type FiltroPrazos,
+} from "@/lib/filtros-prazos";
+import { ordenarPrazos, type LinhaPrazo } from "@/lib/prazo";
+import { contagemDosPrazos } from "@/lib/urgencia";
 import { alterarPrazoInterno, concluirPrazo, criarPrazoManual } from "@/app/app/acoes-prazos";
 import type { PrazoManual, ProcessoResumo } from "@/lib/prazo-manual";
 import { etapasExemplo } from "@/lib/planos-exemplo";
 import { assumirEtapas, etapasPadrao, proximaEtapa, ROTULOS_ETAPA } from "@/lib/etapas-prazo";
 import { AlternarVisao } from "./alternar-visao";
-import { FiltrosPrazos } from "./filtros-prazos";
+import { AtencaoAgora, montarAtencao } from "./atencao-agora";
+import { ChipsFiltros } from "./chips-filtros";
 import { MenuAcoesPrazo } from "./menu-acoes-prazo";
 import { ModalPrazoInterno } from "./modal-prazo-interno";
 import { ModalPrazoManual } from "./modal-prazo-manual";
@@ -46,6 +51,7 @@ type PainelPrazosProps = {
   novoPrazo: boolean;
   urlSemNovo: string;
   intimacoes: { total: number; pendentes: number };
+  modo?: "painel" | "prazos";
 };
 
 const FILTROS_EQUIPE = {
@@ -57,32 +63,6 @@ const FILTROS_EQUIPE = {
 
 type FiltroEquipe = keyof typeof FILTROS_EQUIPE;
 
-function AvisoPendentes({ quantidade }: { quantidade: number }) {
-  const texto =
-    quantidade === 1
-      ? "1 intimação aguardando sua confirmação"
-      : `${quantidade} intimações aguardando sua confirmação`;
-  return (
-    <div
-      role="status"
-      className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-atencao-fundo p-4 text-sm text-atencao"
-    >
-      <span className="flex items-center gap-2 font-medium">
-        <Clock aria-hidden className="size-4 shrink-0" />
-        {texto}
-      </span>
-      <Button asChild size="sm" variant="outline">
-        <Link href="/app/intimacoes?filtro=aguardando">Conferir agora</Link>
-      </Button>
-    </div>
-  );
-}
-
-function resumoAbertos(quantidade: number) {
-  if (quantidade === 0) return "Nenhum prazo em aberto";
-  return quantidade === 1 ? "1 prazo em aberto" : `${quantidade} prazos em aberto`;
-}
-
 export function PainelPrazos({
   nome,
   prazosIniciais,
@@ -92,7 +72,9 @@ export function PainelPrazos({
   novoPrazo,
   urlSemNovo,
   intimacoes,
+  modo = "painel",
 }: PainelPrazosProps) {
+  const base = modo === "painel" ? "/app" : "/app/prazos";
   const router = useRouter();
   const [visaoSalva, trocarVisao] = useVisaoPainel();
   const { plano } = usePlano();
@@ -103,8 +85,6 @@ export function PainelPrazos({
   const [aConfirmar, setAConfirmar] = useState<LinhaPrazo | null>(null);
   const [aEditarInterno, setAEditarInterno] = useState<LinhaPrazo | null>(null);
 
-  const indicadores = contarIndicadores(prazos);
-  const critico = prazoCritico(prazos);
   const eu = advogadoExemplo.nome;
 
   function etapasDoPrazo(id: string) {
@@ -215,44 +195,55 @@ export function PainelPrazos({
     });
   }
 
-  let fala = "Nenhum prazo vence nos próximos 3 dias úteis.";
-  if (critico) fala = `Comece por ${critico.peca} · ${critico.partes}, que vence ${critico.prazo}.`;
-  if (prazos.length === 0) fala = "Assim que você enviar uma intimação, eu cuido do resto.";
-  if (prazos.length === 0 && intimacoes.pendentes > 0)
-    fala = "Já li suas intimações. Confira e confirme os prazos para eles aparecerem aqui.";
+  const contagem = contagemDosPrazos(prazos);
+  const atencao = montarAtencao(prazos, intimacoes.pendentes);
+  const comFiltro = (parcial: Partial<FiltroPrazos>) =>
+    filtroParaUrl({ ...FILTRO_PADRAO, ...parcial }, base);
 
   return (
     <div className="flex flex-col gap-5">
-      {critico && (
-        <div className="-mx-4 -mt-4 md:-mx-6">
-          <FaixaAlertaPrazo {...critico} />
-        </div>
-      )}
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <div className="flex flex-col gap-3">
-          <h1 className="text-3xl font-semibold text-titulo">Olá, {nome}</h1>
-          <p className="text-texto-secundario">{resumoAbertos(indicadores.abertos)}</p>
-          <BalaoLia className="text-sm">{fala}</BalaoLia>
-        </div>
-        {intimacoes.pendentes > 0 && <AvisoPendentes quantidade={intimacoes.pendentes} />}
-        <div className="grid gap-3 sm:grid-cols-3">
+      <div className="flex w-full max-w-[1280px] flex-col gap-5">
+        <header className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold text-titulo">
+            {modo === "painel" ? `Olá, ${nome}` : "Prazos"}
+          </h1>
+          {modo === "prazos" && (
+            <p className="text-sm text-texto-secundario">
+              Todos os prazos, audiências e compromissos confirmados, do mais urgente ao mais
+              distante.
+            </p>
+          )}
+        </header>
+        {modo === "painel" && <AtencaoAgora itens={atencao} />}
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <CardIndicador
+            tipo="vencido"
+            rotulo="Vencidos"
+            valor={contagem.vencido}
+            href={filtro.urgencia === "vencido" ? base : comFiltro({ urgencia: "vencido" })}
+            ativo={filtro.urgencia === "vencido"}
+          />
           <CardIndicador
             tipo="vencimento"
             rotulo="Vencem em até 3 dias"
-            valor={indicadores.vencendo}
-            href="/app?periodo=3-dias"
+            valor={contagem.ate3ComHoje}
+            href={filtro.urgencia === "3-dias" ? base : comFiltro({ urgencia: "3-dias" })}
+            ativo={filtro.urgencia === "3-dias"}
           />
           <CardIndicador
             tipo="rascunho"
             rotulo="Rascunhos para revisar"
-            valor={indicadores.rascunhos}
-            href="/app?status=rascunho_pronto"
+            valor={contagem.rascunhos}
+            href={
+              filtro.status === "rascunho_pronto" ? base : comFiltro({ status: "rascunho_pronto" })
+            }
+            ativo={filtro.status === "rascunho_pronto"}
           />
           <CardIndicador
-            tipo="protocolado"
-            rotulo="Protocolados no mês"
-            valor={indicadores.protocolados}
-            href="/app?status=protocolado"
+            tipo="intimacao"
+            rotulo="Intimações novas"
+            valor={intimacoes.pendentes}
+            href="/app/intimacoes?filtro=aguardando"
           />
         </div>
         {prazos.length === 0 && intimacoes.total > 0 ? (
@@ -271,14 +262,14 @@ export function PainelPrazos({
             descricao="Os prazos aparecem aqui depois que você envia e confirma a intimação."
             acao={
               <Button asChild>
-                <Link href="/app/intimacoes/nova">Nova intimação</Link>
+                <Link href="/app/intimacoes/nova">Enviar intimação</Link>
               </Button>
             }
           />
         ) : (
           <>
             <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                 <AlternarVisao
                   visao={visao}
                   aoTrocar={trocarVisao}
@@ -303,8 +294,8 @@ export function PainelPrazos({
                     ))}
                   </div>
                 )}
+                <ChipsFiltros filtro={filtro} base={base} />
               </div>
-              <FiltrosPrazos filtro={filtro} />
             </div>
             {visiveis.length === 0 ? (
               <EstadoVazio
@@ -312,7 +303,7 @@ export function PainelPrazos({
                 descricao="Troque os filtros para ver outros prazos."
                 acao={
                   <Button asChild variant="outline">
-                    <Link href="/app">Limpar filtros</Link>
+                    <Link href={base}>Limpar filtros</Link>
                   </Button>
                 }
               />

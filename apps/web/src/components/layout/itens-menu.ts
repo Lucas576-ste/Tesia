@@ -1,12 +1,12 @@
 import {
-  FilePlus2,
+  CalendarClock,
   FileText,
-  FolderOpen,
-  Inbox,
   Gift,
+  Inbox,
   LayoutDashboard,
   PenLine,
   Settings,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -15,20 +15,42 @@ export type ItemMenu = {
   rotuloCurto: string;
   href: string;
   icone: LucideIcon;
+  tambem?: string[];
+  contador?: "intimacoes" | "rascunhos";
+  foraDoCelular?: boolean;
 };
 
 export const itensMenu: ItemMenu[] = [
   { rotulo: "Painel", rotuloCurto: "Painel", href: "/app", icone: LayoutDashboard },
   {
-    rotulo: "Nova intimação",
-    rotuloCurto: "Nova",
-    href: "/app/intimacoes/nova",
-    icone: FilePlus2,
+    rotulo: "Intimações",
+    rotuloCurto: "Intimações",
+    href: "/app/intimacoes",
+    icone: Inbox,
+    contador: "intimacoes",
   },
-  { rotulo: "Intimações", rotuloCurto: "Intimações", href: "/app/intimacoes", icone: Inbox },
-  { rotulo: "Processos", rotuloCurto: "Processos", href: "/app/processos", icone: FolderOpen },
-  { rotulo: "Peças", rotuloCurto: "Peças", href: "/app/pecas", icone: FileText },
-  { rotulo: "Meu estilo", rotuloCurto: "Estilo", href: "/app/estilo", icone: PenLine },
+  { rotulo: "Prazos", rotuloCurto: "Prazos", href: "/app/prazos", icone: CalendarClock },
+  {
+    rotulo: "Peças",
+    rotuloCurto: "Peças",
+    href: "/app/pecas",
+    icone: FileText,
+    contador: "rascunhos",
+  },
+  {
+    rotulo: "Clientes",
+    rotuloCurto: "Clientes",
+    href: "/app/clientes",
+    icone: Users,
+    tambem: ["/app/processos"],
+  },
+  {
+    rotulo: "Meu estilo",
+    rotuloCurto: "Estilo",
+    href: "/app/estilo",
+    icone: PenLine,
+    foraDoCelular: true,
+  },
 ];
 
 export const itemIndicar: ItemMenu = {
@@ -38,11 +60,6 @@ export const itemIndicar: ItemMenu = {
   icone: Gift,
 };
 
-function corresponde(href: string, caminho: string) {
-  if (href === "/app") return caminho === href;
-  return caminho === href || caminho.startsWith(`${href}/`);
-}
-
 export const itemConfiguracoes: ItemMenu = {
   rotulo: "Configurações",
   rotuloCurto: "Config.",
@@ -50,9 +67,12 @@ export const itemConfiguracoes: ItemMenu = {
   icone: Settings,
 };
 
+function corresponde(href: string, caminho: string) {
+  if (href === "/app") return caminho === href;
+  return caminho === href || caminho.startsWith(`${href}/`);
+}
+
 export function itemEstaAtivo(href: string, caminho: string) {
-  if (!corresponde(href, caminho)) return false;
-  return !itensMenu.some(
-    (item) => item.href.length > href.length && corresponde(item.href, caminho),
-  );
+  const item = [...itensMenu, itemIndicar, itemConfiguracoes].find((atual) => atual.href === href);
+  return [href, ...(item?.tambem ?? [])].some((alvo) => corresponde(alvo, caminho));
 }
