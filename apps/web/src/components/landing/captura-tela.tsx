@@ -25,7 +25,7 @@ export function CapturaTela({
   const { largura, altura, alt } = TELAS[tela];
   return (
     <Image
-      src={`/telas/${tela}.webp`}
+      src={`/telas/${tela}-v2.webp`}
       width={largura}
       height={altura}
       alt={alt}

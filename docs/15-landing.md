@@ -293,10 +293,13 @@ Sim. Você cancela quando quiser e pode exportar todas as peças e prazos.
 ## Visual
 
 - **Ritmo das seções:** claro (1) → escuro (2–3) → claro (4) → branco (5) → claro (6–7) → escuro com dourado (8) → claro (9–10) → escuro (11).
-- **Cores:** as do produto. Dourado `#E9C46A` só em destaques (selo "Mais escolhido", detalhes da seção 8, sublinhados).
-- **Tipografia:** títulos em Source Serif 4, grandes; texto em Inter.
-- **Imagens:** capturas reais das telas em moldura de navegador. Até as telas ficarem prontas, usar blocos cinza com a legenda da imagem.
-- **Movimento:** entrada suave das seções ao rolar e a animação do hero. Nada de gradientes coloridos, brilhos ou efeitos chamativos.
+- **Design system (2026-11-19):** paleta Dourado e Plus Jakarta Sans em toda a Tesia. Fundo creme `#FAF7F0`, tinta `#1C1A15`, links em dourado escuro `#845F07`, botões principais com degradê dourado (`--dourado`) e texto escuro. Contraste AA conferido nos temas claro e escuro.
+- **Tipografia:** Plus Jakarta Sans nos títulos e no texto. A folha da peça no editor fica em Times, igual ao .docx.
+- **Imagens:** capturas reais de uma conta fictícia em `apps/web/public/telas/*-v2.webp`, em moldura de navegador.
+- **Movimento:** brilho dourado lento no hero, pauta discreta nas seções claras, halo que segue o mouse nas escuras, cards entrando em sequência, números contando, capturas com inclinação 3D e parallax, linha do tempo no "Como funciona", conta do prazo se montando e reflexo no botão principal. Tudo para com "reduzir movimento".
+- **Conversão:** objetivo único, "Começar teste grátis" (`/cadastro`), com "7 dias grátis · sem cartão · sem taxa de ativação". A seção Fundador continua como oferta especial.
+- **Prova social:** números e depoimentos em `apps/web/src/content/proof.ts`. Com `isExample: true`, aparecem com o selo "exemplo" no desenvolvimento e ficam escondidos em produção.
+- **Ordem:** Hero → números → Dor → Custo → Lia → Como funciona → Tesia x IA genérica → Diferenciais → Depoimentos → Segurança → Áreas → Preços e redução de risco → Fundador → Perguntas → CTA final.
 - **Bibliotecas:** shadcn/ui (accordion, tabs, card, form), motion (Framer Motion), lucide-react, react-hook-form + zod no formulário.
 
 ## Medição
@@ -337,3 +340,5 @@ Requisitos:
 - Contraste mínimo de 4.5:1 em todos os textos.
 Ao final, rode pnpm build e corrija os erros.
 ```
+
+- **Áreas (2026-11-19):** a seção "Para quem atua em" lista as 8 áreas, sem "em breve".

@@ -1,5 +1,6 @@
 export type EventoMedicao =
   | "cta_hero_click"
+  | "cta_teste_click"
   | "ver_como_funciona"
   | "scroll_50"
   | "scroll_90"

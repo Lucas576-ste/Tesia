@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Confirmar } from "./confirmar";
 import { CapturaTela } from "./captura-tela";
+import { LinhaPassos } from "./linha-passos";
 import { MolduraNavegador } from "./moldura-navegador";
 import { SecaoLanding } from "./secao-landing";
 
@@ -54,9 +55,13 @@ export function ComoFunciona() {
       id="como-funciona"
       titulo="Agora, você envia a intimação e a Lia faz o trabalho pesado."
     >
-      <ol className="flex flex-col gap-10">
+      <LinhaPassos>
         {passos.map(({ chave, titulo, texto, legenda, tela }, indice) => (
-          <li key={chave} className="grid items-center gap-5 md:grid-cols-2 md:gap-10">
+          <li key={chave} className="relative grid items-center gap-5 md:grid-cols-2 md:gap-16">
+            <span
+              aria-hidden
+              className="absolute top-1 -left-[25px] size-3.5 rounded-full border-2 border-fundo bg-primary md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2"
+            />
             <div className={cn("flex flex-col gap-2", indice % 2 === 1 && "md:order-2")}>
               <span className="text-sm font-semibold text-primaria tabular-nums">
                 Passo {indice + 1}
@@ -67,7 +72,7 @@ export function ComoFunciona() {
             <MolduraNavegador legenda={legenda}>{tela}</MolduraNavegador>
           </li>
         ))}
-      </ol>
+      </LinhaPassos>
     </SecaoLanding>
   );
 }

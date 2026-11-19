@@ -2,12 +2,15 @@ import { AnimacaoFluxo } from "./animacao-fluxo";
 import { BotaoRastreado } from "./botao-rastreado";
 import { ExemploPrazo } from "./exemplo-prazo";
 import { CapturaTela } from "./captura-tela";
+import { CTA_TESTE } from "./cta";
 import { MolduraNavegador } from "./moldura-navegador";
+import { FundoHero } from "./fundo-hero";
 
 export function Heroi() {
   return (
-    <section className="bg-fundo">
-      <div className="mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
+    <section className="relative overflow-hidden bg-fundo">
+      <FundoHero />
+      <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
         <div className="flex flex-col gap-5">
           <h1 className="text-4xl font-semibold text-titulo md:text-5xl">
             Da intimação à peça, no seu estilo.
@@ -19,12 +22,12 @@ export function Heroi() {
           </p>
           <div className="flex flex-wrap gap-2">
             <BotaoRastreado
-              href="#fundador"
+              href={CTA_TESTE.href}
               evento="cta_hero_click"
               size="lg"
-              className="w-full sm:w-auto"
+              className="reflexo-dourado w-full sm:w-auto"
             >
-              Quero ser cliente fundador
+              {CTA_TESTE.texto}
             </BotaoRastreado>
             <BotaoRastreado
               href="#como-funciona"
@@ -36,9 +39,7 @@ export function Heroi() {
               Ver como funciona
             </BotaoRastreado>
           </div>
-          <p className="text-sm text-texto-secundario">
-            6 vagas para advogados do DF, com 15 dias grátis. Sem cartão de crédito.
-          </p>
+          <p className="text-sm text-texto-secundario">{CTA_TESTE.apoio}</p>
         </div>
         <div className="flex flex-col gap-3 md:gap-0">
           <div className="flex justify-center pb-3">

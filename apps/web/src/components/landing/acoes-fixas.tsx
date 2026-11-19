@@ -1,10 +1,9 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { track } from "@/lib/medicao";
-import { cn } from "@/lib/utils";
+import { CTA_TESTE } from "./cta";
 
 export function WhatsappFlutuante() {
   const numero = process.env.NEXT_PUBLIC_WHATSAPP?.replace(/\D/g, "");
@@ -25,28 +24,12 @@ export function WhatsappFlutuante() {
 }
 
 export function CtaCelular() {
-  const [formularioVisivel, setFormularioVisivel] = useState(false);
-
-  useEffect(() => {
-    const formulario = document.getElementById("fundador");
-    if (!formulario) return;
-
-    const observador = new IntersectionObserver(([entrada]) => {
-      setFormularioVisivel(entrada?.isIntersecting ?? false);
-    });
-    observador.observe(formulario);
-    return () => observador.disconnect();
-  }, []);
-
   return (
-    <div
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t bg-card p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden",
-        formularioVisivel && "hidden",
-      )}
-    >
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-card p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
       <Button asChild className="w-full">
-        <a href="#fundador">Quero ser cliente fundador</a>
+        <a href={CTA_TESTE.href} onClick={() => track("cta_teste_click")}>
+          {CTA_TESTE.texto}
+        </a>
       </Button>
     </div>
   );

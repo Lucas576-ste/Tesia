@@ -5,6 +5,26 @@ import { SecaoLanding } from "./secao-landing";
 
 const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }[] = [
   {
+    pergunta: "O que é a Tesia?",
+    resposta:
+      "Um sistema para advogados que lê a intimação que você envia, resume o que aconteceu, calcula o prazo mostrando a conta e escreve o rascunho da peça no seu estilo. Você revisa, baixa em .docx com o seu timbrado e protocola.",
+  },
+  {
+    pergunta: "Para quem é?",
+    resposta:
+      "Para advogados que trabalham sozinhos ou em dupla e querem gastar menos tempo com prazo e rascunho. Hoje, o calendário de feriados cobre o Distrito Federal.",
+  },
+  {
+    pergunta: "Como funciona o teste grátis?",
+    resposta:
+      "Você cria a conta e usa por 7 dias com os recursos do plano Pro, com até 5 peças. Não pedimos cartão e não há cobrança automática no fim: se quiser continuar, escolhe um plano.",
+  },
+  {
+    pergunta: "Como funciona a assinatura?",
+    resposta:
+      "É mensal ou anual (com 2 meses grátis), sem taxa de ativação e sem fidelidade. Cada plano tem um limite de peças por mês; análises de intimação e prazos não têm limite. Você pode trocar de plano ou cancelar quando quiser.",
+  },
+  {
     pergunta: "Quem é a Lia?",
     resposta:
       "A Lia é a assistente de inteligência artificial da Tesia. Ela lê suas intimações, explica o prazo, escreve os rascunhos e avisa antes do vencimento. Ela não é uma pessoa e não decide por você.",

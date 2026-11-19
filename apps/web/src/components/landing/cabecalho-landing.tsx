@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SimboloTesia } from "@/components/layout/simbolo-tesia";
 import { SeletorTema } from "@/components/tema/seletor-tema";
 import { Button } from "@/components/ui/button";
+import { CTA_TESTE } from "./cta";
 
 const links = [
   { rotulo: "Como funciona", href: "/#como-funciona" },
@@ -31,8 +32,8 @@ export function CabecalhoLanding() {
         <Button asChild variant="ghost" size="sm">
           <Link href="/login">Entrar</Link>
         </Button>
-        <Button asChild size="sm" className="hidden md:inline-flex">
-          <Link href="/#fundador">Quero ser cliente fundador</Link>
+        <Button asChild size="sm" className="reflexo-dourado hidden md:inline-flex">
+          <Link href={CTA_TESTE.href}>{CTA_TESTE.texto}</Link>
         </Button>
       </div>
     </header>

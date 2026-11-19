@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Revelar } from "./revelar";
+import { HaloMouse } from "./halo-mouse";
 
 const fundos = {
   claro: "bg-fundo",
@@ -17,8 +18,13 @@ type SecaoLandingProps = {
 
 export function SecaoLanding({ id, fundo = "claro", titulo, children }: SecaoLandingProps) {
   return (
-    <section id={id} className={cn("scroll-mt-14", fundos[fundo])}>
-      <Revelar className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-12 md:py-16">
+    <section id={id} className={cn("relative scroll-mt-14 overflow-hidden", fundos[fundo])}>
+      {fundo === "escuro" ? (
+        <HaloMouse />
+      ) : (
+        <div aria-hidden className="textura-pauta pointer-events-none absolute inset-0" />
+      )}
+      <Revelar className="relative mx-auto flex max-w-5xl flex-col gap-6 px-4 py-12 md:py-16">
         {titulo && (
           <div className="flex flex-col gap-3">
             <h2

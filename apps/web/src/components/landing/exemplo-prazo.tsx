@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, type Variants } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const linhas = [
@@ -7,26 +10,55 @@ const linhas = [
   { rotulo: "Feriado no período", valor: "20/11/2026" },
 ];
 
+const lista: Variants = {
+  oculto: {},
+  visivel: { transition: { staggerChildren: 0.35, delayChildren: 0.4 } },
+};
+
+const linha: Variants = {
+  oculto: { opacity: 0, x: -12 },
+  visivel: { opacity: 1, x: 0, transition: { duration: 0.35 } },
+};
+
+const vencimento: Variants = {
+  oculto: { opacity: 0, x: -12 },
+  visivel: {
+    opacity: 1,
+    x: 0,
+    backgroundColor: ["rgb(227 179 65 / 0)", "rgb(227 179 65 / 0.45)", "rgb(227 179 65 / 0.15)"],
+    transition: { duration: 1.2 },
+  },
+};
+
 export function ExemploPrazo() {
   return (
-    <Card className="gap-3">
+    <Card className="gap-3 shadow-lg shadow-black/5">
       <CardHeader>
         <CardDescription>Exemplo ilustrativo</CardDescription>
         <CardTitle className="text-lg">A conta do prazo, explicada</CardTitle>
       </CardHeader>
       <CardContent>
-        <dl className="flex flex-col gap-2 text-sm">
+        <motion.dl
+          className="flex flex-col gap-2 text-sm"
+          variants={lista}
+          initial="oculto"
+          whileInView="visivel"
+          viewport={{ once: true, amount: 0.6 }}
+        >
           {linhas.map(({ rotulo, valor }) => (
-            <div key={rotulo} className="flex justify-between gap-4">
+            <motion.div key={rotulo} variants={linha} className="flex justify-between gap-4">
               <dt className="text-texto-secundario">{rotulo}</dt>
               <dd className="tabular-nums">{valor}</dd>
-            </div>
+            </motion.div>
           ))}
-          <div className="flex justify-between gap-4 border-t pt-2 font-medium">
+          <motion.div
+            variants={vencimento}
+            className="-mx-2 flex justify-between gap-4 rounded-md border-t px-2 pt-2 pb-1 font-semibold"
+          >
             <dt>Vencimento</dt>
-            <dd className="tabular-nums">25/11/2026</dd>
-          </div>
-        </dl>
+            <dd className="tabular-nums text-primaria">25/11/2026</dd>
+          </motion.div>
+        </motion.dl>
       </CardContent>
     </Card>
   );

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/medicao";
 import { cn } from "@/lib/utils";
+import { CTA_TESTE } from "./cta";
 
 type Plano = {
   nome: string;
@@ -47,7 +48,7 @@ const planos: Plano[] = [
       "Rascunho no seu estilo, com pendências destacadas",
       ".docx com o seu timbrado",
     ],
-    botao: "Começar",
+    botao: "Começar teste grátis",
   },
   {
     nome: "Pro",
@@ -64,7 +65,7 @@ const planos: Plano[] = [
       "Ajustes do rascunho pela Lia",
     ],
     chegando: recursosChegando,
-    botao: "Começar",
+    botao: "Começar teste grátis",
     destaque: true,
   },
   {
@@ -129,7 +130,9 @@ function GradePlanos({ periodo }: { periodo: Periodo }) {
             <div className="flex flex-wrap items-center gap-2">
               <CardTitle className="text-xl">{plano.nome}</CardTitle>
               {plano.destaque && (
-                <Badge className="border-transparent bg-destaque text-menu">Recomendado</Badge>
+                <Badge className="brilho-selo border-transparent bg-destaque text-menu">
+                  Mais escolhido
+                </Badge>
               )}
               {plano.emBreve && <Badge variant="secondary">Em breve</Badge>}
             </div>
@@ -140,7 +143,7 @@ function GradePlanos({ periodo }: { periodo: Periodo }) {
             <ListaRecursos inclui={plano.inclui} itens={plano.itens} chegando={plano.chegando} />
             {plano.botao ? (
               <Button asChild variant={plano.destaque ? "default" : "outline"} className="w-full">
-                <a href="#fundador">{plano.botao}</a>
+                <a href={plano.emBreve ? "#fundador" : CTA_TESTE.href}>{plano.botao}</a>
               </Button>
             ) : (
               <Button disabled variant="outline" className="w-full">

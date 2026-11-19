@@ -1,4 +1,5 @@
 import { SecaoLanding } from "./secao-landing";
+import { RevelarItem, RevelarLista } from "./revelar";
 
 const cards = [
   {
@@ -28,14 +29,14 @@ export function Dor() {
       fundo="escuro"
       titulo="Você estudou Direito para advogar, não para contar dias no calendário."
     >
-      <ul className="grid gap-3 sm:grid-cols-2">
+      <RevelarLista className="grid gap-3 sm:grid-cols-2">
         {cards.map(({ titulo, texto }) => (
-          <li key={titulo} className="rounded-xl bg-menu-ativo p-5">
+          <RevelarItem key={titulo} className="rounded-xl bg-menu-ativo p-5">
             <h3 className="text-lg font-semibold">{titulo}</h3>
             <p className="mt-1 text-sm text-menu-texto">{texto}</p>
-          </li>
+          </RevelarItem>
         ))}
-      </ul>
+      </RevelarLista>
     </SecaoLanding>
   );
 }

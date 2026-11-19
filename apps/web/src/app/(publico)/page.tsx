@@ -1,6 +1,9 @@
 import { CtaCelular, WhatsappFlutuante } from "@/components/landing/acoes-fixas";
 import { Areas } from "@/components/landing/areas";
 import { ComoFunciona } from "@/components/landing/como-funciona";
+import { ComparacaoIa } from "@/components/landing/comparacao-ia";
+import { Depoimentos } from "@/components/landing/depoimentos";
+import { ProvaSocial } from "@/components/landing/prova-social";
 import { ConhecaLia } from "@/components/landing/conheca-lia";
 import { CtaFinal } from "@/components/landing/cta-final";
 import { Custo } from "@/components/landing/custo";
@@ -18,15 +21,18 @@ export default function LandingPage() {
   return (
     <ProvedorMovimento>
       <Heroi />
+      <ProvaSocial />
       <Dor />
       <Custo />
       <ConhecaLia />
       <ComoFunciona />
+      <ComparacaoIa />
       <Diferenciais />
+      <Depoimentos />
       <Seguranca />
       <Areas />
-      <Fundador />
       <Precos />
+      <Fundador />
       <Perguntas />
       <CtaFinal />
       <WhatsappFlutuante />
