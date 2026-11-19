@@ -2,12 +2,12 @@
 
 import { toast } from "sonner";
 import { FormularioPerfil } from "@/components/onboarding/formulario-perfil";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { Card } from "@/components/ui/card";
 import { perfilContaExemplo } from "@/lib/conta-exemplo";
 
 export function AbaPerfil() {
-  const { maxAreas } = usePlanoDemo().plano;
+  const { maxAreas } = usePlano().plano;
   const areas = perfilContaExemplo.areas.slice(0, maxAreas ?? undefined);
 
   return (

@@ -23,7 +23,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PecaEditor } from "@/lib/peca";
 import { AvisoPro } from "@/components/plano/aviso-pro";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { BarraFormatacao } from "./barra-formatacao";
 import { ExtensaoPendencias, encontrarPendencias, type Pendencia } from "./extensao-pendencias";
 import { PainelAjuste } from "./painel-ajuste";
@@ -45,7 +45,7 @@ function falaLia(quantidade: number, protocolada: boolean) {
 }
 
 export function TelaEditor({ peca }: { peca: PecaEditor }) {
-  const { recursosPro } = usePlanoDemo().plano;
+  const { recursosPro } = usePlano().plano;
   const [aba, setAba] = useState("peca");
   const [pendencias, setPendencias] = useState<Pendencia[]>([]);
   const [protocolada, setProtocolada] = useState(peca.status === "protocolada");

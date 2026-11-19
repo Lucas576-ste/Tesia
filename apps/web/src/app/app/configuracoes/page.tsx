@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { BotaoSair } from "@/components/autenticacao/botao-sair";
+import { preferenciasAlertaSchema } from "@/lib/alertas";
 import { TelaConfiguracoes } from "@/components/configuracoes/tela-configuracoes";
 import { Badge } from "@/components/ui/badge";
 import { abaConfiguracoesSchema } from "@/lib/conta-exemplo";
@@ -32,6 +33,10 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
       <TelaConfiguracoes
         abaInicial={abaConfiguracoesSchema.parse(aba)}
         agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
+        alertas={preferenciasAlertaSchema.parse({
+          email: usuario.alerta_email,
+          dias: usuario.alerta_dias,
+        })}
         modelo={{
           escritorioId: usuario.escritorio_id,
           usuarioId: usuario.id,

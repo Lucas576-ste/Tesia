@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { BalaoLia } from "@/components/lia/balao-lia";
 import { AvisoPro } from "@/components/plano/aviso-pro";
 import { ModalLimite } from "@/components/plano/modal-limite";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Analise } from "@/lib/analise";
@@ -30,7 +30,7 @@ export function TelaAnalise({ analise, uso }: { analise: Analise; uso: UsoPecas 
   const [destaque, setDestaque] = useState<string | null>(null);
   const [confirmado, setConfirmado] = useState(analise.confirmado);
   const router = useRouter();
-  const { plano } = usePlanoDemo();
+  const { plano } = usePlano();
   const [pecaEscolhida, setPecaEscolhida] = useState(analise.pecas[0]?.codigo);
   const [gerando, iniciar] = useTransition();
   const [limiteAberto, setLimiteAberto] = useState(false);

@@ -12,12 +12,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { planosEscolhaExemplo } from "@/lib/conta-exemplo";
-import type { IdPlanoDemo } from "@/lib/planos-exemplo";
+import type { IdPlano } from "@/lib/plano";
 
 type ModalEscolhaPlanoProps = {
   aberto: boolean;
   fimDoTeste: boolean;
-  planoAtual: IdPlanoDemo;
+  planoAtual: IdPlano;
   aoMudar: (aberto: boolean) => void;
 };
 

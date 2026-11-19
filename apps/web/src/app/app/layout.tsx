@@ -4,31 +4,30 @@ import { AjudaFlutuante } from "@/components/layout/ajuda-flutuante";
 import { BarraSuperior } from "@/components/layout/barra-superior";
 import { MenuInferior } from "@/components/layout/menu-inferior";
 import { MenuLateral } from "@/components/layout/menu-lateral";
-import { SeletorPlanoDemo } from "@/components/layout/seletor-plano-demo";
-import { ProvedorPlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { AvisoLimite } from "@/components/plano/aviso-limite";
+import { ProvedorPlano } from "@/components/plano/provedor-plano";
 import { Toaster } from "@/components/ui/sonner";
-import { lerPlanoDemo } from "@/lib/plano-demo";
-import { mostrarSeletorPlano } from "@/lib/planos-exemplo";
+import { lerPlano } from "@/lib/plano-servidor";
 import { exigirUsuario, rotuloOab } from "@/lib/sessao";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const usuario = await exigirUsuario();
   if (!usuario.oab_numero) redirect("/onboarding/perfil");
-  const estado = await lerPlanoDemo();
+  const estado = await lerPlano();
 
   return (
-    <ProvedorPlanoDemo estado={estado}>
+    <ProvedorPlano estado={estado}>
       <div className="flex min-h-dvh">
         <MenuLateral conta={{ nome: usuario.nome, oab: rotuloOab(usuario) }} />
         <div className="flex min-w-0 flex-1 flex-col">
-          {mostrarSeletorPlano && <SeletorPlanoDemo />}
           <BarraSuperior uso={estado.uso} />
+          <AvisoLimite {...estado.uso} />
           <main className="flex-1 px-4 pt-4 pb-32 md:px-6 md:pb-16">{children}</main>
         </div>
         <MenuInferior />
         <AjudaFlutuante />
         <Toaster />
       </div>
-    </ProvedorPlanoDemo>
+    </ProvedorPlano>
   );
 }

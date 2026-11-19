@@ -78,6 +78,7 @@ Vencimento: 18/11/2026
 ### 6. Confirmação
 - O prazo nasce com status `sugerido`.
 - Só vira `confirmado` quando o advogado confirma. Só prazos confirmados geram alertas.
+- Alertas: um e-mail-resumo por dia, a partir das 7h de Brasília, nos momentos escolhidos (5 e 2 dias úteis antes, dia do interno, dia do fatal). Audiências e compromissos avisam só no dia.
 - O advogado pode editar a data. O sistema registra a data sugerida e a data final.
 
 ### 7. Prazo interno

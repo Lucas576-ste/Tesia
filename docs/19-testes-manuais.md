@@ -40,6 +40,12 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Painel → "Novo prazo": prazo, audiência com hora e compromisso aparecem no painel e na agenda
 - [ ] "Marcar como protocolado" tira o prazo dos abertos; "Desfazer" volta
 
+## Alertas e plano
+- [ ] Configurações → Alertas: mudar e salvar; recarregar mantém
+- [ ] E-mail de alerta chega com o prazo e o link "Abrir na Tesia"
+- [ ] Plano e uso mostra o plano e as peças do mês reais
+- [ ] Faixa amarela aos 80% e vermelha aos 100% das peças
+
 ## Análise
 - [ ] Partes, número do processo e órgão estão certos
 - [ ] O resumo ("O que aconteceu") está correto e sem invenção

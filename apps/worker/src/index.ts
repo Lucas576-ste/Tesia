@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { criarClienteIa } from "@tesia/ia";
 import pg from "pg";
 import { ambiente } from "./ambiente.js";
+import { enviarAlertas, horaBrasilia, hojeBrasilia } from "./alertas/enviar.js";
 import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from "./fila.js";
 import { analisarIntimacao } from "./tarefas/analisar-intimacao.js";
 import { ajustarPecaTarefa } from "./tarefas/ajustar-peca.js";
@@ -57,8 +58,23 @@ async function processar(job: Job) {
 
 async function laco() {
   let ultimaLimpeza = 0;
+  let ultimaConferenciaAlertas = 0;
+  let diaAlertas = "";
   while (ativo) {
     try {
+      if (Date.now() - ultimaConferenciaAlertas > 3_600_000 || ultimaConferenciaAlertas === 0) {
+        ultimaConferenciaAlertas = Date.now();
+        const hoje = hojeBrasilia();
+        if (hoje !== diaAlertas && horaBrasilia() >= ambiente.HORA_ALERTAS) {
+          await enviarAlertas(contexto.db, {
+            chaveResend: ambiente.RESEND_API_KEY,
+            remetente: ambiente.ALERTA_REMETENTE,
+            urlApp: ambiente.URL_APP,
+            registrar,
+          });
+          diaAlertas = hoje;
+        }
+      }
       if (Date.now() - ultimaLimpeza > 60_000) {
         const devolvidos = await devolverPresos(contexto.db);
         if (devolvidos > 0) registrar("jobs_devolvidos", { quantidade: devolvidos });

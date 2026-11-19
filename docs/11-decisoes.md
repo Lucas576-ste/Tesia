@@ -81,6 +81,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-12 | Regras de prazo ainda não revisadas são usadas no cálculo, com aviso na análise | Sem isso nenhum prazo seria calculado até a revisão; o advogado confirma toda data antes de ir ao painel |
 | 2026-11-12 | Painel e análise mostram só dados reais; os exemplos saíram | Conta nova vê o painel vazio com convite para enviar a primeira intimação |
 | 2026-11-11 | Worker roda com `tsx` também em produção, sem etapa de compilação, e checa tipos com resolução `Bundler` | Importa os pacotes `@tesia/*` direto do TypeScript, como o web; imports sem extensão funcionam no Next e no `tsx` |
+| 2026-11-18 | Alertas por e-mail via Resend com remetente `onboarding@resend.dev` até verificar um domínio | Sem domínio verificado, o Resend só entrega para o dono da conta; verificar o domínio antes do lançamento |
+| 2026-11-18 | Plano e uso lidos da assinatura real; saiu o seletor de plano de demonstração | Dia 30 |
 
 ## Pendências
 
@@ -107,3 +109,4 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Definir WhatsApp, e-mail de contato, CNPJ e razão social | Lucas | Antes de divulgar a landing |
 | Consultar o nome Lia no INPI junto com Tesia | Lucas | Antes do dia 32 |
 | Deixar a cobrança pelo Asaas pronta antes do fim dos 15 dias grátis do primeiro fundador | Lucas | Até 15 dias após o dia 34 |
+| Verificar um domínio no Resend e trocar `ALERTA_REMETENTE` | Lucas | Antes do lançamento |

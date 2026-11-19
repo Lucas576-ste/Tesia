@@ -3,7 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AvisoPro } from "@/components/plano/aviso-pro";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ABAS_CONFIGURACOES, type AbaConfiguracoes } from "@/lib/conta-exemplo";
@@ -13,6 +13,7 @@ import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
 import type { DadosModelo } from "@/components/modelo/envio-modelo";
+import type { PreferenciasAlerta } from "@/lib/alertas";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
 import { AbaSeguranca } from "./aba-seguranca";
@@ -20,9 +21,10 @@ import { AbaSeguranca } from "./aba-seguranca";
 function conteudosDasAbas(
   modelo: DadosModelo,
   agenda: DadosAgenda,
+  alertas: PreferenciasAlerta,
 ): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
   return {
-    alertas: <AbaAlertas />,
+    alertas: <AbaAlertas alertas={alertas} />,
     agenda: <AbaAgenda agenda={agenda} />,
     equipe: <AbaEquipe />,
     modelo: <AbaModelo modelo={modelo} />,
@@ -43,13 +45,15 @@ export function TelaConfiguracoes({
   abaInicial,
   modelo,
   agenda,
+  alertas,
 }: {
   abaInicial: AbaConfiguracoes;
   modelo: DadosModelo;
   agenda: DadosAgenda;
+  alertas: PreferenciasAlerta;
 }) {
-  const conteudos = conteudosDasAbas(modelo, agenda);
-  const { id, plano } = usePlanoDemo();
+  const conteudos = conteudosDasAbas(modelo, agenda, alertas);
+  const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);
   const aba = abas.includes(abaEscolhida) ? abaEscolhida : "perfil";

@@ -244,10 +244,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-18:** Processos e detalhe com dados reais (cadastro e edição, CNJ repetido recusado, linha do tempo com intimações, prazos e peças); prazo manual, audiência e compromisso gravados e no painel, no detalhe e na agenda iCal; editar prazo interno grava; "Marcar como protocolado/cumprido" conclui o prazo e a peça, com "Desfazer". Os alertas por e-mail ficam no Dia 30.
 
-### Dia 30 — Alertas e limites
+### Dia 30 — Alertas e limites ✅
 - Alertas de prazo por e-mail (job agendado diário), incluindo o aviso no dia do prazo interno
 - Limites por plano, aviso aos 80% e bloqueio aos 100%
 - Tela Plano e uso com o consumo real
+
+**Feito em 2026-11-18:** e-mail-resumo diário às 7h (5 e 2 dias úteis antes, dia do interno e do fatal), sem repetir; aba Alertas salva de verdade; plano e uso reais (teste grátis com 5 peças), faixa no topo aos 80% e aos 100%; o bloqueio aos 100% já existia. Remetente provisório do Resend até verificar um domínio.
 
 ### Dia 31 — Segurança
 - Rate limit, links de download temporários, Sentry em web e worker

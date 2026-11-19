@@ -10,7 +10,7 @@ import { EstadoVazio } from "@/components/estado-vazio";
 import { advogadoExemplo } from "@/components/layout/dados-exemplo";
 import { FaixaAlertaPrazo } from "@/components/layout/faixa-alerta-prazo";
 import { BalaoLia } from "@/components/lia/balao-lia";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { TabelaPrazos } from "@/components/tabela-prazos";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -95,7 +95,7 @@ export function PainelPrazos({
 }: PainelPrazosProps) {
   const router = useRouter();
   const [visaoSalva, trocarVisao] = useVisaoPainel();
-  const { plano } = usePlanoDemo();
+  const { plano } = usePlano();
   const visao = plano.recursosPro ? visaoSalva : "lista";
   const [filtroEquipe, setFiltroEquipe] = useState<FiltroEquipe>("todos");
   const [etapas, setEtapas] = useState(etapasExemplo);

@@ -3,7 +3,7 @@
 import { CalendarPlus, FilePlus2, FolderPlus, Plus } from "lucide-react";
 import Link from "next/link";
 import { SeloPro } from "@/components/plano/aviso-pro";
-import { usePlanoDemo } from "@/components/plano/provedor-plano-demo";
+import { usePlano } from "@/components/plano/provedor-plano";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,7 +19,7 @@ const opcoes = [
 ];
 
 export function MenuAdicionar() {
-  const { recursosPro } = usePlanoDemo().plano;
+  const { recursosPro } = usePlano().plano;
 
   return (
     <DropdownMenu modal={false}>
