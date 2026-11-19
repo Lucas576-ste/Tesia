@@ -37,6 +37,9 @@ insert into processos (id, escritorio_id, numero_cnj, area, rito) values
   ('00000000-0000-0000-0000-0000000000a3', current_setting('teste.esc_a')::uuid, '0000001-00.2026.8.07.0001', 'civel', 'jec'),
   ('00000000-0000-0000-0000-0000000000b3', current_setting('teste.esc_b')::uuid, '0000002-00.2026.8.07.0001', 'trabalhista', 'trabalhista');
 
+insert into clientes (escritorio_id, nome, tipo_pessoa, qualificacao, pix, observacoes) values
+  (current_setting('teste.esc_a')::uuid, 'Cliente de A', 'pf', '{"rg": "123"}', 'chave-a', 'nota de A');
+
 insert into feriados (data, nome, abrangencia, escritorio_id) values
   ('2026-12-01', 'Feriado só do escritório B', 'municipal', current_setting('teste.esc_b')::uuid);
 
@@ -212,6 +215,7 @@ begin
   assert (select count(*) from prazos) = 0, 'B não deveria ver prazos de A';
   assert (select count(*) from feriados where escritorio_id is not null) = 1, 'B deveria ver só o próprio feriado';
   assert (select parte_contraria from processos) is null, 'O processo de B não deveria ter sido alterado';
+  assert (select count(*) from clientes) = 0, 'B não deveria ver clientes, PIX nem qualificação de A';
   assert (select count(*) from estilo_documentos) = 0, 'B não deveria ver peças de estilo de A';
   assert (select count(*) from estilo_trechos) = 0, 'B não deveria ver trechos de A';
 end;

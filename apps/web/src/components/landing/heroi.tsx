@@ -1,28 +1,29 @@
 import { Check } from "lucide-react";
-import { AnimacaoFluxo } from "./animacao-fluxo";
+import { PainelEscuro } from "@/components/mockups/painel-escuro";
 import { BotaoRastreado } from "./botao-rastreado";
-import { ExemploPrazo } from "./exemplo-prazo";
-import { CapturaTela } from "./captura-tela";
 import { CTA_TESTE } from "./cta";
+import { ExemploPrazo } from "./exemplo-prazo";
+import { FundoCalendario } from "./fundo-calendario";
 import { MolduraNavegador } from "./moldura-navegador";
-import { FundoHero } from "./fundo-hero";
+
+const checks = ["Sem cartão de crédito", "Sem taxa de ativação", "Cancele quando quiser"];
 
 export function Heroi() {
   return (
     <section className="relative overflow-hidden bg-fundo">
-      <FundoHero />
-      <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:py-20">
-        <div className="flex flex-col gap-5">
+      <FundoCalendario />
+      <div className="relative mx-auto grid max-w-6xl items-stretch gap-10 px-4 py-12 md:grid-cols-[1.1fr_1fr] md:py-20">
+        <div className="flex min-w-0 flex-col gap-5">
           <span className="w-fit rounded-full bg-primaria-fundo px-3 py-1 text-sm font-semibold text-primaria">
-            11 dias grátis · sem cartão
+            Com IA · 11 dias grátis
           </span>
-          <h1 className="text-4xl font-bold text-titulo md:text-5xl">
-            Intimações, prazos, peças e clientes. Tudo num só lugar, com IA.
+          <h1 className="max-w-[16ch] text-[clamp(2.25rem,3.4vw,3.25rem)] leading-[1.1] font-bold text-titulo">
+            Intimações, prazos, peças e clientes. Tudo num só lugar.
           </h1>
           <p className="text-lg text-texto-secundario">
-            A Lia, sua assistente, encontra suas intimações, calcula o prazo mostrando a conta e
-            escreve a peça no seu estilo. Seus clientes e processos ficam organizados do início ao
-            fim. Você revisa, confirma e protocola.
+            A Lia, sua assistente, lê suas intimações, calcula o prazo mostrando a conta e escreve a
+            peça no seu estilo. Seus clientes e processos ficam organizados do início ao fim. Você
+            revisa, confirma e protocola.
           </p>
           <div className="flex flex-wrap gap-2">
             <BotaoRastreado
@@ -43,26 +44,21 @@ export function Heroi() {
               Ver como funciona
             </BotaoRastreado>
           </div>
-          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-base font-medium">
-            {["Sem cartão de crédito", "Sem taxa de ativação", "Cancele quando quiser"].map(
-              (item) => (
-                <li key={item} className="flex items-center gap-1.5">
-                  <Check aria-hidden className="size-4 text-sucesso" />
-                  {item}
-                </li>
-              ),
-            )}
+          <ul className="flex flex-wrap gap-x-3 gap-y-1 font-medium text-base lg:flex-nowrap lg:text-[0.9375rem]">
+            {checks.map((item) => (
+              <li key={item} className="flex items-center gap-1.5 whitespace-nowrap">
+                <Check aria-hidden className="size-4 text-sucesso" />
+                {item}
+              </li>
+            ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-3 md:gap-0">
-          <div className="flex justify-center pb-3">
-            <AnimacaoFluxo />
-          </div>
-          <MolduraNavegador legenda="Tela real, com dados fictícios">
-            <CapturaTela tela="analise" prioridade />
+        <div className="relative flex min-w-0 flex-col gap-4 md:block">
+          <MolduraNavegador legenda="Exemplo com dados fictícios">
+            <PainelEscuro />
           </MolduraNavegador>
-          <div className="relative md:mt-3 md:ml-auto md:w-full lg:-mt-6 lg:w-72">
-            <ExemploPrazo />
+          <div className="md:absolute md:bottom-12 md:left-0 md:w-[60%] md:max-w-[17rem]">
+            <ExemploPrazo compacto />
           </div>
         </div>
       </div>

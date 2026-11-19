@@ -16,7 +16,7 @@ export default async function ClientesPage({ searchParams }: ClientesPageProps) 
     listarProcessos(),
   ]);
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <header className="flex flex-col gap-1">
         <h1 className="text-3xl font-semibold text-titulo">Clientes</h1>
         <p className="text-sm text-texto-secundario">

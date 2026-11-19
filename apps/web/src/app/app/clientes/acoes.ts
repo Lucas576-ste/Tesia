@@ -3,7 +3,13 @@
 import { fasesDoRito, normalizarNome } from "@tesia/shared";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { dadosClienteSchema, type DadosCliente } from "@/lib/cliente-tipos";
+import {
+  dadosClienteSchema,
+  extrasClienteSchema,
+  qualificacaoSchema,
+  type DadosCliente,
+  type ExtrasCliente,
+} from "@/lib/cliente-tipos";
 import { usuarioAtual } from "@/lib/sessao";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -17,6 +23,7 @@ function atualizar(clienteId?: string) {
 
 function colunas(dados: z.output<typeof dadosClienteSchema>) {
   return {
+    tipo_pessoa: dados.tipo_pessoa,
     nome: dados.nome,
     nome_normalizado: normalizarNome(dados.nome),
     documento: dados.documento || null,
@@ -55,6 +62,35 @@ export async function editarCliente(id: string, entrada: DadosCliente): Promise<
   if (error || !data?.length) return { erro: "Não foi possível salvar." };
   atualizar(id);
   return { ok: true };
+}
+
+async function atualizarCampos(id: string, campos: Record<string, unknown>): Promise<Resultado> {
+  const usuario = await usuarioAtual();
+  if (!usuario || !z.uuid().safeParse(id).success) return { erro: "Cliente não encontrado." };
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase.from("clientes").update(campos).eq("id", id).select("id");
+  if (error || !data?.length) return { erro: "Não foi possível salvar." };
+  atualizar(id);
+  return { ok: true };
+}
+
+export async function salvarQualificacao(id: string, entrada: unknown): Promise<Resultado> {
+  const dados = qualificacaoSchema.safeParse(entrada);
+  if (!dados.success) return { erro: dados.error.issues[0]?.message ?? "Dados inválidos." };
+  return atualizarCampos(id, { qualificacao: dados.data });
+}
+
+export async function salvarExtras(id: string, entrada: ExtrasCliente): Promise<Resultado> {
+  const dados = extrasClienteSchema.safeParse(entrada);
+  if (!dados.success) return { erro: dados.error.issues[0]?.message ?? "Dados inválidos." };
+  return atualizarCampos(id, {
+    pix: dados.data.pix || null,
+    observacoes: dados.data.observacoes || null,
+  });
+}
+
+export async function registrarContato(id: string): Promise<Resultado> {
+  return atualizarCampos(id, { ultimo_contato_em: new Date().toISOString() });
 }
 
 export async function juntarClientes(manterId: string, removerId: string): Promise<Resultado> {

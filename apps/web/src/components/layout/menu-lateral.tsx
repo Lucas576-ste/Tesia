@@ -3,7 +3,7 @@
 import { ChevronsLeft, ChevronsRight, CreditCard, LogOut, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { sair } from "@/app/(autenticacao)/acoes";
 import {
   DropdownMenu,
@@ -70,28 +70,36 @@ function LinkMenu({
   );
 }
 
+function assinarRecolhido(aoMudar: () => void) {
+  window.addEventListener(CHAVE_RECOLHIDO, aoMudar);
+  window.addEventListener("storage", aoMudar);
+  return () => {
+    window.removeEventListener(CHAVE_RECOLHIDO, aoMudar);
+    window.removeEventListener("storage", aoMudar);
+  };
+}
+
+function lerRecolhido() {
+  try {
+    return localStorage.getItem(CHAVE_RECOLHIDO) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function MenuLateral({ conta, contadores, uso }: MenuLateralProps) {
   const caminho = usePathname();
-  const [recolhido, setRecolhido] = useState(false);
+  const recolhido = useSyncExternalStore(assinarRecolhido, lerRecolhido, () => false);
   const percentual =
     uso.limite > 0 ? Math.min(100, Math.round((uso.usadas / uso.limite) * 100)) : 0;
 
-  useEffect(() => {
-    try {
-      if (localStorage.getItem(CHAVE_RECOLHIDO) === "1") setRecolhido(true);
-    } catch {
-      return;
-    }
-  }, []);
-
   function alternar() {
-    const novo = !recolhido;
-    setRecolhido(novo);
     try {
-      localStorage.setItem(CHAVE_RECOLHIDO, novo ? "1" : "0");
+      localStorage.setItem(CHAVE_RECOLHIDO, recolhido ? "0" : "1");
     } catch {
       return;
     }
+    window.dispatchEvent(new Event(CHAVE_RECOLHIDO));
   }
 
   return (

@@ -1,7 +1,9 @@
+import { tituloNome } from "@tesia/shared";
 import { CalendarClock, Hourglass } from "lucide-react";
 import Link from "next/link";
 import type { ProcessoAcompanhado } from "@/lib/clientes";
 import { BarraFases } from "./barra-fases";
+import { SeloFase } from "./selo-fase";
 
 export function CardProcesso({
   processo,
@@ -11,27 +13,32 @@ export function CardProcesso({
   mostrarCliente?: boolean;
 }) {
   return (
-    <Link
-      href={`/app/processos/${processo.id}`}
-      className="flex flex-col gap-2 rounded-xl border bg-card p-3 text-sm shadow-xs transition hover:border-primary hover:shadow-md focus-visible:border-primary focus-visible:outline-none"
-    >
+    <div className="relative flex flex-col gap-2 rounded-xl border bg-card p-3 text-sm shadow-card transition hover:border-primary">
       {mostrarCliente && (
         <span className="font-semibold text-titulo">
-          {processo.clienteNome ?? "Sem cliente definido"}
+          {processo.clienteNome ? tituloNome(processo.clienteNome) : "Sem cliente definido"}
         </span>
       )}
-      <span className={mostrarCliente ? "text-xs text-texto-secundario" : "font-medium"}>
-        {processo.partes}
-      </span>
-      <span className="text-xs text-texto-secundario tabular-nums">{processo.cnj}</span>
+      <Link
+        href={`/app/processos/${processo.id}`}
+        className={`outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-ring ${
+          mostrarCliente ? "text-xs text-texto-secundario" : "font-medium"
+        }`}
+      >
+        {processo.partes
+          .split(/\s+x\s+/i)
+          .map(tituloNome)
+          .join(" x ")}
+      </Link>
+      <span className="font-mono text-xs text-texto-secundario">{processo.cnj}</span>
       <BarraFases
         rito={processo.rito}
         fase={processo.fase}
         encerrado={processo.etapa === "encerrado"}
         compacta
       />
-      <span className="flex flex-col">
-        <span className="font-medium text-primaria">{processo.nomeFase}</span>
+      <span className="flex flex-col items-start gap-1">
+        <SeloFase processo={processo} />
         <span className="text-xs text-texto-secundario">{processo.origemFase}</span>
       </span>
       {processo.proximoPrazo && (
@@ -46,6 +53,6 @@ export function CardProcesso({
           Parado há {processo.diasParado} dias
         </span>
       )}
-    </Link>
+    </div>
   );
 }

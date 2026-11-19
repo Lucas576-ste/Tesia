@@ -16,6 +16,7 @@ export type EntradaGeracao = {
   textoIntimacao: string;
   pontosAtacar: { titulo: string; explicacao?: string }[];
   prazo: { vencimento: string; fundamento: string } | null;
+  qualificacaoCliente?: string | null;
 };
 
 export type ResultadoGeracao = {
@@ -83,8 +84,13 @@ export function montarPedidoGeracao(entrada: EntradaGeracao) {
     `<documento_do_caso>\n${entrada.textoIntimacao}\n</documento_do_caso>`,
     `<pontos_a_atacar>\n${pontos}\n</pontos_a_atacar>`,
     prazo,
+    entrada.qualificacaoCliente
+      ? `<qualificacao_cliente>\n${entrada.qualificacaoCliente}\n</qualificacao_cliente>`
+      : "",
     `Escreva agora a ${entrada.peca.nome} completa.`,
-  ].join("\n\n");
+  ]
+    .filter(Boolean)
+    .join("\n\n");
   return { sistema, conteudo };
 }
 

@@ -96,6 +96,11 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-19 | MVP com 8 áreas (inclui criminal, tributário, empresarial e bancário, administrativo e servidor público) e agravo de instrumento em todas; regras novas "em validação" | Decisão de Lucas; o advogado sempre confirma o prazo |
 | 2026-11-19 | Status "Vencido" e uma única regra de urgência para cards, quadro, lista e alertas do painel; o quadro passa a ser por urgência e "Rascunho pronto" vira selo | Os números precisam bater, e prazo passado aparecia como "vence hoje" |
 | 2026-11-19 | Teste grátis de 11 dias sem cartão; planos Individual (7 peças/dia, R$ 129) e Sócio (2 advogados, 15/dia, R$ 219), com pushes destacados; limite passa a ser diário | Decisão de Lucas sobre preços; landing reforça "tudo num só lugar" e o teste grátis |
+| 2026-11-19 | Cadastro de cliente em 2 etapas: rápido (PF/PJ, nome, CPF/CNPJ validado, WhatsApp, e-mail) e qualificação completa depois, na página do cliente | Pedido de advogado: vincular o processo sem travar; a qualificação (art. 319 do CPC) entra quando for gerar peça ou procuração |
+| 2026-11-19 | Qualificação em `clientes.qualificacao` (jsonb validado com zod), mais `tipo_pessoa`, `pix` e `observacoes` | Campos variam entre PF e PJ; evita dezenas de colunas. A Lia usa o texto montado por `textoQualificacao` no rascunho, e o que falta vira [CONFIRMAR] |
+| 2026-11-19 | Não guardar senha do Gov.br/INSS do cliente | É a senha da vida digital do cliente: risco alto pela LGPD e de responsabilidade se vazar, e o compartilhamento contraria os termos do Gov.br. Revisitar só com integração oficial |
+| 2026-11-19 | "Enviar atualização" ao cliente monta a mensagem sem IA, a partir do resumo da última intimação; "Copiar mensagem" grava `clientes.ultimo_contato_em` | Sem custo e instantâneo; o advogado revisa e envia. Versão com IA fica para a Fase 1.5 |
+| 2026-11-19 | Tema claro com fundo #F2F1EC, sombra de card em token (`--sombra-card`), texto dourado só em `--primaria` (#8A6510) e container único de 1280px no /app | Mais contraste e leitura; o tema escuro não mudou |
 
 ## Pendências
 

@@ -1,17 +1,15 @@
 "use client";
 
+import { Maximize2 } from "lucide-react";
 import { useState, type DragEvent, type ReactNode } from "react";
-import { SeloStatus } from "@/components/selo-status";
 import { SeloUrgencia } from "@/components/selo-urgencia";
-import {
-  DescricaoPrazo,
-  PrazoInterno,
-  TituloPrazo,
-  VencimentoPrazo,
-} from "@/components/tabela-prazos";
+import { VencimentoPrazo } from "@/components/tabela-prazos";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { nomeCurto } from "@/lib/nome-curto";
 import type { ColunaQuadro, LinhaPrazo } from "@/lib/prazo";
 import { nivelDoPrazo } from "@/lib/urgencia";
 import { cn } from "@/lib/utils";
+import { DetalhePrazo } from "./detalhe-prazo";
 
 const colunas: { id: ColunaQuadro; titulo: string }[] = [
   { id: "vencido", titulo: "Vencidos" },
@@ -21,54 +19,53 @@ const colunas: { id: ColunaQuadro; titulo: string }[] = [
   { id: "concluido", titulo: "Protocolado" },
 ];
 
+const LIMITE_CELULAR = 3;
+
 type QuadroPrazosProps = {
   prazos: LinhaPrazo[];
   acoes: (prazo: LinhaPrazo) => ReactNode;
   aoConcluir: (prazo: LinhaPrazo) => void;
 };
 
-function CartaoPrazo({ prazo, acoes }: Pick<QuadroPrazosProps, "acoes"> & { prazo: LinhaPrazo }) {
-  const { id, cnj, status, tipo } = prazo;
-  const arrastavel = status !== "protocolado";
-  const ehPrazo = !tipo || tipo === "prazo";
-
+function CartaoPrazo({
+  prazo,
+  aoAbrir,
+  className,
+}: {
+  prazo: LinhaPrazo;
+  aoAbrir: (prazo: LinhaPrazo) => void;
+  className?: string;
+}) {
+  const arrastavel = prazo.status !== "protocolado";
   return (
-    <li
-      draggable={arrastavel}
-      onDragStart={(evento) => evento.dataTransfer.setData("text/prazo", id)}
-      className={cn(
-        "relative flex flex-col gap-1.5 rounded-lg border bg-card p-3 pr-10 text-sm shadow-xs transition-colors hover:border-primary/60",
-        arrastavel && "md:cursor-grab",
-      )}
-    >
-      <TituloPrazo prazo={prazo} />
-      {cnj && <span className="font-mono text-[11px] text-texto-secundario">{cnj}</span>}
-      <span className="text-texto-secundario">
-        <DescricaoPrazo prazo={prazo} />
-      </span>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-base font-semibold">
+    <li className={className}>
+      <button
+        type="button"
+        draggable={arrastavel}
+        onDragStart={(evento) => evento.dataTransfer.setData("text/prazo", prazo.id)}
+        onClick={() => aoAbrir(prazo)}
+        className={cn(
+          "flex w-full flex-col gap-1 rounded-lg border bg-card p-2.5 text-left text-sm shadow-xs transition-colors hover:border-primary/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+          arrastavel && "md:cursor-grab",
+        )}
+      >
+        <span className="truncate font-medium" title={prazo.partes}>
+          {nomeCurto(prazo.partes)}
+        </span>
+        <span className="truncate text-xs text-texto-secundario">{prazo.peca}</span>
+        <span className="flex flex-wrap items-center gap-2 text-xs font-semibold">
           <VencimentoPrazo prazo={prazo} />
+          <SeloUrgencia prazo={prazo} />
         </span>
-        <SeloUrgencia prazo={prazo} />
-      </div>
-      {ehPrazo && prazo.prazoInterno && (
-        <span className="text-xs">
-          <PrazoInterno prazo={prazo} rotulo="Interno" />
-        </span>
-      )}
-      {status !== "nao_iniciado" && (
-        <div>
-          <SeloStatus status={status} manual={Boolean(tipo)} />
-        </div>
-      )}
-      <div className="absolute top-2 right-1 z-10">{acoes(prazo)}</div>
+      </button>
     </li>
   );
 }
 
 export function QuadroPrazos({ prazos, acoes, aoConcluir }: QuadroPrazosProps) {
   const [sobreProtocolado, setSobreProtocolado] = useState(false);
+  const [aberto, setAberto] = useState<LinhaPrazo | null>(null);
+  const [expandida, setExpandida] = useState<ColunaQuadro | null>(null);
 
   function aoSoltar(evento: DragEvent<HTMLElement>) {
     evento.preventDefault();
@@ -77,15 +74,24 @@ export function QuadroPrazos({ prazos, acoes, aoConcluir }: QuadroPrazosProps) {
     if (prazo && prazo.status !== "protocolado") aoConcluir(prazo);
   }
 
+  function abrir(prazo: LinhaPrazo) {
+    setExpandida(null);
+    setAberto(prazo);
+  }
+
+  const itensDe = (id: ColunaQuadro) => prazos.filter((prazo) => nivelDoPrazo(prazo) === id);
+  const colunaExpandida = colunas.find(({ id }) => id === expandida);
+
   return (
     <div className="flex flex-col gap-2">
       <p className="hidden text-xs text-texto-secundario md:block">
-        Arraste um cartão para Protocolado para concluir o prazo.
+        Clique num cartão para ver os detalhes. Arraste para Protocolado para concluir.
       </p>
-      <div className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {colunas.map(({ id, titulo }) => {
-          const itens = prazos.filter((prazo) => nivelDoPrazo(prazo) === id);
+          const itens = itensDe(id);
           const recebe = id === "concluido";
+          const alerta = id === "vencido" && itens.length > 0;
           return (
             <section
               key={id}
@@ -101,32 +107,80 @@ export function QuadroPrazos({ prazos, acoes, aoConcluir }: QuadroPrazosProps) {
               onDragLeave={recebe ? () => setSobreProtocolado(false) : undefined}
               onDrop={recebe ? aoSoltar : undefined}
               className={cn(
-                "flex min-w-0 flex-col gap-2 rounded-xl border bg-muted/40 p-2",
-                id === "vencido" && itens.length > 0 && "border-erro/40 bg-erro-fundo/40",
+                "flex min-w-0 flex-col self-start rounded-xl border bg-muted/40",
+                itens.length > 0 && "md:h-[28rem] md:self-stretch",
+                alerta && "border-erro/40 bg-erro-fundo/40",
                 recebe && sobreProtocolado && "border-primaria bg-primaria-fundo",
               )}
             >
-              <h2 className="flex items-center justify-between px-1 text-sm font-semibold">
-                <span className={cn(id === "vencido" && itens.length > 0 && "text-erro")}>
-                  {titulo}
-                </span>
-                <span className="rounded-full bg-card px-2 text-xs text-texto-secundario tabular-nums">
-                  {itens.length}
+              <h2 className="flex items-center justify-between gap-2 border-b px-3 py-2 text-xs font-semibold tracking-wide uppercase">
+                <span className={cn("truncate", alerta && "text-erro")}>{titulo}</span>
+                <span className="flex items-center gap-1">
+                  <span className="rounded-full bg-card px-2 text-texto-secundario tabular-nums">
+                    {itens.length}
+                  </span>
+                  {itens.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setExpandida(id)}
+                      aria-label={`Ver todos de ${titulo}`}
+                      className="rounded p-1 text-texto-secundario hover:bg-card hover:text-foreground"
+                    >
+                      <Maximize2 className="size-3.5" />
+                    </button>
+                  )}
                 </span>
               </h2>
               {itens.length === 0 ? (
-                <p className="px-1 pb-1 text-xs text-texto-secundario">Nenhum prazo aqui ✓</p>
+                <p className="p-3 text-xs text-texto-secundario">Nenhum prazo aqui ✓</p>
               ) : (
-                <ul className="flex flex-col gap-2">
-                  {itens.map((prazo) => (
-                    <CartaoPrazo key={prazo.id} prazo={prazo} acoes={acoes} />
+                <ul className="flex flex-1 flex-col gap-2 p-2 md:overflow-y-auto">
+                  {itens.map((prazo, indice) => (
+                    <CartaoPrazo
+                      key={prazo.id}
+                      prazo={prazo}
+                      aoAbrir={abrir}
+                      className={cn(indice >= LIMITE_CELULAR && "hidden md:block")}
+                    />
                   ))}
+                  {itens.length > LIMITE_CELULAR && (
+                    <li className="md:hidden">
+                      <button
+                        type="button"
+                        onClick={() => setExpandida(id)}
+                        className="w-full rounded-lg py-1.5 text-xs font-medium text-primaria hover:bg-card"
+                      >
+                        Ver todos ({itens.length})
+                      </button>
+                    </li>
+                  )}
                 </ul>
               )}
             </section>
           );
         })}
       </div>
+      <Dialog open={Boolean(expandida)} onOpenChange={(valor) => !valor && setExpandida(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {colunaExpandida?.titulo} ({expandida ? itensDe(expandida).length : 0})
+            </DialogTitle>
+          </DialogHeader>
+          <ul className="flex max-h-[60vh] flex-col gap-2 overflow-y-auto pr-1">
+            {expandida &&
+              itensDe(expandida).map((prazo) => (
+                <CartaoPrazo key={prazo.id} prazo={prazo} aoAbrir={abrir} />
+              ))}
+          </ul>
+        </DialogContent>
+      </Dialog>
+      <DetalhePrazo
+        prazo={aberto}
+        aoFechar={() => setAberto(null)}
+        acoes={acoes}
+        aoConcluir={aoConcluir}
+      />
     </div>
   );
 }

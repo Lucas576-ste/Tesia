@@ -1,5 +1,7 @@
 import { etapaDaFase, faseDoProcesso, type CodigoEtapa } from "@tesia/shared";
 import { z } from "zod";
+import { diasUteisAte, hojeEmBrasilia } from "@/lib/datas-servidor";
+import { rotuloArea } from "@/lib/painel";
 import { isoParaData } from "@/lib/prazo-interno";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -11,6 +13,7 @@ const processoSchema = z.object({
   partes: z.string().nullable(),
   parte_contraria: z.string().nullable(),
   rito: z.string().nullable(),
+  area: z.string().nullable().catch(null),
   fase: z.string().nullable(),
   fase_origem: z.string().nullable(),
   fase_atualizada_em: z.string().nullable(),
@@ -25,6 +28,11 @@ const clienteSchema = z.object({
   nome: z.string(),
   documento: z.string().nullable(),
   contato: z.object({ telefone: z.string().optional(), email: z.string().optional() }).nullable(),
+  tipo_pessoa: z.enum(["pf", "pj"]).catch("pf"),
+  qualificacao: z.unknown(),
+  pix: z.string().nullable().catch(null),
+  observacoes: z.string().nullable().catch(null),
+  ultimo_contato_em: z.string().nullable().catch(null),
 });
 
 export type ProcessoAcompanhado = {
@@ -37,6 +45,10 @@ export type ProcessoAcompanhado = {
   etapa: CodigoEtapa;
   origemFase: string;
   proximoPrazo: string | null;
+  urgenciaProximo: { vencimento: string; diasUteis: number; diasAtraso: number } | null;
+  protocolado: boolean;
+  area: string | null;
+  diasDesdeMovimentacao: number;
   diasParado: number | null;
   clienteId: string | null;
   clienteNome: string | null;
@@ -70,6 +82,7 @@ function paraAcompanhado(
     .map(({ data_vencimento }) => data_vencimento)
     .sort()[0];
   const encerrado = Boolean(linha.encerrado_em);
+  const hoje = hojeEmBrasilia();
   const fase = faseDoProcesso(linha.rito, linha.fase);
   const ultimaMovimentacao = linha.fase_atualizada_em ?? linha.atualizado_em;
   const dias = diasDesde(ultimaMovimentacao);
@@ -86,19 +99,36 @@ function paraAcompanhado(
         ? `Encerrado em ${dataCurta(linha.encerrado_em)}`
         : textoOrigem(linha.fase_origem, linha.fase_atualizada_em),
     proximoPrazo: proximo ? isoParaData(proximo) : null,
+    urgenciaProximo: proximo
+      ? {
+          vencimento: isoParaData(proximo),
+          diasUteis: diasUteisAte(proximo, hoje),
+          diasAtraso: Math.max(
+            0,
+            Math.round(
+              (Date.parse(`${hoje}T00:00:00Z`) - Date.parse(`${proximo}T00:00:00Z`)) / 86_400_000,
+            ),
+          ),
+        }
+      : null,
+    protocolado: !proximo && (linha.prazos ?? []).some(({ status }) => status === "cumprido"),
+    area: linha.area ? rotuloArea(linha.area) : null,
+    diasDesdeMovimentacao: dias,
     diasParado: !encerrado && !proximo && dias >= DIAS_PARADO ? dias : null,
     clienteId: linha.cliente_id,
     clienteNome: linha.cliente_id ? (nomes.get(linha.cliente_id) ?? null) : null,
   };
 }
 
+const COLUNAS_CLIENTE =
+  "id, nome, documento, contato, tipo_pessoa, qualificacao, pix, observacoes, ultimo_contato_em";
 const COLUNAS_PROCESSO =
-  "id, numero_cnj, partes, parte_contraria, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, atualizado_em, cliente_id, prazos(status, data_vencimento)";
+  "id, numero_cnj, partes, parte_contraria, rito, area, fase, fase_origem, fase_atualizada_em, encerrado_em, atualizado_em, cliente_id, prazos(status, data_vencimento)";
 
 export async function listarAcompanhamento() {
   const supabase = await criarClienteServidor();
   const [{ data: clientes }, { data: processos }] = await Promise.all([
-    supabase.from("clientes").select("id, nome, documento, contato").order("nome"),
+    supabase.from("clientes").select(COLUNAS_CLIENTE).order("nome"),
     supabase.from("processos").select(COLUNAS_PROCESSO).is("excluido_em", null),
   ]);
   const listaClientes = z.array(clienteSchema).safeParse(clientes).data ?? [];
@@ -120,7 +150,7 @@ export async function buscarCliente(id: string): Promise<ClienteResumo | null> {
   if (!z.uuid().safeParse(id).success) return null;
   const supabase = await criarClienteServidor();
   const [{ data: cliente }, { data: processos }] = await Promise.all([
-    supabase.from("clientes").select("id, nome, documento, contato").eq("id", id).maybeSingle(),
+    supabase.from("clientes").select(COLUNAS_CLIENTE).eq("id", id).maybeSingle(),
     supabase
       .from("processos")
       .select(COLUNAS_PROCESSO)
@@ -142,4 +172,31 @@ export async function listarClientesSimples() {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.from("clientes").select("id, nome").order("nome");
   return z.array(z.object({ id: z.uuid(), nome: z.string() })).safeParse(data).data ?? [];
+}
+
+const ultimaIntimacaoSchema = z.object({
+  processo_id: z.uuid(),
+  criado_em: z.string(),
+  extracao: z.object({ resumo: z.object({ o_que_aconteceu: z.string() }) }),
+});
+
+export async function ultimaMovimentacaoDoCliente(processoIds: string[]) {
+  if (!processoIds.length) return null;
+  const supabase = await criarClienteServidor();
+  const { data } = await supabase
+    .from("intimacoes")
+    .select("processo_id, criado_em, extracao")
+    .in("processo_id", processoIds)
+    .eq("status", "analisada")
+    .is("excluido_em", null)
+    .order("criado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const linha = ultimaIntimacaoSchema.safeParse(data);
+  if (!linha.success) return null;
+  return {
+    processoId: linha.data.processo_id,
+    data: dataCurta(linha.data.criado_em),
+    resumo: linha.data.extracao.resumo.o_que_aconteceu,
+  };
 }

@@ -4,6 +4,7 @@ import { motion, type Variants } from "motion/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const linhas = [
+  { rotulo: "Contestação", valor: "CPC art. 335" },
   { rotulo: "Publicação", valor: "03/11/2026" },
   { rotulo: "Início da contagem", valor: "04/11/2026" },
   { rotulo: "Prazo da contestação", valor: "15 dias úteis" },
@@ -30,18 +31,24 @@ const vencimento: Variants = {
   },
 };
 
-export function ExemploPrazo() {
+export function ExemploPrazo({ compacto = false }: { compacto?: boolean }) {
   return (
-    <Card className="gap-3 shadow-lg shadow-black/5">
+    <Card
+      className={
+        compacto ? "gap-2 py-4 text-sm shadow-xl shadow-black/20" : "gap-3 shadow-lg shadow-black/5"
+      }
+    >
       <CardHeader>
         <CardDescription>Exemplo ilustrativo</CardDescription>
-        <CardTitle className="text-lg">A conta do prazo, explicada</CardTitle>
+        <CardTitle className={compacto ? "text-base" : "text-lg"}>
+          A conta do prazo, explicada
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <motion.dl
-          className="flex flex-col gap-2 text-sm"
+          className={compacto ? "flex flex-col gap-1.5 text-xs" : "flex flex-col gap-2 text-sm"}
           variants={lista}
-          initial="oculto"
+          initial={compacto ? "visivel" : "oculto"}
           whileInView="visivel"
           viewport={{ once: true, amount: 0.6 }}
         >

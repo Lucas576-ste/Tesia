@@ -26,7 +26,7 @@ export default async function IntimacoesPage({ searchParams }: IntimacoesPagePro
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-semibold text-titulo">Intimações</h1>

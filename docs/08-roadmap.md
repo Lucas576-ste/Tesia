@@ -105,6 +105,9 @@ A Tesia começa rápido com solo e dupla e cresce até o nível corporativo. Nen
 |---|---|---|
 | Mensagem para o cliente: traduz o andamento em português claro | 1.5 | Gerada a partir de "O que aconteceu". O advogado revisa e envia; sem envio automático (LGPD e ética da OAB) |
 | Captura automática pela OAB: processos e intimações chegam sozinhos | 1.5 | O advogado citou como a primeira necessidade. Avaliar adiantar |
+| Documentos do cliente (RG, comprovante, contratos antigos) indexados com voyage-law-2 e pesquisáveis em linguagem natural | 2 | Sugestão de advogado (2026-11-19). Reaproveita a busca do Meu estilo |
+| Ler o RG e o comprovante enviados e preencher a qualificação do cliente sozinho | 1.5 | O advogado só confere |
+| Consulta ao Gov.br/INSS (CNIS, CTPS Digital) para previdenciário e trabalhista | 3+ | Só com integração oficial; não guardamos a senha do cliente (decisão de 2026-11-19) |
 
 ### Sociedade
 | Ideia | Fase | Observações |

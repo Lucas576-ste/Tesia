@@ -9,7 +9,7 @@ import {
   RespostaInvalidaDaIa,
   vetorParaPgvector,
 } from "@tesia/ia";
-import { analiseGravadaSchema, perfilEstiloSchema } from "@tesia/shared";
+import { analiseGravadaSchema, perfilEstiloSchema, textoQualificacao } from "@tesia/shared";
 import { z } from "zod";
 import { registrarUso } from "../analise/banco.js";
 import { competenciaEmBrasilia, textoBuscaEstilo } from "../analise/montar.js";
@@ -17,6 +17,13 @@ import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ peca_id: z.uuid() });
+
+const clienteSchema = z.object({
+  nome: z.string(),
+  documento: z.string().nullable(),
+  tipo_pessoa: z.enum(["pf", "pj"]),
+  qualificacao: z.unknown(),
+});
 const MAXIMO_TRECHOS = 3;
 
 const pecaSchema = z.object({
@@ -136,6 +143,17 @@ async function executar(job: Job, contexto: Contexto) {
   );
   const vencimento = z.object({ vencimento: z.string() }).safeParse(prazos[0]).data?.vencimento;
 
+  const { rows: clientes } = await db.query(
+    `select c.nome, c.documento, c.tipo_pessoa::text as tipo_pessoa, c.qualificacao
+     from intimacoes i
+     join processos p on p.id = i.processo_id and p.escritorio_id = i.escritorio_id
+     join clientes c on c.id = p.cliente_id and c.escritorio_id = p.escritorio_id
+     where i.id = $1 and i.escritorio_id = $2`,
+    [peca.data.intimacao_id, job.escritorio_id],
+  );
+  const clienteDaPeca = clienteSchema.safeParse(clientes[0]);
+  const qualificacaoCliente = clienteDaPeca.success ? textoQualificacao(clienteDaPeca.data) : null;
+
   const pontos = analise.data.resumo.pontos_ataque;
   const trechos = await buscarTrechos(
     contexto,
@@ -157,6 +175,7 @@ async function executar(job: Job, contexto: Contexto) {
       textoIntimacao: intimacao.data.texto ?? "",
       pontosAtacar: pontos,
       prazo: vencimento ? { vencimento, fundamento: analise.data.prazo?.fundamento ?? "" } : null,
+      qualificacaoCliente,
     }),
   );
   await registrarUso(db, job, { etapa: "geracao_peca", ...resultado });

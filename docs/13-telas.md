@@ -282,8 +282,8 @@ Abas:
 | Tela | Rota | Conteúdo |
 |---|---|---|
 | Agenda | `/app/agenda` | Calendário com prazos internos, prazos fatais e audiências dentro da Tesia, com filtro por área |
-| Clientes (**feito em 2026-11-19**) | `/app/clientes` | Abas "Por cliente" (cada cliente com os seus processos e a fase de cada um) e "Por fase" (quadro com Início, Defesa e instrução, Sentença, Recurso, Cumprimento e Encerrado); aviso de processos sem cliente; novo cliente |
-| Detalhe do cliente (**feito em 2026-11-19**) | `/app/clientes/:id` | Dados editáveis, processos em andamento e encerrados com a barra de fases, juntar cadastros duplicados. Honorários ficam para depois |
+| Clientes (**feito em 2026-11-19**) | `/app/clientes` | Cards ou Lista (tabela ordenável: cliente, processos, fase, próximo prazo, último contato), filtros "Com prazo esta semana" e "Sem contato há 30 dias", nomes em title case com avatar, selo de fase (encerrado cinza, sem fase com "Definir fase"), processos sem cliente com "Vincular cliente". Abas "Por cliente" (cada cliente com os seus processos e a fase de cada um) e "Por fase" (quadro com Início, Defesa e instrução, Sentença, Recurso, Cumprimento e Encerrado); aviso de processos sem cliente; novo cliente |
+| Detalhe do cliente (**feito em 2026-11-19**) | `/app/clientes/:id` | Botão "Enviar atualização" (mensagem em linguagem simples, copiar ou abrir no WhatsApp). Dados editáveis (PF/PJ, CPF/CNPJ com máscara e validação), card Qualificação (RG, estado civil, profissão, endereço com busca pelo CEP; na PJ, representante legal) com prévia de como sai na peça, card Observações e PIX, processos em andamento e encerrados com a barra de fases, juntar cadastros duplicados. Honorários ficam para depois |
 | Biblioteca de teses | `/app/teses` | Argumentações salvas, por área e assunto, para reaproveitar |
 
 ## Fase 3 (avançado)

@@ -1,12 +1,13 @@
 "use client";
 
-import { ETAPAS, type CodigoEtapa } from "@tesia/shared";
-import { Search, UserPlus, Users } from "lucide-react";
+import { ETAPAS, tituloNome, type CodigoEtapa } from "@tesia/shared";
+import { LayoutGrid, List, Search, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { criarCliente } from "@/app/app/clientes/acoes";
+import { AvisoInfo } from "@/components/aviso-info";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,7 +23,11 @@ import type { ClienteResumo, ProcessoAcompanhado } from "@/lib/clientes";
 import type { Processo } from "@/lib/processo-tipos";
 import { ListaProcessos } from "@/components/processo/lista-processos";
 import { cn } from "@/lib/utils";
+import { resumoCliente } from "@/lib/resumo-cliente";
+import { CardCliente } from "./card-cliente";
 import { CardProcesso } from "./card-processo";
+import { EscolherCliente } from "./escolher-cliente";
+import { TabelaClientes } from "./tabela-clientes";
 import { FormularioCliente } from "./formulario-cliente";
 
 type TelaClientesProps = {
@@ -38,61 +43,155 @@ function normalizar(texto: string) {
   return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-function resumoEtapas(processos: ProcessoAcompanhado[]) {
-  const contagem = new Map<string, number>();
-  for (const processo of processos)
-    contagem.set(processo.nomeFase, (contagem.get(processo.nomeFase) ?? 0) + 1);
-  return [...contagem.entries()];
+type Exibicao = "cards" | "lista";
+type FiltroRapido = "semana" | "sem-contato";
+
+const FILTROS_RAPIDOS: { id: FiltroRapido; rotulo: string }[] = [
+  { id: "semana", rotulo: "Com prazo esta semana" },
+  { id: "sem-contato", rotulo: "Sem contato há 30 dias" },
+];
+
+function passaNoFiltro(cliente: ClienteResumo, filtro: FiltroRapido | null) {
+  if (!filtro) return true;
+  const resumo = resumoCliente(cliente);
+  if (filtro === "sem-contato") return resumo.diasContato === null || resumo.diasContato >= 30;
+  if (!resumo.proximo) return false;
+  return resumo.proximo.diasAtraso > 0 || resumo.proximo.diasUteis <= 5;
 }
 
-function ListaPorCliente({ clientes }: { clientes: ClienteResumo[] }) {
+const EVENTO_EXIBICAO = "tesia-clientes-exibicao";
+
+function assinarExibicao(aoMudar: () => void) {
+  window.addEventListener(EVENTO_EXIBICAO, aoMudar);
+  window.addEventListener("storage", aoMudar);
+  return () => {
+    window.removeEventListener(EVENTO_EXIBICAO, aoMudar);
+    window.removeEventListener("storage", aoMudar);
+  };
+}
+
+function lerExibicao(): Exibicao {
+  try {
+    return localStorage.getItem("tesia-clientes-exibicao") === "lista" ? "lista" : "cards";
+  } catch {
+    return "cards";
+  }
+}
+
+function PorCliente({ clientes }: { clientes: ClienteResumo[] }) {
+  const exibicao = useSyncExternalStore(assinarExibicao, lerExibicao, () => "cards" as const);
+  const [filtro, setFiltro] = useState<FiltroRapido | null>(null);
+  const visiveis = clientes.filter((cliente) => passaNoFiltro(cliente, filtro));
+
+  function trocar(valor: Exibicao) {
+    try {
+      localStorage.setItem("tesia-clientes-exibicao", valor);
+    } catch {
+      return;
+    }
+    window.dispatchEvent(new Event(EVENTO_EXIBICAO));
+  }
+
   return (
-    <ul className="grid gap-3 md:grid-cols-2">
-      {clientes.map((cliente) => {
-        const proximo = cliente.processos
-          .map((processo) => processo.proximoPrazo)
-          .filter(Boolean)[0];
-        const parados = cliente.processos.filter((processo) => processo.diasParado).length;
-        return (
-          <li key={cliente.id}>
-            <Link
-              href={`/app/clientes/${cliente.id}`}
-              className="flex h-full flex-col gap-2 rounded-xl border bg-card p-4 shadow-xs transition hover:border-primary hover:shadow-md focus-visible:border-primary focus-visible:outline-none"
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div role="group" aria-label="Filtros rápidos" className="flex flex-wrap gap-1.5">
+          {FILTROS_RAPIDOS.map(({ id, rotulo }) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={filtro === id}
+              onClick={() => setFiltro(filtro === id ? null : id)}
+              className={cn(
+                "h-7 rounded-full border px-3 text-xs font-medium",
+                filtro === id
+                  ? "border-primary bg-primaria-fundo text-primaria"
+                  : "bg-card text-texto-secundario hover:text-texto",
+              )}
             >
-              <span className="flex items-center justify-between gap-2">
-                <span className="text-base font-semibold text-titulo">{cliente.nome}</span>
-                <span className="text-xs text-texto-secundario">
-                  {cliente.processos.length === 1
-                    ? "1 processo"
-                    : `${cliente.processos.length} processos`}
-                </span>
+              {rotulo}
+            </button>
+          ))}
+        </div>
+        <div role="group" aria-label="Exibição" className="flex rounded-lg border bg-card p-0.5">
+          {(
+            [
+              ["cards", LayoutGrid, "Cards"],
+              ["lista", List, "Lista"],
+            ] as const
+          ).map(([valor, Icone, rotulo]) => (
+            <button
+              key={valor}
+              type="button"
+              aria-pressed={exibicao === valor}
+              onClick={() => trocar(valor)}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-texto-secundario",
+                exibicao === valor && "bg-primaria-fundo text-primaria",
+              )}
+            >
+              <Icone aria-hidden className="size-3.5" />
+              {rotulo}
+            </button>
+          ))}
+        </div>
+      </div>
+      {visiveis.length === 0 ? (
+        <p className="text-sm text-texto-secundario">Nenhum cliente encontrado.</p>
+      ) : exibicao === "lista" ? (
+        <TabelaClientes clientes={visiveis} />
+      ) : (
+        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {visiveis.map((cliente) => (
+            <CardCliente key={cliente.id} cliente={cliente} />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ProcessosSemCliente({
+  processos,
+  clientes,
+}: {
+  processos: ProcessoAcompanhado[];
+  clientes: { id: string; nome: string }[];
+}) {
+  return (
+    <AvisoInfo
+      icone={Users}
+      titulo={
+        processos.length === 1
+          ? "1 processo sem cliente definido"
+          : `${processos.length} processos sem cliente definido`
+      }
+    >
+      <ul className="flex flex-col divide-y rounded-lg border bg-card">
+        {processos.map((processo) => (
+          <li
+            key={processo.id}
+            className="flex flex-col gap-2 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <Link href={`/app/processos/${processo.id}`} className="min-w-0 hover:underline">
+              <span className="block truncate text-sm font-medium">
+                {processo.partes
+                  .split(/\s+x\s+/i)
+                  .map(tituloNome)
+                  .join(" x ")}
               </span>
-              <span className="flex flex-wrap gap-1.5">
-                {resumoEtapas(cliente.processos).map(([fase, quantidade]) => (
-                  <span
-                    key={fase}
-                    className="rounded-full bg-primaria-fundo px-2 py-0.5 text-xs font-medium text-primaria"
-                  >
-                    {quantidade > 1 ? `${quantidade} em ` : ""}
-                    {fase}
-                  </span>
-                ))}
-              </span>
-              <span className="flex flex-wrap gap-x-4 text-xs text-texto-secundario">
-                {proximo && (
-                  <span>
-                    Próximo prazo: <strong className="text-texto tabular-nums">{proximo}</strong>
-                  </span>
-                )}
-                {parados > 0 && (
-                  <span className="text-atencao">{parados} parado(s) há mais de 60 dias</span>
-                )}
-              </span>
+              <span className="block font-mono text-xs text-texto-secundario">{processo.cnj}</span>
             </Link>
+            <EscolherCliente
+              processoId={processo.id}
+              clienteAtual={null}
+              clientes={clientes}
+              rotulo="Vincular cliente"
+            />
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </AvisoInfo>
   );
 }
 
@@ -243,26 +342,10 @@ export function TelaClientes({
         </Button>
       </div>
       {semCliente.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-xl border border-atencao/40 bg-atencao-fundo p-3">
-          <p className="flex items-center gap-2 text-sm font-semibold text-atencao">
-            <Users aria-hidden className="size-4" />
-            {semCliente.length === 1
-              ? "1 processo sem cliente definido"
-              : `${semCliente.length} processos sem cliente definido`}
-          </p>
-          <ul className="flex flex-wrap gap-2">
-            {semCliente.map((processo) => (
-              <li key={processo.id}>
-                <Link
-                  href={`/app/processos/${processo.id}`}
-                  className="rounded-md bg-card px-2 py-1 text-xs underline-offset-2 hover:underline"
-                >
-                  {processo.partes} · {processo.cnj}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ProcessosSemCliente
+          processos={semCliente}
+          clientes={clientes.map(({ id, nome }) => ({ id, nome: tituloNome(nome) }))}
+        />
       )}
       <Tabs value={aba} onValueChange={trocarAba}>
         <TabsList>
@@ -271,11 +354,7 @@ export function TelaClientes({
           <TabsTrigger value="processos">Todos os processos</TabsTrigger>
         </TabsList>
         <TabsContent value="cliente" className="pt-2">
-          {clientesVisiveis.length ? (
-            <ListaPorCliente clientes={clientesVisiveis} />
-          ) : (
-            <p className="text-sm text-texto-secundario">Nenhum cliente encontrado.</p>
-          )}
+          <PorCliente clientes={clientesVisiveis} />
         </TabsContent>
         <TabsContent value="fase" className="pt-2">
           <QuadroFases processos={processosVisiveis} />

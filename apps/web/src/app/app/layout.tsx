@@ -27,7 +27,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <div className="flex min-w-0 flex-1 flex-col">
           <BarraSuperior />
           <AvisoLimite {...estado.uso} />
-          <main className="flex-1 px-4 pt-4 pb-32 md:px-6 md:pb-16">{children}</main>
+          <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-4 pb-32 md:px-6 md:pb-16">
+            {children}
+          </main>
         </div>
         <MenuInferior />
         <AjudaFlutuante />

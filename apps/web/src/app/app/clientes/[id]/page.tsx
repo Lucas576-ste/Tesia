@@ -3,7 +3,7 @@ import Link from "next/link";
 import { TelaCliente } from "@/components/clientes/tela-cliente";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { Button } from "@/components/ui/button";
-import { buscarCliente, listarClientesSimples } from "@/lib/clientes";
+import { buscarCliente, listarClientesSimples, ultimaMovimentacaoDoCliente } from "@/lib/clientes";
 
 export const metadata: Metadata = { title: "Cliente · Tesia" };
 
@@ -23,8 +23,13 @@ export default async function ClientePage({ params }: { params: Promise<{ id: st
       />
     );
   }
+  const ultima = await ultimaMovimentacaoDoCliente(cliente.processos.map(({ id }) => id));
+  const processo = cliente.processos.find(({ id }) => id === ultima?.processoId);
   return (
     <TelaCliente
+      movimentacao={
+        ultima && processo ? { cnj: processo.cnj, data: ultima.data, resumo: ultima.resumo } : null
+      }
       key={cliente.id}
       cliente={cliente}
       outros={todos.filter((outro) => outro.id !== cliente.id)}

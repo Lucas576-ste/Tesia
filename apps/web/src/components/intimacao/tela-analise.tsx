@@ -65,7 +65,7 @@ export function TelaAnalise({ analise, uso }: { analise: Analise; uso: UsoPecas 
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link href="/app">
           <ArrowLeft aria-hidden />

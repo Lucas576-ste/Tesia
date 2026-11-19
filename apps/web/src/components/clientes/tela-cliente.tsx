@@ -20,12 +20,22 @@ import { Label } from "@/components/ui/label";
 import { SelectNativo } from "@/components/ui/select-nativo";
 import type { DadosCliente } from "@/lib/cliente-tipos";
 import type { ClienteResumo } from "@/lib/clientes";
+import { mascararDocumento, tituloNome } from "@tesia/shared";
+import { resumoCliente } from "@/lib/resumo-cliente";
+import { AvatarCliente } from "./avatar-cliente";
+import { EnviarAtualizacao } from "./enviar-atualizacao";
+import { CardExtras } from "./card-extras";
 import { CardProcesso } from "./card-processo";
+import { CardQualificacao } from "./card-qualificacao";
 import { FormularioCliente } from "./formulario-cliente";
 
-type TelaClienteProps = { cliente: ClienteResumo; outros: { id: string; nome: string }[] };
+type TelaClienteProps = {
+  cliente: ClienteResumo;
+  outros: { id: string; nome: string }[];
+  movimentacao: { cnj: string; data: string; resumo: string } | null;
+};
 
-export function TelaCliente({ cliente, outros }: TelaClienteProps) {
+export function TelaCliente({ cliente, outros, movimentacao }: TelaClienteProps) {
   const router = useRouter();
   const [editando, setEditando] = useState(false);
   const [juntando, setJuntando] = useState(false);
@@ -60,7 +70,7 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link href="/app/clientes">
           <ArrowLeft aria-hidden />
@@ -69,9 +79,16 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
       </Button>
       <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-titulo md:text-3xl">{cliente.nome}</h1>
+          <div className="flex items-center gap-3">
+            <AvatarCliente nome={cliente.nome} className="size-11 text-base" />
+            <h1 className="text-2xl font-semibold text-titulo md:text-3xl">
+              {tituloNome(cliente.nome)}
+            </h1>
+          </div>
           <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-texto-secundario">
-            {cliente.documento && <span>{cliente.documento}</span>}
+            {cliente.documento && (
+              <span>{mascararDocumento(cliente.documento, cliente.tipo_pessoa)}</span>
+            )}
             {cliente.contato?.telefone && (
               <span className="flex items-center gap-1">
                 <Phone aria-hidden className="size-3.5" />
@@ -90,6 +107,13 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <EnviarAtualizacao
+            clienteId={cliente.id}
+            nome={cliente.nome}
+            telefone={cliente.contato?.telefone ?? null}
+            movimentacao={movimentacao}
+            proximoPrazo={resumoCliente(cliente).proximo?.vencimento ?? null}
+          />
           <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
             <Pencil aria-hidden />
             Editar dados
@@ -117,6 +141,10 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
           <p className="text-sm text-texto-secundario">Nenhum processo em andamento.</p>
         )}
       </Card>
+      <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+        <CardQualificacao cliente={cliente} />
+        <CardExtras cliente={cliente} />
+      </div>
       {encerrados.length > 0 && (
         <Card className="gap-3 p-4">
           <h2 className="text-lg font-semibold">Encerrados</h2>
@@ -135,6 +163,7 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
           </DialogHeader>
           <FormularioCliente
             inicial={{
+              tipo_pessoa: cliente.tipo_pessoa,
               nome: cliente.nome,
               documento: cliente.documento ?? "",
               telefone: cliente.contato?.telefone ?? "",
@@ -162,7 +191,7 @@ export function TelaCliente({ cliente, outros }: TelaClienteProps) {
             >
               {outros.map((outro) => (
                 <option key={outro.id} value={outro.id}>
-                  {outro.nome}
+                  {tituloNome(outro.nome)}
                 </option>
               ))}
             </SelectNativo>

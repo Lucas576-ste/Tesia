@@ -158,7 +158,7 @@ export function TelaEditor({ peca }: { peca: PecaEditor }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link href={peca.intimacaoId ? `/app/intimacoes/${peca.intimacaoId}` : "/app/pecas"}>
           <ArrowLeft aria-hidden />

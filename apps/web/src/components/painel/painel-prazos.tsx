@@ -1,6 +1,5 @@
 "use client";
 
-import { Clock } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -202,7 +201,7 @@ export function PainelPrazos({
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex w-full max-w-[1280px] flex-col gap-5">
+      <div className="flex w-full flex-col gap-5">
         <header className="flex flex-col gap-1">
           <h1 className="text-3xl font-semibold text-titulo">
             {modo === "painel" ? `Olá, ${nome}` : "Prazos"}

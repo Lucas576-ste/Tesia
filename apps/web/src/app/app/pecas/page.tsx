@@ -11,7 +11,7 @@ export default async function PecasPage() {
   const pecas = await listarPecasEscritorio();
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <header>
         <h1 className="text-3xl font-semibold text-titulo">Peças</h1>
       </header>

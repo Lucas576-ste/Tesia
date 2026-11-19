@@ -2,6 +2,7 @@
 
 import { ChevronDown, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { AREAS_ATUACAO } from "@/lib/onboarding";
 import {
   FILTRO_PADRAO,
@@ -49,6 +50,15 @@ function Chip({
   );
 }
 
+function Grupo({ rotulo, children }: { rotulo: string; children: ReactNode }) {
+  return (
+    <div role="group" aria-label={rotulo} className="flex flex-wrap items-center gap-1.5">
+      <span className="mr-0.5 text-xs font-semibold text-texto-secundario">{rotulo}</span>
+      {children}
+    </div>
+  );
+}
+
 export function ChipsFiltros({ filtro, base }: { filtro: FiltroPrazos; base: string }) {
   const router = useRouter();
 
@@ -57,41 +67,44 @@ export function ChipsFiltros({ filtro, base }: { filtro: FiltroPrazos; base: str
   }
 
   return (
-    <div role="group" aria-label="Filtros" className="flex flex-wrap items-center gap-1.5">
-      {URGENCIAS.map(({ valor, rotulo }) => (
-        <Chip
-          key={valor}
-          ativo={filtro.urgencia === valor}
-          aoClicar={() => mudar({ urgencia: filtro.urgencia === valor ? "todas" : valor })}
-        >
-          {rotulo}
-        </Chip>
-      ))}
-      {(Object.keys(PERIODOS) as (keyof typeof PERIODOS)[])
-        .filter((chave) => chave !== "3-dias")
-        .map((chave) => (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <Grupo rotulo="Prazo">
+        {URGENCIAS.map(({ valor, rotulo }) => (
           <Chip
-            key={chave}
-            ativo={filtro.periodo === chave}
-            aoClicar={() =>
-              mudar({
-                periodo: filtro.periodo === chave ? "todos" : (chave as FiltroPrazos["periodo"]),
-              })
-            }
+            key={valor}
+            ativo={filtro.urgencia === valor}
+            aoClicar={() => mudar({ urgencia: filtro.urgencia === valor ? "todas" : valor })}
           >
-            {PERIODOS[chave].rotulo.replace("Até ", "")}
+            {rotulo}
           </Chip>
         ))}
-      <span aria-hidden className="mx-1 h-4 w-px bg-borda" />
-      {STATUS.map(({ valor, rotulo }) => (
-        <Chip
-          key={valor}
-          ativo={filtro.status === valor}
-          aoClicar={() => mudar({ status: filtro.status === valor ? "todos" : valor })}
-        >
-          {rotulo}
-        </Chip>
-      ))}
+        {(Object.keys(PERIODOS) as (keyof typeof PERIODOS)[])
+          .filter((chave) => chave !== "3-dias")
+          .map((chave) => (
+            <Chip
+              key={chave}
+              ativo={filtro.periodo === chave}
+              aoClicar={() =>
+                mudar({
+                  periodo: filtro.periodo === chave ? "todos" : (chave as FiltroPrazos["periodo"]),
+                })
+              }
+            >
+              {PERIODOS[chave].rotulo.replace("Até ", "")}
+            </Chip>
+          ))}
+      </Grupo>
+      <Grupo rotulo="Status">
+        {STATUS.map(({ valor, rotulo }) => (
+          <Chip
+            key={valor}
+            ativo={filtro.status === valor}
+            aoClicar={() => mudar({ status: filtro.status === valor ? "todos" : valor })}
+          >
+            {rotulo}
+          </Chip>
+        ))}
+      </Grupo>
       <label
         className={cn(
           "relative flex h-7 items-center rounded-full border pr-7 pl-3 text-xs font-medium",

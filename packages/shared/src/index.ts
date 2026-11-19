@@ -37,3 +37,21 @@ export {
   type EntradaUrgencia,
   type NivelUrgencia,
 } from "./urgencia";
+export {
+  mascararCnpj,
+  mascararCpf,
+  mascararDocumento,
+  somenteDigitos,
+  validarCnpj,
+  validarCpf,
+} from "./cpf-cnpj";
+export {
+  camposFaltando,
+  enderecoSchema,
+  ESTADOS_CIVIS,
+  qualificacaoSchema,
+  textoQualificacao,
+  type ClienteQualificavel,
+  type Qualificacao,
+} from "./qualificacao";
+export { iniciais, tituloNome } from "./nomes";

@@ -65,6 +65,17 @@ describe("separarSecoes e acharPendencias", () => {
 });
 
 describe("montarPedidoGeracao", () => {
+  it("inclui a qualificação do cliente só quando ela existe", () => {
+    expect(montarPedidoGeracao(entrada).conteudo).not.toContain("<qualificacao_cliente>");
+    const { conteudo } = montarPedidoGeracao({
+      ...entrada,
+      qualificacaoCliente: "MARIA DA SILVA, brasileira",
+    });
+    expect(conteudo).toContain(
+      "<qualificacao_cliente>\nMARIA DA SILVA, brasileira\n</qualificacao_cliente>",
+    );
+  });
+
   it("põe instruções, perfil e tipo de peça em 3 blocos com cache, nesta ordem", () => {
     const { sistema, conteudo } = montarPedidoGeracao(entrada);
     expect(sistema).toHaveLength(3);
@@ -86,7 +97,7 @@ describe("gerarPeca", () => {
     expect(pedido?.fallbacks).toBe("default");
     expect(resultado.secoes).toHaveLength(3);
     expect(resultado.pendencias).toHaveLength(2);
-    expect(resultado.versaoPrompt).toBe("geracao@2");
+    expect(resultado.versaoPrompt).toBe("geracao@3");
     expect(resultado.uso.custoEstimado).toBeCloseTo(0.0485, 6);
   });
 
