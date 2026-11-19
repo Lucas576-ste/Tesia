@@ -3,6 +3,7 @@
 import { analiseGravadaSchema, nomePartes } from "@tesia/shared";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { limitar, MENSAGEM_LIMITE } from "@/lib/limite";
 import { STATUS_INTIMACAO, idsSchema, registroSchema } from "@/lib/envio-intimacao";
 import { usuarioAtual } from "@/lib/sessao";
 import { buscarUsoPecas } from "@/lib/uso-pecas";
@@ -16,6 +17,7 @@ export async function registrarIntimacao(
   const usuario = await usuarioAtual();
   if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
 
+  if (!(await limitar(`envio:${usuario.id}`, 60, 3600))) return { erro: MENSAGEM_LIMITE };
   const resultado = registroSchema.safeParse({ caminho });
   if (!resultado.success || !caminho.startsWith(`${usuario.escritorio_id}/`)) {
     return { erro: "Arquivo inválido." };
@@ -149,6 +151,7 @@ export async function gerarRascunho(
   if (!z.uuid().safeParse(intimacaoId).success || !/^[a-z_]{2,60}$/.test(codigoPeca)) {
     return { erro: "Pedido inválido." };
   }
+  if (!(await limitar(`ia:${usuario.id}`, 20, 3600))) return { erro: MENSAGEM_LIMITE };
 
   const supabase = await criarClienteServidor();
   const { data: linhaIntimacao } = await supabase

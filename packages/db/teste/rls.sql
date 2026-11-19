@@ -430,4 +430,49 @@ begin
 end;
 $$;
 
+do $$
+declare
+  esc_original uuid;
+begin
+  select escritorio_id into esc_original from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+  update usuarios set nome = 'Advogada A2', alerta_dias = '{fatal}' where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  begin
+    update usuarios set papel = 'dono' where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+    assert false, 'Usuário não deveria conseguir mudar o próprio papel';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    update usuarios set escritorio_id = current_setting('teste.esc_b')::uuid where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+    assert false, 'Usuário não deveria conseguir mudar de escritório';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    update usuarios set email = 'outro@exemplo.com' where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+    assert false, 'Usuário não deveria conseguir mudar o e-mail direto na tabela';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform consumir_limite('x', 1, 60);
+    assert false, 'Usuário não deveria chamar consumir_limite';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform count(*) from alertas_enviados;
+    assert false, 'Usuário não deveria ler alertas_enviados';
+  exception when insufficient_privilege then null;
+  end;
+  assert (select count(*) from processos where escritorio_id = current_setting('teste.esc_b')::uuid) = 0,
+    'A não deveria ver processos de B';
+  reset role;
+  assert (select nome from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1') = 'Advogada A2',
+    'Usuário deveria conseguir editar o próprio nome';
+  assert (select escritorio_id from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1') = esc_original,
+    'Escritório deveria continuar o mesmo';
+  assert consumir_limite('teste', 2, 60) and consumir_limite('teste', 2, 60) and not consumir_limite('teste', 2, 60),
+    'O terceiro uso deveria estourar o limite de 2';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { createClient } from "@supabase/supabase-js";
 import { criarClienteIa } from "@tesia/ia";
 import pg from "pg";
@@ -18,6 +19,24 @@ const tarefas: Record<string, Tarefa> = {
   gerar_peca: gerarPecaTarefa,
   ajustar_peca: ajustarPecaTarefa,
 };
+
+if (ambiente.SENTRY_DSN) {
+  Sentry.init({
+    dsn: ambiente.SENTRY_DSN,
+    environment: process.env.NODE_ENV ?? "development",
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: false,
+      httpBodies: [],
+      urlQueryParams: false,
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      stackFrameVariables: false,
+    },
+    tracesSampleRate: 0,
+  });
+}
 
 function registrar(evento: string, dados: Record<string, unknown>) {
   console.log(JSON.stringify({ evento, ...dados, em: new Date().toISOString() }));
@@ -46,6 +65,8 @@ async function processar(job: Job) {
   } catch (erro) {
     const definitiva = await registrarFalha(contexto.db, job, erro);
     if (definitiva && tarefa) await tarefa.aoFalhar(job, contexto);
+    if (definitiva)
+      Sentry.captureException(erro, { tags: { tipo: job.tipo }, extra: { job_id: job.id } });
     registrar(definitiva ? "job_falhou" : "job_reagendado", {
       job_id: job.id,
       tipo: job.tipo,
@@ -87,6 +108,7 @@ async function laco() {
       }
     } catch (erro) {
       registrar("erro_fila", { erro: erro instanceof Error ? erro.message : String(erro) });
+      Sentry.captureException(erro);
     }
     await new Promise((resolver) => setTimeout(resolver, ambiente.INTERVALO_FILA_MS));
   }

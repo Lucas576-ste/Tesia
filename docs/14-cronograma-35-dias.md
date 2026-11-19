@@ -251,10 +251,12 @@ Se o cronograma atrasar, corte nesta ordem: ajustes pela IA no editor (dia 26), 
 
 **Feito em 2026-11-18:** e-mail-resumo diário às 7h (5 e 2 dias úteis antes, dia do interno e do fatal), sem repetir; aba Alertas salva de verdade; plano e uso reais (teste grátis com 5 peças), faixa no topo aos 80% e aos 100%; o bloqueio aos 100% já existia. Remetente provisório do Resend até verificar um domínio.
 
-### Dia 31 — Segurança
+### Dia 31 — Segurança ✅
 - Rate limit, links de download temporários, Sentry em web e worker
 - Backup diário configurado
 - Repetir os testes de acesso entre escritórios
+
+**Feito em 2026-11-18:** permissões por coluna em `usuarios` (papel e escritório travados), rate limit no Postgres (login, envio, IA, agenda e .docx), Sentry no web e no worker sem coletar conteúdo, backup diário criptografado por GitHub Action (falta cadastrar os Secrets), testes de acesso entre escritórios ampliados.
 
 ### Dia 32 — Produção
 - Termos de uso e política de privacidade (rascunho, enviar para revisão)

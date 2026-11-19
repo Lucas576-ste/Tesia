@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import { montarIcal, type EventoAgenda } from "@tesia/documentos";
 import { nomePartes } from "@tesia/shared";
 import { z } from "zod";
+import { ipDaRequisicao, limitar, MENSAGEM_LIMITE } from "@/lib/limite";
 import { TOKEN_AGENDA } from "@/lib/agenda";
 import { ambienteSupabase } from "@/lib/supabase/ambiente";
 
@@ -28,6 +29,9 @@ export async function GET(
 ) {
   const { arquivo } = await params;
   const token = arquivo.replace(/\.ics$/, "");
+  if (!(await limitar(`agenda:${await ipDaRequisicao()}`, 60, 3600))) {
+    return new Response(MENSAGEM_LIMITE, { status: 429, headers: { "Retry-After": "3600" } });
+  }
   if (!TOKEN_AGENDA.test(token)) return naoEncontrado();
 
   const { url, chave } = ambienteSupabase();

@@ -12,6 +12,7 @@ import {
   recuperacaoSchema,
   type EstadoFormulario,
 } from "@/lib/autenticacao";
+import { limitarAutenticacao, MENSAGEM_LIMITE } from "@/lib/limite";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
 async function origemDoSite() {
@@ -33,6 +34,7 @@ export async function cadastrar(
   const email = String(dados.get("email") ?? "");
   const resultado = cadastroSchema.safeParse(Object.fromEntries(dados));
   if (!resultado.success) return { erro: primeiroErro(resultado.error), email };
+  if (!(await limitarAutenticacao(resultado.data.email))) return { erro: MENSAGEM_LIMITE, email };
 
   const { nome, senha } = resultado.data;
   const supabase = await criarClienteServidor();
@@ -60,6 +62,7 @@ export async function entrar(
   const email = String(dados.get("email") ?? "");
   const resultado = loginSchema.safeParse(Object.fromEntries(dados));
   if (!resultado.success) return { erro: primeiroErro(resultado.error), email };
+  if (!(await limitarAutenticacao(resultado.data.email))) return { erro: MENSAGEM_LIMITE, email };
 
   const supabase = await criarClienteServidor();
   const { error } = await supabase.auth.signInWithPassword({
@@ -78,6 +81,7 @@ export async function enviarRecuperacao(
   const email = String(dados.get("email") ?? "");
   const resultado = recuperacaoSchema.safeParse(Object.fromEntries(dados));
   if (!resultado.success) return { erro: primeiroErro(resultado.error), email };
+  if (!(await limitarAutenticacao(resultado.data.email))) return { erro: MENSAGEM_LIMITE, email };
 
   const supabase = await criarClienteServidor();
   const { error } = await supabase.auth.resetPasswordForEmail(resultado.data.email, {

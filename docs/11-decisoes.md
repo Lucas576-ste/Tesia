@@ -83,6 +83,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-11 | Worker roda com `tsx` também em produção, sem etapa de compilação, e checa tipos com resolução `Bundler` | Importa os pacotes `@tesia/*` direto do TypeScript, como o web; imports sem extensão funcionam no Next e no `tsx` |
 | 2026-11-18 | Alertas por e-mail via Resend com remetente `onboarding@resend.dev` até verificar um domínio | Sem domínio verificado, o Resend só entrega para o dono da conta; verificar o domínio antes do lançamento |
 | 2026-11-18 | Plano e uso lidos da assinatura real; saiu o seletor de plano de demonstração | Dia 30 |
+| 2026-11-18 | Backup diário por GitHub Action (`pg_dump` criptografado, 30 dias) em vez do Supabase Pro | Custo zero no início; reavaliar o Pro no lançamento |
+| 2026-11-18 | Rate limit no próprio Postgres, sem Redis | Simples e suficiente para o volume do MVP |
 
 ## Pendências
 
@@ -110,3 +112,4 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Consultar o nome Lia no INPI junto com Tesia | Lucas | Antes do dia 32 |
 | Deixar a cobrança pelo Asaas pronta antes do fim dos 15 dias grátis do primeiro fundador | Lucas | Até 15 dias após o dia 34 |
 | Verificar um domínio no Resend e trocar `ALERTA_REMETENTE` | Lucas | Antes do lançamento |
+| Cadastrar `BACKUP_DATABASE_URL` e `BACKUP_SENHA` nos Secrets do GitHub e rodar o backup uma vez | Lucas | Depois do push |

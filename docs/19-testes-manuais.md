@@ -69,6 +69,8 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
 ## Segurança
+- [ ] Errar a senha 11 vezes seguidas mostra "Muitas tentativas"
+- [ ] Backup: rodar o workflow no GitHub e baixar o arquivo do dia
 - [ ] Uma segunda conta não vê nada da primeira
 - [ ] Link de análise da primeira conta, aberto na segunda, mostra "Intimação não encontrada"
 

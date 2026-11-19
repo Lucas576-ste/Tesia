@@ -3,6 +3,7 @@
 import type { JSONContent } from "@tiptap/core";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { limitar, MENSAGEM_LIMITE } from "@/lib/limite";
 import {
   documentoDoConteudo,
   documentoSchema,
@@ -146,6 +147,7 @@ export async function pedirAjuste(
   if (!usuario || !z.uuid().safeParse(id).success) return { erro: "Peça não encontrada." };
   if (texto.length < 5) return { erro: "Descreva o ajuste em pelo menos algumas palavras." };
   if (texto.length > 500) return { erro: "O pedido pode ter no máximo 500 caracteres." };
+  if (!(await limitar(`ia:${usuario.id}`, 20, 3600))) return { erro: MENSAGEM_LIMITE };
 
   const supabase = await criarClienteServidor();
   const { data } = await supabase

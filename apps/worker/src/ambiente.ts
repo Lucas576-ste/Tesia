@@ -6,6 +6,7 @@ const ambienteSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20, "Defina SUPABASE_SERVICE_ROLE_KEY."),
   ANTHROPIC_API_KEY: z.string().min(20, "Defina ANTHROPIC_API_KEY."),
   EMBEDDINGS_API_KEY: z.string().min(20, "Defina EMBEDDINGS_API_KEY (Voyage)."),
+  SENTRY_DSN: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   ALERTA_REMETENTE: z.string().default("Tesia <onboarding@resend.dev>"),
   URL_APP: z.url().default("http://localhost:3000"),

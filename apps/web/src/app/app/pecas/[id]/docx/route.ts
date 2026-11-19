@@ -1,3 +1,4 @@
+import { limitar, MENSAGEM_LIMITE } from "@/lib/limite";
 import { montarDocx, nomeArquivoDocx } from "@tesia/documentos";
 import type { NoDocumento } from "@tesia/shared";
 import { BUCKET_MODELOS, TIPO_DOCX } from "@/lib/modelo-docx";
@@ -13,6 +14,9 @@ export async function GET(_requisicao: Request, { params }: { params: Promise<{ 
   const { id } = await params;
   const usuario = await usuarioAtual();
   if (!usuario) return naoEncontrado();
+  if (!(await limitar(`docx:${usuario.id}`, 60, 3600))) {
+    return new Response(MENSAGEM_LIMITE, { status: 429, headers: { "Retry-After": "3600" } });
+  }
   const estado = await buscarPeca(id);
   if (estado?.status !== "pronta") return naoEncontrado();
 

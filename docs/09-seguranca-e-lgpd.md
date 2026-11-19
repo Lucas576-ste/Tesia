@@ -18,6 +18,20 @@
 - **Dependências:** atualização periódica e verificação de vulnerabilidades no CI.
 - **Logs:** nunca gravar o texto dos documentos nos logs, só identificadores.
 
+## Como está implementado (Dia 31, 2026-11-18)
+
+- **Permissões por coluna:** o advogado só edita nome, OAB, áreas, WhatsApp, timbrado e alertas na própria linha de `usuarios`. Papel, escritório e e-mail não mudam pelo app (migration 0015, coberto em `packages/db/teste/rls.sql`).
+- **Rate limit:** contador no Postgres (`limites_uso` e `consumir_limite`, só com a service role). Login, cadastro e recuperação: 10 por 10 minutos por IP e por e-mail. Envio de intimação: 60 por hora. Gerar peça e ajuste: 20 por hora. Agenda `.ics`: 60 por hora por IP. Download do `.docx`: 60 por hora. Se o contador falhar, a ação segue (não trava o advogado).
+- **Downloads:** os buckets são privados. O `.docx` sai por rota autenticada que confere o dono, com `Cache-Control: private, no-store`. Não existe link público de arquivo.
+- **Sentry:** web (`instrumentation.ts`, `instrumentation-client.ts`, `global-error.tsx`) e worker. Coleta desligada para usuário, cookies, cabeçalhos, corpos, parâmetros, entradas e saídas da IA, consultas e variáveis: só a mensagem do erro e ids.
+- **Backup:** GitHub Action `backup.yml`, todo dia às 3h de Brasília. `pg_dump` (schemas public, auth e storage) criptografado com AES-256 e guardado 30 dias como artefato privado. Os arquivos do Storage não entram no dump.
+
+### Restaurar um backup
+1. Baixe o artefato do dia em GitHub → Actions → "Backup diário do banco".
+2. Descriptografe: `gpg -d tesia-AAAA-MM-DD.dump.gpg > tesia.dump` (pede a senha `BACKUP_SENHA`).
+3. Restaure num banco vazio: `pg_restore --no-owner --no-privileges -d "<url do banco novo>" tesia.dump`.
+4. Teste de restauração: uma vez por mês, num projeto Supabase de teste.
+
 ## Dados e IA
 
 - Dados armazenados no Brasil (Supabase, região São Paulo).
