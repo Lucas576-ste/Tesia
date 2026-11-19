@@ -16,8 +16,8 @@ export function AvisoLimite({ usadas, limite }: AvisoLimiteProps) {
       }
     >
       {esgotado
-        ? `Você usou as ${limite} peças do mês. Novos rascunhos ficam bloqueados; análises e prazos continuam funcionando.`
-        : `Você já usou ${usadas} de ${limite} peças do mês.`}{" "}
+        ? `Você usou as ${limite} peças de hoje. Novos rascunhos voltam amanhã; análises e prazos continuam funcionando.`
+        : `Você já usou ${usadas} de ${limite} peças hoje.`}{" "}
       <Link href="/app/plano" className="font-medium underline underline-offset-2">
         Ver pacote extra ou trocar de plano
       </Link>

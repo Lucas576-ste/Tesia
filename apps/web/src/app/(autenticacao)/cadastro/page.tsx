@@ -11,7 +11,7 @@ export default function CadastroPage() {
     <>
       <TituloAutenticacao
         titulo="Criar conta"
-        descricao="7 dias grátis com os recursos do Pro, sem cartão de crédito."
+        descricao="11 dias grátis com tudo liberado, sem cartão de crédito."
       />
       <BotaoGoogle />
       <FormularioCadastro />

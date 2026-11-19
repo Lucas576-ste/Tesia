@@ -342,3 +342,4 @@ Ao final, rode pnpm build e corrija os erros.
 ```
 
 - **Áreas (2026-11-19):** a seção "Para quem atua em" lista as 8 áreas, sem "em breve".
+- **Planos e teste (2026-11-19):** hero com "Intimações, prazos, peças e clientes. Tudo num só lugar, com IA." e selos legíveis; seção "Tudo o que seu escritório precisa, num só lugar" (8 módulos); faixa dourada grande "Comece grátis hoje" (11 dias); preços com Teste grátis, Individual e Sócio, destacando peças por dia, processos com push e advogados.

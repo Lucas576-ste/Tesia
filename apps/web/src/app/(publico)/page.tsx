@@ -10,7 +10,9 @@ import { Custo } from "@/components/landing/custo";
 import { Diferenciais } from "@/components/landing/diferenciais";
 import { Dor } from "@/components/landing/dor";
 import { Fundador } from "@/components/landing/fundador";
+import { FaixaTeste } from "@/components/landing/faixa-teste";
 import { Heroi } from "@/components/landing/heroi";
+import { TudoEmUm } from "@/components/landing/tudo-em-um";
 import { Perguntas } from "@/components/landing/perguntas";
 import { Precos } from "@/components/landing/precos";
 import { RastreadorRolagem } from "@/components/landing/rastreador-rolagem";
@@ -25,12 +27,14 @@ export default function LandingPage() {
       <Dor />
       <Custo />
       <ConhecaLia />
+      <TudoEmUm />
       <ComoFunciona />
       <ComparacaoIa />
       <Diferenciais />
       <Depoimentos />
       <Seguranca />
       <Areas />
+      <FaixaTeste />
       <Precos />
       <Fundador />
       <Perguntas />

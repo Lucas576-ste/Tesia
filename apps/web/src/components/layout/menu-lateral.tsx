@@ -161,7 +161,7 @@ export function MenuLateral({ conta, contadores, uso }: MenuLateralProps) {
         >
           <span className="flex items-center justify-between gap-2">
             <span className="font-medium text-white tabular-nums">
-              Peças: {uso.usadas} de {uso.limite}
+              Peças hoje: {uso.usadas} de {uso.limite}
             </span>
             <span className="truncate text-menu-texto">{uso.plano}</span>
           </span>

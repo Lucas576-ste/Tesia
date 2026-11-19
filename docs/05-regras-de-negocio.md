@@ -161,3 +161,16 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 - Toda peça é um rascunho. A revisão e o protocolo são responsabilidade do advogado. Isso aparece nos termos de uso e no editor.
 - Todo prazo é uma sugestão até ser confirmado pelo advogado.
 - O sistema nunca protocola nada em nome do advogado.
+
+## Planos (2026-11-19, substitui Start, Pro e Sociedade)
+
+| | Teste grátis | Individual | Sócio |
+|---|---|---|---|
+| Preço | R$ 0 por 11 dias, sem cartão | R$ 129/mês (R$ 1.290/ano) | R$ 219/mês (R$ 2.190/ano) |
+| Advogados | 1 | 1 | 2 |
+| Peças por dia | 7 | 7 | 15 (compartilhadas) |
+| Processos com push (monitoramento) | — | 100 | 300 |
+
+- Limite de peças é diário (dia de Brasília); pacote extra de 10 peças por R$ 19.
+- Códigos internos: `pro` = Individual, `sociedade` = Sócio, `fundador` = Individual por R$ 79 para sempre; `start` saiu da venda.
+- Números de push são proposta, a confirmar com o provedor da integração; ainda sem bloqueio no código.

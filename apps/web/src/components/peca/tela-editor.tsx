@@ -253,7 +253,7 @@ export function TelaEditor({ peca }: { peca: PecaEditor }) {
                   alterado={alterado}
                   aoAtingirLimite={() =>
                     toast.error(
-                      "Você chegou ao limite de peças do mês. Este ajuste contaria como peça nova.",
+                      "Você chegou ao limite de peças de hoje. Este ajuste contaria como peça nova.",
                     )
                   }
                 />

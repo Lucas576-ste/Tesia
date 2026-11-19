@@ -23,8 +23,8 @@ begin
   assert usuario_b.escritorio_nome = 'Meu escritório', 'Sem nome, o escritório deveria se chamar Meu escritório';
   assert usuario_b.termos_aceitos_em is null, 'Sem aceite, a data deveria ficar vazia';
   assert usuario_a.escritorio_id <> usuario_b.escritorio_id, 'Cada cadastro deveria ter o próprio escritório';
-  assert (select count(*) from assinaturas where status = 'trial' and plano_codigo = 'pro' and periodo_fim = current_date + 7) = 2,
-    'Cada cadastro deveria começar com 7 dias de teste no Pro';
+  assert (select count(*) from assinaturas where status = 'trial' and plano_codigo = 'pro' and periodo_fim = current_date + 11) = 2,
+    'Cada cadastro deveria começar com 11 dias de teste no Pro';
 end;
 $$;
 
@@ -331,7 +331,7 @@ declare
 begin
   select * into uso from uso_pecas_atual();
   assert uso.usadas = 1, 'A deveria ter 1 peça em geração contada';
-  assert uso.limite = 5, 'O teste grátis deveria ter limite de 5 peças';
+  assert uso.limite = 7, 'O teste grátis deveria ter limite de 7 peças por dia';
 end;
 $$;
 
@@ -514,6 +514,22 @@ begin
   insert into intimacoes (escritorio_id, origem, texto, djen_id) values (current_setting('teste.esc_a')::uuid, 'djen', 'x', 42)
     on conflict (escritorio_id, djen_id) where djen_id is not null do nothing;
   assert (select count(*) from intimacoes where djen_id = 42) = 1, 'A mesma comunicação do DJEN não deveria entrar duas vezes';
+end;
+$$;
+
+do $$
+declare
+  uso record;
+begin
+  update assinaturas set status = 'trial', plano_codigo = 'pro' where escritorio_id = current_setting('teste.esc_b')::uuid;
+  insert into pecas (escritorio_id, tipo_peca_id, titulo, status)
+  select current_setting('teste.esc_b')::uuid, (select id from tipos_peca where codigo = 'apelacao' and area = 'civel'), 'Teste ' || n, 'rascunho'
+  from generate_series(1, 7) n;
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+  select * into uso from uso_pecas_atual();
+  assert uso.usadas = 7 and uso.limite = 7, 'Teste grátis deveria ter limite de 7 peças por dia, e 7 já usadas';
+  reset role;
 end;
 $$;
 

@@ -1,10 +1,9 @@
 "use client";
 
-import { Check, Clock } from "lucide-react";
+import { Check } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { track } from "@/lib/medicao";
 import { cn } from "@/lib/utils";
@@ -15,144 +14,127 @@ type Plano = {
   mensal: string;
   anual: string;
   publico: string;
-  inclui?: string;
+  numeros: { valor: string; rotulo: string }[];
   itens: string[];
-  chegando?: string[];
-  botao?: string;
+  botao: string;
   destaque?: boolean;
-  emBreve?: boolean;
+  teste?: boolean;
 };
 
-const recursosChegando = [
-  "Busca automática de intimações",
-  "Alertas no WhatsApp",
-  "Agenda no Google, Apple e Outlook",
-  "Relatório do mês",
-  "Honorários simples",
+const comuns = [
+  "Intimações automáticas pelo DJEN e envio de PDF",
+  "Prazo com a conta, prazo interno e fatal",
+  "Rascunho no seu estilo, com pontos a conferir",
+  ".docx com o seu timbrado",
+  "Clientes e processos fase a fase",
+  "Painel, quadro, alertas e agenda no celular",
+  "8 áreas de atuação",
 ];
 
 const planos: Plano[] = [
   {
-    nome: "Start",
-    mensal: "R$ 79/mês",
-    anual: "R$ 790/ano",
-    publico: "O essencial para começar",
-    itens: [
-      "10 peças por mês",
-      "1 área de atuação",
-      "1 usuário",
-      "Resumo da intimação e peça recomendada",
-      "Prazo com a conta e o fundamento legal",
-      "Prazo interno e prazo fatal",
-      "Painel em lista e alerta por e-mail",
-      "Rascunho no seu estilo, com pendências destacadas",
-      ".docx com o seu timbrado",
+    nome: "Teste grátis",
+    mensal: "R$ 0",
+    anual: "R$ 0",
+    publico: "11 dias com tudo do Individual liberado. Sem cartão.",
+    numeros: [
+      { valor: "11", rotulo: "dias grátis" },
+      { valor: "7", rotulo: "peças por dia" },
+      { valor: "0", rotulo: "cartão de crédito" },
     ],
-    botao: "Começar teste grátis",
+    itens: [
+      "Tudo do plano Individual",
+      "Sem cobrança automática no fim",
+      "Escolha um plano só se gostar",
+    ],
+    botao: CTA_TESTE.texto,
+    teste: true,
   },
   {
-    nome: "Pro",
+    nome: "Individual",
     mensal: "R$ 129/mês",
     anual: "R$ 1.290/ano",
-    publico: "Para quem quer tudo, sem limite apertado",
-    inclui: "Tudo do Start, mais:",
-    itens: [
-      "50 peças por mês",
-      "Todas as áreas de atuação",
-      "Pontos que podem ser atacados e peças alternativas",
-      "Quadro de prazos (kanban)",
-      "Audiências, compromissos e prazos manuais",
-      "Ajustes do rascunho pela Lia",
+    publico: "Para o advogado que trabalha sozinho.",
+    numeros: [
+      { valor: "7", rotulo: "peças por dia" },
+      { valor: "100", rotulo: "processos com push" },
+      { valor: "1", rotulo: "advogado" },
     ],
-    chegando: recursosChegando,
-    botao: "Começar teste grátis",
+    itens: comuns,
+    botao: CTA_TESTE.texto,
     destaque: true,
   },
   {
-    nome: "Sociedade",
+    nome: "Sócio",
     mensal: "R$ 219/mês",
     anual: "R$ 2.190/ano",
-    publico: "Para dois advogados que dividem o trabalho. R$ 109,50 por advogado",
-    inclui: "Tudo do Pro, para 2 advogados:",
-    itens: [
-      "2 advogados na mesma conta, com convite do sócio",
-      "100 peças por mês, compartilhadas",
-      "Quem elabora, revisa e protocola em cada prazo",
-      "Divisão por área, com responsável sugerido em cada intimação",
-      "Se um prazo ficar para trás, os dois são avisados",
-      "Estilo próprio para cada advogado",
-      'Filtros "Meus", "Do sócio", "Sem responsável" e "Todos"',
-      "Notas internas em cada prazo e processo",
+    publico: "Para dois advogados que dividem o trabalho. R$ 109,50 por advogado.",
+    numeros: [
+      { valor: "15", rotulo: "peças por dia" },
+      { valor: "300", rotulo: "processos com push" },
+      { valor: "2", rotulo: "advogados" },
     ],
-    chegando: recursosChegando,
-    botao: "Entrar na lista",
-    emBreve: true,
+    itens: [
+      "Tudo do Individual, para 2 advogados",
+      "Estilo próprio para cada advogado",
+      'Responsável por prazo e "Meus prazos"',
+      "Se um prazo ficar para trás, os dois são avisados",
+    ],
+    botao: CTA_TESTE.texto,
   },
 ];
 
 type Periodo = "mensal" | "anual";
 
-function ListaRecursos({ inclui, itens, chegando }: Pick<Plano, "inclui" | "itens" | "chegando">) {
+function CardPlano({ plano, periodo }: { plano: Plano; periodo: Periodo }) {
   return (
-    <div className="flex flex-1 flex-col gap-3 text-sm">
-      {inclui && <p className="font-semibold">{inclui}</p>}
-      <ul className="flex flex-col gap-1.5">
-        {itens.map((item) => (
+    <div
+      className={cn(
+        "relative flex flex-col gap-5 rounded-2xl border bg-card p-6 shadow-sm",
+        plano.destaque && "border-2 border-primary shadow-lg",
+        plano.teste && "bg-primaria-fundo",
+      )}
+    >
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-2xl font-bold">{plano.nome}</h3>
+          {plano.destaque && (
+            <Badge className="brilho-selo border-transparent bg-destaque text-menu">
+              Mais escolhido
+            </Badge>
+          )}
+        </div>
+        <p className="text-base text-texto-secundario">{plano.publico}</p>
+      </div>
+      <p className="text-4xl font-extrabold tabular-nums">{plano[periodo]}</p>
+      <dl className="grid grid-cols-3 gap-2 rounded-xl bg-fundo/70 p-3 text-center">
+        {plano.numeros.map(({ valor, rotulo }) => (
+          <div key={rotulo} className="flex flex-col">
+            <dd className="order-1 text-2xl font-extrabold text-primaria tabular-nums">{valor}</dd>
+            <dt className="order-2 text-xs leading-tight font-medium text-texto-secundario">
+              {rotulo}
+            </dt>
+          </div>
+        ))}
+      </dl>
+      <ul className="flex flex-1 flex-col gap-2 text-base">
+        {plano.itens.map((item) => (
           <li key={item} className="flex gap-2">
-            <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-sucesso" />
+            <Check aria-hidden className="mt-1 size-4 shrink-0 text-sucesso" />
             {item}
           </li>
         ))}
       </ul>
-      {chegando && (
-        <div>
-          <p className="text-xs font-semibold text-texto-secundario">Em breve no plano</p>
-          <ul className="mt-1 flex flex-col gap-1.5 text-texto-secundario">
-            {chegando.map((item) => (
-              <li key={item} className="flex gap-2">
-                <Clock aria-hidden className="mt-0.5 size-4 shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function GradePlanos({ periodo }: { periodo: Periodo }) {
-  return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      {planos.map((plano) => (
-        <Card key={plano.nome} className={cn(plano.destaque && "border-2 border-primaria")}>
-          <CardHeader>
-            <div className="flex flex-wrap items-center gap-2">
-              <CardTitle className="text-xl">{plano.nome}</CardTitle>
-              {plano.destaque && (
-                <Badge className="brilho-selo border-transparent bg-destaque text-menu">
-                  Mais escolhido
-                </Badge>
-              )}
-              {plano.emBreve && <Badge variant="secondary">Em breve</Badge>}
-            </div>
-            <CardDescription>{plano.publico}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col gap-4">
-            <p className="font-serif text-2xl font-semibold tabular-nums">{plano[periodo]}</p>
-            <ListaRecursos inclui={plano.inclui} itens={plano.itens} chegando={plano.chegando} />
-            {plano.botao ? (
-              <Button asChild variant={plano.destaque ? "default" : "outline"} className="w-full">
-                <a href={plano.emBreve ? "#fundador" : CTA_TESTE.href}>{plano.botao}</a>
-              </Button>
-            ) : (
-              <Button disabled variant="outline" className="w-full">
-                Em breve
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+      <Button
+        asChild
+        size="lg"
+        variant={plano.destaque || plano.teste ? "default" : "outline"}
+        className="w-full"
+      >
+        <a href={CTA_TESTE.href} onClick={() => track("cta_teste_click")}>
+          {plano.botao}
+        </a>
+      </Button>
     </div>
   );
 }
@@ -172,12 +154,15 @@ export function AbasPrecos() {
         <TabsTrigger value="mensal">Mensal</TabsTrigger>
         <TabsTrigger value="anual">Anual (2 meses grátis)</TabsTrigger>
       </TabsList>
-      <TabsContent value="mensal">
-        <GradePlanos periodo="mensal" />
-      </TabsContent>
-      <TabsContent value="anual">
-        <GradePlanos periodo="anual" />
-      </TabsContent>
+      {(["mensal", "anual"] as const).map((valor) => (
+        <TabsContent key={valor} value={valor} className="pt-2">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {planos.map((plano) => (
+              <CardPlano key={plano.nome} plano={plano} periodo={valor} />
+            ))}
+          </div>
+        </TabsContent>
+      ))}
     </Tabs>
   );
 }

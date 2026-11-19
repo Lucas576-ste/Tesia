@@ -4,8 +4,8 @@ import { FormularioFundador } from "./formulario-fundador";
 import { SecaoLanding } from "./secao-landing";
 
 const incluido = [
-  "15 dias grátis, com até 15 peças e sem cartão",
-  "R$ 79/mês depois do período grátis, com 50 peças por mês (preço normal do Pro: R$ 129)",
+  "Os mesmos 11 dias grátis, sem cartão",
+  "R$ 79/mês para sempre no plano Individual (preço normal: R$ 129), com 7 peças por dia",
   "Configuração feita junto com você",
   "Canal direto com o fundador",
 ];
@@ -20,7 +20,7 @@ export function Fundador() {
           </h2>
           <p className="text-lg">
             Estamos abrindo a Tesia para um grupo pequeno de advogados do DF, onde os calendários
-            locais de prazo já estão prontos. Quem entrar agora tem 15 dias grátis para testar a Lia
+            locais de prazo já estão prontos. Quem entrar agora tem 11 dias grátis para testar a Lia
             no dia a dia, paga R$ 79 por mês enquanto a assinatura estiver ativa e ajuda a decidir o
             que a Tesia vai fazer a seguir.
           </p>

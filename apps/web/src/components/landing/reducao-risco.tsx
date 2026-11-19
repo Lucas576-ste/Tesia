@@ -5,7 +5,7 @@ const itens = [
   {
     icone: CreditCard,
     titulo: "Teste sem cartão",
-    texto: "7 dias grátis, sem cobrança automática no fim.",
+    texto: "11 dias grátis, sem cobrança automática no fim.",
   },
   {
     icone: BadgeCheck,
@@ -27,8 +27,8 @@ export function ReducaoRisco() {
         <RevelarItem key={titulo} className="flex gap-3 rounded-xl border bg-card p-4">
           <Icone aria-hidden className="mt-0.5 size-5 shrink-0 text-primaria" />
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-semibold">{titulo}</span>
-            <span className="text-xs text-texto-secundario">{texto}</span>
+            <span className="text-base font-semibold">{titulo}</span>
+            <span className="text-sm text-texto-secundario">{texto}</span>
           </div>
         </RevelarItem>
       ))}

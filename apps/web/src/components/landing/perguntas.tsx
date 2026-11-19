@@ -17,7 +17,7 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
   {
     pergunta: "Como funciona o teste grátis?",
     resposta:
-      "Você cria a conta e usa por 7 dias com os recursos do plano Pro, com até 5 peças. Não pedimos cartão e não há cobrança automática no fim: se quiser continuar, escolhe um plano.",
+      "Você cria a conta e usa por 11 dias com tudo do plano Individual, até 7 peças por dia. Não pedimos cartão e não há cobrança automática no fim: se quiser continuar, escolhe um plano.",
   },
   {
     pergunta: "Como funciona a assinatura?",

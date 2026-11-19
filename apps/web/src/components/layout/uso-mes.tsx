@@ -24,7 +24,7 @@ export function UsoMes({ usadas, limite, className }: UsoMesProps) {
       </span>
       <div
         role="progressbar"
-        aria-label="Uso do mês"
+        aria-label="Peças de hoje"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percentual}

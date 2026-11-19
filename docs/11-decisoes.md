@@ -95,6 +95,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-19 | Menu com 5 itens (Painel, Intimações, Clientes, Peças, Meu estilo) + Configurações; Processos dentro de Clientes; Indicar no rodapé | Tirar repetições (Nova intimação e + Adicionar; Processos e Clientes) e seguir o caminho intimação → prazo → peça → cliente |
 | 2026-11-19 | MVP com 8 áreas (inclui criminal, tributário, empresarial e bancário, administrativo e servidor público) e agravo de instrumento em todas; regras novas "em validação" | Decisão de Lucas; o advogado sempre confirma o prazo |
 | 2026-11-19 | Status "Vencido" e uma única regra de urgência para cards, quadro, lista e alertas do painel; o quadro passa a ser por urgência e "Rascunho pronto" vira selo | Os números precisam bater, e prazo passado aparecia como "vence hoje" |
+| 2026-11-19 | Teste grátis de 11 dias sem cartão; planos Individual (7 peças/dia, R$ 129) e Sócio (2 advogados, 15/dia, R$ 219), com pushes destacados; limite passa a ser diário | Decisão de Lucas sobre preços; landing reforça "tudo num só lugar" e o teste grátis |
 
 ## Pendências
 
@@ -131,3 +132,5 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Trocar os números e depoimentos de exemplo (`content/proof.ts`) pelos reais, com autorização dos advogados | Lucas | Depois dos primeiros fundadores |
 | Validar com o advogado parceiro as fases de cada rito e os nomes usados no dia a dia (`packages/shared/src/fases.ts`) | Lucas | Antes de divulgar |
 | Validar com advogados as regras de prazo das áreas novas (criminal, tributário, empresarial, administrativo) | Lucas | Antes de divulgar essas áreas |
+| Confirmar os números de push por plano (100 e 300) quando escolher o provedor da integração | Lucas | Antes de divulgar |
+| Decidir se entra um teto mensal de segurança além do limite diário | Lucas | Antes de cobrar |

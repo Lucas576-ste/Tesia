@@ -50,7 +50,7 @@ export function ExemploToast() {
       >
         Erro
       </Button>
-      <Button variant="outline" onClick={() => toast.warning("Você usou 80% das peças do mês.")}>
+      <Button variant="outline" onClick={() => toast.warning("Você usou 80% das peças de hoje.")}>
         Aviso
       </Button>
       <Button variant="outline" onClick={() => toast.info("Análise da intimação concluída.")}>

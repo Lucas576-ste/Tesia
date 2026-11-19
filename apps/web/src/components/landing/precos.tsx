@@ -1,25 +1,17 @@
 import { AbasPrecos } from "./abas-precos";
-import { Confirmar } from "./confirmar";
 import { FaixaPlus } from "./faixa-plus";
 import { ReducaoRisco } from "./reducao-risco";
 import { SecaoLanding } from "./secao-landing";
 
 export function Precos() {
   return (
-    <SecaoLanding
-      id="precos"
-      titulo={
-        <Confirmar motivo="valor da hora do advogado" alternativa="Preços">
-          Menos do que uma hora do seu trabalho por mês.
-        </Confirmar>
-      }
-    >
+    <SecaoLanding id="precos" titulo={"Comece grátis. Depois, escolha o seu plano."}>
       <AbasPrecos />
       <ReducaoRisco />
       <FaixaPlus />
-      <p className="text-sm text-texto-secundario">
-        Precisa de mais? 10 peças extras a partir de R$ 19. Sem taxa de ativação. Cancele quando
-        quiser. Exporte seus dados a qualquer momento.
+      <p className="text-base text-texto-secundario">
+        Precisa de mais num dia corrido? 10 peças extras por R$ 19. Sem taxa de ativação. Cancele
+        quando quiser e leve seus dados.
       </p>
     </SecaoLanding>
   );

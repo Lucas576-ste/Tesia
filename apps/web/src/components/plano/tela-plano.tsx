@@ -54,7 +54,7 @@ export function TelaPlano({ exemploInicial }: TelaPlanoProps) {
           <Dado rotulo="Forma de pagamento" valor={teste ? "Sem cartão no teste" : "A definir"} />
         </dl>
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-medium">Uso do mês</h3>
+          <h3 className="text-sm font-medium">Peças de hoje</h3>
           <UsoMes {...uso} className="w-full max-w-sm" />
         </div>
         <div className="flex flex-wrap gap-2">
