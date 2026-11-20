@@ -1,4 +1,5 @@
 import {
+  classificarTipoPeca,
   dividirEmSecoes,
   ehDocx,
   ehErroDefinitivoDaApi,
@@ -17,6 +18,7 @@ import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ estilo_documento_id: z.uuid() });
 const linhaSchema = z.object({ arquivo_path: z.string() });
+const opcoesTipoSchema = z.array(z.object({ id: z.uuid(), nome: z.string(), area: z.string() }));
 
 function documentoDoJob(job: Job) {
   const resultado = dadosSchema.safeParse(job.dados);
@@ -49,6 +51,25 @@ async function extrairTexto(arquivo: Uint8Array, job: Job, contexto: Contexto) {
   if (leitura.origem === "ia")
     await registrarUso(contexto.db, job, { etapa: "transcricao", ...leitura.transcricao });
   return leitura.texto;
+}
+
+async function identificarTipo(texto: string, job: Job, contexto: Contexto) {
+  try {
+    const { rows } = await contexto.db.query(
+      "select id, nome, area from tipos_peca order by area, nome",
+    );
+    const opcoes = opcoesTipoSchema.parse(rows);
+    if (opcoes.length === 0) return null;
+    const etapa = await classificarTipoPeca(contexto.ia, texto, opcoes);
+    await registrarUso(contexto.db, job, { etapa: "tipo_peca_estilo", ...etapa });
+    return etapa.resultado;
+  } catch (erro) {
+    contexto.registrar("tipo_peca_estilo_falhou", {
+      job_id: job.id,
+      erro: erro instanceof Error ? erro.message : String(erro),
+    });
+    return null;
+  }
 }
 
 async function executar(job: Job, contexto: Contexto) {
@@ -89,6 +110,8 @@ async function executar(job: Job, contexto: Contexto) {
     },
   });
 
+  const tipoPecaId = await identificarTipo(texto, job, contexto);
+
   const cliente = await db.connect();
   try {
     await cliente.query("begin");
@@ -106,8 +129,9 @@ async function executar(job: Job, contexto: Contexto) {
       );
     }
     await cliente.query(
-      "update estilo_documentos set texto = $3, status = 'lido' where id = $1 and escritorio_id = $2",
-      [documentoId, job.escritorio_id, texto],
+      `update estilo_documentos set texto = $3, status = 'lido', tipo_peca_id = $4
+       where id = $1 and escritorio_id = $2`,
+      [documentoId, job.escritorio_id, texto, tipoPecaId],
     );
     await cliente.query("commit");
   } catch (erro) {

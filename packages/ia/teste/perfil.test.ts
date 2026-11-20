@@ -4,6 +4,7 @@ import { gerarPerfilEstilo, type PerfilEstilo } from "../src/estilo/perfil.js";
 import { RespostaInvalidaDaIa } from "../src/transcricao.js";
 
 const perfil: PerfilEstilo = {
+  aprendizados: [{ parte: "abertura", itens: ["Você abre pedindo a palavra.", "  "] }],
   estrutura_por_tipo: [{ tipo: "Contestação", secoes: ["DOS FATOS", "DO DIREITO", "DOS PEDIDOS"] }],
   tom: "Direto e técnico",
   tamanho_frases: "curtas",
@@ -45,7 +46,7 @@ describe("gerarPerfilEstilo", () => {
     expect(pedido?.fallbacks).toBe("default");
     expect(JSON.stringify(pedido?.messages)).toContain('arquivo=\\"recurso.pdf\\"');
     expect(resultado.perfil.frases_exibicao).toHaveLength(6);
-    expect(resultado.versaoPrompt).toBe("perfil@1");
+    expect(resultado.versaoPrompt).toBe("perfil@2");
     expect(resultado.uso.custoEstimado).toBeCloseTo(0.028, 6);
   });
 

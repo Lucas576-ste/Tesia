@@ -49,8 +49,15 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | areas | text[] | áreas de atuação escolhidas |
 | papel | enum | `dono`, `advogado`, `estagiario` (multiusuário futuro) |
 | whatsapp | text | para alertas |
+| modelo_docx_path | text | caminho do timbrado .docx no Storage (null: modelo padrão) |
+| modelo_status | text | `processando`, `ativo` ou `erro` (null: sem timbrado) |
+| modelo_nome | text | nome do arquivo enviado |
+| modelo_enviado_em | timestamptz | data do envio |
+| modelo_erro | text | o que deu errado e como resolver, quando o status é `erro` |
 | alerta_email | boolean | alertas por e-mail ligados (padrão: sim) |
 | alerta_dias | text[] | quando avisar: `5_uteis`, `2_uteis`, `fatal`, `interno` |
+| tribunais | text[] | tribunais em que mais atua (escolhidos no perfil) |
+| estilo_aprender_revisoes | boolean | aprender com as revisões de rascunho (padrão: sim) |
 | djen_ativo | boolean | busca automática no DJEN ligada (contas novas: sim; contas anteriores a 19/11/2026 começam desligadas) |
 | djen_buscado_ate | date | até que data as publicações já foram buscadas (só o worker altera) |
 | modelo_docx_path | text | `escritorio_id/usuario_id/modelo.docx` no bucket privado `modelos` (até 5 MB, só .docx); vazio = modelo padrão da Tesia |
@@ -58,6 +65,44 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | calendario_token | text | token secreto do link da agenda (48 caracteres hexadecimais); `gerar_novo_link_agenda()` troca, `agenda_valida(token)` e `agenda_por_token(token)` atendem a rota pública `/agenda/<token>.ics` |
 
 O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cria o escritório, o usuário dono e a assinatura em teste de 7 dias no Pro.
+
+### estilo_correcoes
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id | uuid | |
+| usuario_id | uuid | |
+| item_id | text | id estável do aprendizado (`idAprendizado(parte, texto)`); único por usuário |
+| parte | text | `abertura`, `fatos`, `fundamentacao`, `pedidos`, `fechamento` |
+| texto_item | text | o aprendizado avaliado |
+| avaliacao | text | `certo` ou `errado` ("Não sou assim") |
+| correcao | text | "Como você faz?", opcional |
+| aplicada_em | timestamptz | quando a análise do estilo passou a usar a correção |
+
+### pedidos_dados
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id | uuid | |
+| usuario_id | uuid | |
+| tipo | text | `exportacao` ou `exclusao` |
+| atendido_em | timestamptz | quando o pedido foi atendido |
+
+### conversas_lia
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id | uuid | |
+| usuario_id | uuid | só o próprio usuário vê a conversa |
+| titulo | text | início da primeira pergunta |
+| atualizada_em | timestamptz | |
+
+### mensagens_lia
+| Campo | Tipo | Observação |
+|---|---|---|
+| conversa_id | uuid | |
+| papel | text | `usuario` ou `lia` |
+| conteudo | text | |
+| contexto_json | jsonb | rota e plano no momento da pergunta |
+| avaliacao | text | `positiva` ou `negativa` |
+| avaliacao_comentario | text | "O que faltou?", opcional |
 
 ### clientes
 | Campo | Tipo | Observação |

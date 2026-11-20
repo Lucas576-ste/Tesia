@@ -11,6 +11,53 @@ const dataOpcional = z.union([z.iso.date("Informe uma data válida."), z.literal
 
 export { hojeBrasilia } from "@/lib/hoje";
 
+export const calculoPrazoSchema = z.object({
+  forma: z.enum(["diario", "portal"]),
+  marco: z.iso.date("Informe a data da publicação."),
+  abertura: dataOpcional,
+  dias: z.number().int().min(1, "Informe os dias.").max(365, "Informe até 365 dias."),
+  contagem: z.enum(["uteis", "corridos"]),
+  fundamento: z.string().trim().max(200),
+  regraId: z.union([z.uuid(), z.literal("")]),
+});
+
+export type CalculoPrazo = z.infer<typeof calculoPrazoSchema>;
+
+export type PresetPrazo = {
+  id: string;
+  peca: string;
+  dias: number;
+  contagem: "uteis" | "corridos";
+  fundamento: string;
+  revisada: boolean;
+};
+
+export type RegraParaPreset = {
+  id: string;
+  peca: string;
+  dias: number;
+  contagem: "uteis" | "corridos";
+  fundamento: string;
+  revisada: boolean;
+};
+
+export function rotuloPreset({ peca, dias, contagem, fundamento }: PresetPrazo) {
+  return `${peca} · ${dias} dias ${contagem === "uteis" ? "úteis" : "corridos"} (${fundamento})`;
+}
+
+export function agruparPresets(regras: RegraParaPreset[]): PresetPrazo[] {
+  const grupos = new Map<string, PresetPrazo>();
+  for (const regra of regras) {
+    const chave = `${regra.peca}|${regra.dias}|${regra.contagem}|${regra.fundamento}`;
+    const existente = grupos.get(chave);
+    if (existente) existente.revisada = existente.revisada && regra.revisada;
+    else grupos.set(chave, { ...regra });
+  }
+  return [...grupos.values()].sort(
+    (a, b) => a.peca.localeCompare(b.peca, "pt-BR") || a.dias - b.dias,
+  );
+}
+
 export function esquemaPrazoManual(hoje: string) {
   return z
     .object({
@@ -26,6 +73,7 @@ export function esquemaPrazoManual(hoje: string) {
       processoId: z.string(),
       prazoInterno: dataOpcional,
       inicio: dataOpcional,
+      calculo: calculoPrazoSchema.optional(),
     })
     .superRefine(({ tipo, data, prazoInterno, inicio }, contexto) => {
       if (tipo !== "prazo" || !data) return;

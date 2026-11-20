@@ -5,6 +5,14 @@ import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ usuario_id: z.uuid() });
+const correcoesSchema = z.array(
+  z.object({
+    parte: z.string(),
+    texto_item: z.string(),
+    avaliacao: z.enum(["certo", "errado"]),
+    correcao: z.string().nullable(),
+  }),
+);
 const pecasSchema = z.array(z.object({ nome: z.string(), texto: z.string() }));
 
 function usuarioDoJob(job: Job) {
@@ -44,14 +52,26 @@ async function executar(job: Job, contexto: Contexto) {
     return;
   }
 
+  const { rows: linhasCorrecoes } = await db.query(
+    `select parte, texto_item, avaliacao, correcao from estilo_correcoes
+     where usuario_id = $1 and escritorio_id = $2 order by criado_em`,
+    [usuarioId, job.escritorio_id],
+  );
+  const correcoes = correcoesSchema.parse(linhasCorrecoes);
+
   try {
-    const resultado = await gerarPerfilEstilo(ia, pecas);
+    const resultado = await gerarPerfilEstilo(ia, pecas, correcoes);
     await registrarUso(db, job, { etapa: "perfil_estilo", ...resultado });
     await salvar(contexto, job, usuarioId, {
       guia: resultado.perfil,
       frases: resultado.perfil.frases_exibicao,
       pecas: pecas.length,
     });
+    await db.query(
+      `update estilo_correcoes set aplicada_em = now()
+       where usuario_id = $1 and escritorio_id = $2`,
+      [usuarioId, job.escritorio_id],
+    );
     registrar("perfil_estilo_gerado", {
       job_id: job.id,
       pecas: pecas.length,

@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ClienteIa } from "../src/cliente.js";
 import { gerarPeca, montarPedidoGeracao, type EntradaGeracao } from "../src/geracao/gerar-peca.js";
+import { clienteFalso as clienteFalsoDeEtapa } from "./cliente-falso.js";
+import { pontosSemPrazo } from "../src/geracao/pontos.js";
+import { marcarMencaoDePrazo } from "../src/geracao/revisao.js";
 import { acharPendencias, separarSecoes } from "../src/geracao/secoes.js";
 import { RespostaInvalidaDaIa } from "../src/transcricao.js";
 
@@ -30,7 +33,6 @@ const entrada: EntradaGeracao = {
   pontosAtacar: [
     { titulo: "Atestado ignorado", explicacao: "A sentença não analisou o atestado." },
   ],
-  prazo: { vencimento: "2026-11-23", fundamento: "Lei 9.099/1995" },
 };
 
 function clienteFalso(texto: string, stopReason = "end_turn") {
@@ -65,6 +67,18 @@ describe("separarSecoes e acharPendencias", () => {
 });
 
 describe("montarPedidoGeracao", () => {
+  it("envia nome e OAB do advogado e não envia prazo", () => {
+    const { conteudo } = montarPedidoGeracao({
+      ...entrada,
+      advogado: { nome: "Helena Martins Prado", oab: "OAB/DF 00.000" },
+    });
+    expect(conteudo).toContain(
+      "<advogado>\nNome: Helena Martins Prado\nOAB: OAB/DF 00.000\n</advogado>",
+    );
+    expect(conteudo).not.toMatch(/prazo/i);
+    expect(montarPedidoGeracao(entrada).conteudo).not.toContain("<advogado>");
+  });
+
   it("inclui a qualificação do cliente só quando ela existe", () => {
     expect(montarPedidoGeracao(entrada).conteudo).not.toContain("<qualificacao_cliente>");
     const { conteudo } = montarPedidoGeracao({
@@ -97,7 +111,7 @@ describe("gerarPeca", () => {
     expect(pedido?.fallbacks).toBe("default");
     expect(resultado.secoes).toHaveLength(3);
     expect(resultado.pendencias).toHaveLength(2);
-    expect(resultado.versaoPrompt).toBe("geracao@3");
+    expect(resultado.versaoPrompt).toBe("geracao@5");
     expect(resultado.uso.custoEstimado).toBeCloseTo(0.0485, 6);
   });
 
@@ -110,5 +124,84 @@ describe("gerarPeca", () => {
       const { cliente } = clienteFalso(texto, motivo);
       await expect(gerarPeca(cliente, entrada)).rejects.toBeInstanceOf(RespostaInvalidaDaIa);
     }
+  });
+});
+
+describe("marcarMencaoDePrazo", () => {
+  const secoes = [
+    {
+      titulo: "II – DO DIREITO",
+      texto:
+        "Com a devida vênia, a ação não procede.\n\nQuanto à tempestividade, a contestação é apresentada dentro do prazo legal.",
+    },
+  ];
+
+  it("marca só o parágrafo que trata de prazo", () => {
+    const { secoes: marcadas, inseridos } = marcarMencaoDePrazo(secoes, [
+      "Em síntese, o autor alega.",
+    ]);
+    expect(inseridos).toBe(1);
+    expect(marcadas[0]?.texto.split("\n\n")[0]).not.toContain("[CONFIRMAR");
+    expect(marcadas[0]?.texto).toContain(
+      "dentro do prazo legal. [CONFIRMAR: o prazo é controlado pelo sistema",
+    );
+  });
+
+  it("pega o parágrafo sobre início do prazo, mas não o prazo prescricional", () => {
+    const { inseridos } = marcarMencaoDePrazo(
+      [
+        {
+          titulo: "II – DO DIREITO",
+          texto:
+            "O prazo para contestar tem início com a juntada aos autos do comprovante de citação.\n\nO prazo prescricional é de 5 anos.\n\nO prazo de 5 anos já se esgotou.",
+        },
+      ],
+      [],
+    );
+    expect(inseridos).toBe(1);
+  });
+
+  it("não marca de novo e não age se o advogado já fala de prazo nas peças dele", () => {
+    const uma = marcarMencaoDePrazo(secoes, []);
+    expect(marcarMencaoDePrazo(uma.secoes, []).inseridos).toBe(0);
+    expect(marcarMencaoDePrazo(secoes, ["A contestação é tempestiva."]).inseridos).toBe(0);
+  });
+});
+
+describe("revisarCitacoes", () => {
+  it("manda nome, OAB e qualificação como fontes válidas", async () => {
+    const { revisarCitacoes } = await import("../src/geracao/revisao.js");
+    const { cliente, parse } = clienteFalsoDeEtapa({ problemas: [] });
+    await revisarCitacoes(cliente, {
+      secoes: [{ titulo: "", texto: "texto" }],
+      textoIntimacao: "intimação",
+      trechos: [],
+      advogado: { nome: "Helena", oab: "OAB/DF nº 1" },
+      qualificacaoCliente: "MARIA, brasileira",
+    });
+    const pedido = JSON.stringify(parse.mock.calls[0]);
+    expect(pedido).toContain(
+      "<dados_do_advogado>\\nNome: Helena\\nOAB: OAB/DF nº 1\\n</dados_do_advogado>",
+    );
+    expect(pedido).toContain(
+      "<qualificacao_cliente>\\nMARIA, brasileira\\n</qualificacao_cliente>",
+    );
+  });
+});
+
+describe("pontosSemPrazo", () => {
+  it("tira o ponto que é só sobre prazo e mantém os de mérito", () => {
+    const pontos = [
+      { titulo: "Prazo conta da juntada do comprovante" },
+      { titulo: "Valor sem discriminação de multa e juros" },
+      { titulo: "Prescrição quinquenal" },
+      { titulo: "Prazo prescricional de 5 anos" },
+      { titulo: "Tempestividade da contestação" },
+    ];
+    expect(pontosSemPrazo(pontos).map((p) => p.titulo)).toEqual([
+      "Valor sem discriminação de multa e juros",
+      "Prescrição quinquenal",
+      "Prazo prescricional de 5 anos",
+    ]);
   });
 });

@@ -11,6 +11,7 @@ Protótipo visual das telas principais: canvas "Protótipo Agente Jurídico" (Me
 - **Painel (`/app`):** bloco "Atenção agora" (até 3 itens, com ação direta); cards clicáveis Vencidos, Vencem em até 3 dias, Rascunhos para revisar e Intimações novas; quadro com Vencidos, Vence hoje, Próximos 3 dias, Mais de 3 dias e Protocolado ("Rascunho pronto" virou selo no card); filtros em chips; conteúdo alinhado ao menu, até 1280px.
 - **Prazos (`/app/prazos`):** a lista completa, com os mesmos cards, chips e quadro, sem o "Atenção agora".
 - **Topo:** botão "Nova intimação" (com ⌄ para prazo manual, processo e cliente); o uso de peças foi para o rodapé do menu.
+- **Lia (chat):** botão flutuante com o avatar da Lia em todo o app (Ctrl+J); abre o painel de chat com sugestões por tela, histórico e feedback. Detalhes em `21-lia-chat.md`.
 - **Menu:** Painel, Intimações (badge), Prazos, Peças (badge), Clientes, Meu estilo; embaixo, Configurações e Indicar a Tesia; card "Peças: X de Y" com o plano; perfil com menu (Configurações, Plano e uso, Sair); botão para recolher, salvo no navegador.
 
 ## Menu do app (reorganizado em 2026-11-19)
@@ -215,9 +216,12 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 
 ### 18. Meu estilo (`/app/estilo`) — MVP
 - Peças enviadas, com opção de adicionar e remover
-- Perfil de estilo: "O que aprendi sobre você"
-- Botão "Atualizar meu estilo" depois de mudanças
-- Opção: usar peças revisadas no sistema para melhorar o estilo (ligada por padrão)
+- Card de status com o nível (Básico, Bom, Ótimo), a próxima ação e "Adicionar peças"
+- "O que a Lia aprendeu sobre você" por parte da peça (abertura, fatos, fundamentação, pedidos, fechamento), com "Está certo" e "Não sou assim" (campo "Como você faz?")
+- "Veja no seu estilo": parágrafo de exemplo com as expressões típicas destacadas e "Gerar outro exemplo"
+- "Suas peças": nome, tipo detectado, data e remover; sugestão do tipo que falta
+- Botão "Atualizar meu estilo" só quando há peças ou correções novas desde a última análise
+- Switch "Aprender com suas revisões" (ligado por padrão)
 
 ### 19. Configurações (`/app/configuracoes`) — MVP
 Abas:
@@ -225,7 +229,7 @@ Abas:
 - **Alertas:** canais (e-mail, WhatsApp), dias de antecedência e aviso no dia do prazo interno
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso, divisão por área
-- **Modelo de documento:** trocar o .docx timbrado
+- **Modelo de documento:** quatro estados pelo status real do timbrado: sem timbrado (envio grande com miniatura), processando ("Lendo seu timbrado…"), ativo (prévia A4 com o arquivo real à esquerda e card "Timbrado em uso" com baixar peça de teste, trocar e remover) e erro (mensagem de como resolver e "Tentar outro arquivo"). Só .docx; PDF é recusado com orientação
 - **Calendário:** feriados e suspensões próprios do escritório
 - **Segurança:** senha, sessões ativas
 - **Dados:** exportar tudo e excluir conta
@@ -246,7 +250,7 @@ Abas:
 - **M1. Limite atingido:** aviso aos 80% e bloqueio aos 100%, com opções de pacote extra ou upgrade
 - **M2. Fim do teste grátis:** escolha do plano e pagamento
 - **M3. Confirmação de prazo editado:** registra a data sugerida e a data escolhida
-- **M4. Novo prazo manual:** tipo (prazo, audiência, compromisso), descrição, data (prazo fatal, quando o tipo é prazo), hora, processo (opcional), responsável; com o tipo prazo, prazo interno e início da contagem (opcionais); opção "calcular a partir da disponibilização"
+- **M4. Novo prazo:** com o tipo prazo, o padrão é "Calcular pela publicação": como foi intimado (Diário ou Portal), data da publicação e atalho de prazo (peça, dias e contagem, ou "Outro prazo"); a tela mostra "Sugestão de vencimento", a conta e a data fatal editável (a sugerida fica registrada). "Informar a data" mantém o formulário manual. Campos do formulário: tipo (prazo, audiência, compromisso), descrição, data (prazo fatal, quando o tipo é prazo), hora, processo (opcional), responsável; com o tipo prazo, prazo interno e início da contagem (opcionais); opção "calcular a partir da disponibilização"
 
 ---
 

@@ -15,8 +15,11 @@ export {
   type SecaoEstilo,
   type TrechoEstilo,
 } from "./secoes.js";
+export { classificarTipoPeca, type OpcaoTipoPeca } from "./classificar.js";
+export { gerarExemploEstilo } from "./exemplo.js";
 export {
   gerarPerfilEstilo,
+  type CorrecaoEstilo,
   perfilEstiloSchema,
   type PecaParaPerfil,
   type PerfilEstilo,

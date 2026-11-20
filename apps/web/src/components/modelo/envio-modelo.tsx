@@ -63,7 +63,7 @@ export function EnvioModelo({ escritorioId, usuarioId, temModelo }: DadosModelo)
         toast.error("Falha no envio. Tente de novo.");
         return;
       }
-      const resultado = await salvarModelo(caminho);
+      const resultado = await salvarModelo(caminho, arquivo.name);
       if ("erro" in resultado) {
         toast.error(resultado.erro);
         return;

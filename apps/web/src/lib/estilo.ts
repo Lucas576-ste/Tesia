@@ -1,3 +1,4 @@
+import { normalizarNome } from "@tesia/shared";
 import { z } from "zod";
 
 export const BUCKET_ESTILO = "estilo";
@@ -26,6 +27,8 @@ export type PecaEstilo = {
   id: string;
   nome: string;
   data: string;
+  criadaEm: string;
+  tipo: string | null;
   status: StatusPecaEstilo;
   trechos: number;
   erro?: string;
@@ -56,3 +59,23 @@ export const registroPecaSchema = z.object({
   caminho: z.string().regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|docx)$/),
   nome: z.string().trim().min(1).max(200),
 });
+
+const TIPOS_SUGERIDOS = [
+  { chave: "contestacao", frase: "nenhuma contestação" },
+  { chave: "replica", frase: "nenhuma réplica" },
+  { chave: "apelacao", frase: "nenhuma apelação" },
+  { chave: "recurso inominado", frase: "nenhum recurso inominado" },
+  { chave: "agravo", frase: "nenhum agravo de instrumento" },
+  { chave: "embargos", frase: "nenhum embargo de declaração" },
+] as const;
+
+export function tipoSugerido(tiposEnviados: (string | null)[]) {
+  const enviados = tiposEnviados
+    .filter((tipo): tipo is string => Boolean(tipo))
+    .map(normalizarNome);
+  if (enviados.length === 0) return null;
+  return (
+    TIPOS_SUGERIDOS.find(({ chave }) => !enviados.some((tipo) => tipo.includes(chave)))?.frase ??
+    null
+  );
+}

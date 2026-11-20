@@ -48,6 +48,7 @@ type PainelPrazosProps = {
   idsComAnalise: string[];
   processos: ProcessoResumo[];
   novoPrazo: boolean;
+  processoInicial?: string;
   urlSemNovo: string;
   intimacoes: { total: number; pendentes: number };
   modo?: "painel" | "prazos";
@@ -69,6 +70,7 @@ export function PainelPrazos({
   idsComAnalise,
   processos,
   novoPrazo,
+  processoInicial,
   urlSemNovo,
   intimacoes,
   modo = "painel",
@@ -350,6 +352,7 @@ export function PainelPrazos({
       <ModalPrazoManual
         aberto={novoPrazo && plano.recursosPro}
         processos={processos}
+        processoInicial={processoInicial}
         aoFechar={fecharNovoPrazo}
         aoSalvar={salvarPrazoManual}
       />

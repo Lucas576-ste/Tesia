@@ -30,6 +30,7 @@ type FormularioPerfilProps = {
   rotuloBotao?: string;
   maxAreas?: number | null;
   aoSalvar?: () => void;
+  aoCancelar?: () => void;
   salvar?: (perfil: Perfil) => Promise<{ erro?: string }>;
 };
 
@@ -39,6 +40,7 @@ export function FormularioPerfil({
   rotuloBotao = "Continuar",
   maxAreas = null,
   aoSalvar,
+  aoCancelar,
   salvar,
 }: FormularioPerfilProps) {
   const router = useRouter();
@@ -182,13 +184,21 @@ export function FormularioPerfil({
             {form.formState.errors.root.message}
           </p>
         )}
-        <Button
-          type="submit"
-          disabled={form.formState.isSubmitting}
-          className="w-full sm:w-auto sm:self-end"
-        >
-          {rotuloBotao}
-        </Button>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          {aoCancelar && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={aoCancelar}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+          )}
+          <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+            {rotuloBotao}
+          </Button>
+        </div>
       </form>
     </Form>
   );

@@ -5,6 +5,7 @@ export {
   type ResultadoGeracao,
   type TrechoReferencia,
 } from "./gerar-peca.js";
+export { pontosSemPrazo } from "./pontos.js";
 export { acharPendencias, separarSecoes, type Pendencia, type SecaoPeca } from "./secoes.js";
 export {
   ajustarPeca,
@@ -14,4 +15,9 @@ export {
   type ResultadoAjuste,
   type SecaoAlterada,
 } from "./ajuste.js";
-export { marcarProblemas, revisarCitacoes, type ProblemaCitacao } from "./revisao.js";
+export {
+  marcarMencaoDePrazo,
+  marcarProblemas,
+  revisarCitacoes,
+  type ProblemaCitacao,
+} from "./revisao.js";

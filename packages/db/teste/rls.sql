@@ -284,6 +284,32 @@ begin
 end;
 $$;
 
+insert into estilo_correcoes (escritorio_id, usuario_id, item_id, parte, texto_item, avaliacao, correcao)
+select escritorio_id, id, 'fatos-x', 'fatos', 'Narra em ordem cronológica', 'errado', 'Começo pelo pedido'
+from usuarios;
+
+do $$
+begin
+  assert (select count(*) from estilo_correcoes) = 1, 'B deveria ver só a própria correção';
+  insert into pedidos_dados (escritorio_id, usuario_id, tipo)
+  select escritorio_id, id, 'exportacao' from usuarios;
+  assert (select count(*) from pedidos_dados) = 1, 'B deveria ver só o próprio pedido de dados';
+
+  insert into conversas_lia (escritorio_id, usuario_id)
+  select escritorio_id, id from usuarios;
+  insert into mensagens_lia (conversa_id, escritorio_id, papel, conteudo)
+  select id, escritorio_id, 'usuario', 'Como uso a Tesia?' from conversas_lia;
+  assert (select count(*) from conversas_lia) = 1, 'B deveria ver só a própria conversa da Lia';
+  assert (select perguntas_lia_hoje()) = 1, 'B deveria ter 1 pergunta hoje';
+  assert (select count(*) from mensagens_lia) = 1, 'B deveria ver só as próprias mensagens da Lia';
+  insert into estilo_correcoes (escritorio_id, usuario_id, item_id, parte, texto_item, avaliacao)
+  select current_setting('teste.esc_a')::uuid, id, 'fatos-y', 'fatos', 'x', 'certo' from usuarios;
+  raise exception 'B não pode gravar correção no escritório de A';
+exception
+  when insufficient_privilege or foreign_key_violation then null;
+end;
+$$;
+
 do $$
 begin
   perform public.enfileirar_perfil_estilo(current_setting('teste.esc_a')::uuid, '00000000-0000-0000-0000-000000000000');

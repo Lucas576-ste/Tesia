@@ -12,14 +12,17 @@ import { AbaAlertas } from "./aba-alertas";
 import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
-import type { DadosModelo } from "@/components/modelo/envio-modelo";
+import type { DadosTimbrado } from "@/components/modelo/painel-timbrado";
 import type { DadosDjen, PreferenciasAlerta } from "@/lib/alertas";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
+import type { PerfilConta, ResumoDados } from "@/lib/perfil-conta";
 import { AbaSeguranca } from "./aba-seguranca";
 
 function conteudosDasAbas(
-  modelo: DadosModelo,
+  conta: PerfilConta,
+  resumo: ResumoDados,
+  modelo: DadosTimbrado,
   agenda: DadosAgenda,
   alertas: PreferenciasAlerta,
   djen: DadosDjen,
@@ -31,7 +34,7 @@ function conteudosDasAbas(
     modelo: <AbaModelo modelo={modelo} />,
     calendario: <AbaCalendario />,
     seguranca: <AbaSeguranca />,
-    dados: <AbaDados />,
+    dados: <AbaDados conta={conta} resumo={resumo} />,
   };
 }
 
@@ -44,18 +47,22 @@ const todasAbas = Object.keys(ABAS_CONFIGURACOES) as AbaConfiguracoes[];
 
 export function TelaConfiguracoes({
   abaInicial,
+  conta,
+  resumo,
   modelo,
   agenda,
   alertas,
   djen,
 }: {
   abaInicial: AbaConfiguracoes;
-  modelo: DadosModelo;
+  conta: PerfilConta;
+  resumo: ResumoDados;
+  modelo: DadosTimbrado;
   agenda: DadosAgenda;
   alertas: PreferenciasAlerta;
   djen: DadosDjen;
 }) {
-  const conteudos = conteudosDasAbas(modelo, agenda, alertas, djen);
+  const conteudos = conteudosDasAbas(conta, resumo, modelo, agenda, alertas, djen);
   const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);
@@ -97,7 +104,7 @@ export function TelaConfiguracoes({
             className="data-[state=inactive]:hidden"
           >
             {chave === "perfil" ? (
-              <AbaPerfil key={id} />
+              <AbaPerfil key={id} conta={conta} />
             ) : chave === "agenda" && !plano.recursosPro ? (
               <AvisoPro
                 titulo="Agenda no celular"

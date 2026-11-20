@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -91,12 +91,20 @@ export function TelaProcesso({
             </span>
           </div>
         </div>
-        <Button asChild className="shrink-0">
-          <Link href={`/app/intimacoes/nova?processo=${processo.id}`}>
-            <Plus aria-hidden />
-            Nova intimação neste processo
-          </Link>
-        </Button>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <Link href={`/app/prazos?novo=prazo&processo=${processo.id}`}>
+              <CalendarPlus aria-hidden />
+              Novo prazo
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/app/intimacoes/nova?processo=${processo.id}`}>
+              <Plus aria-hidden />
+              Nova intimação neste processo
+            </Link>
+          </Button>
+        </div>
       </header>
       <Card className="gap-4 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">

@@ -11,6 +11,7 @@ const ambienteSchema = z.object({
   ALERTA_REMETENTE: z.string().default("Tesia <onboarding@resend.dev>"),
   URL_APP: z.url().default("http://localhost:3000"),
   HORA_ALERTAS: z.coerce.number().int().min(0).max(23).default(7),
+  LIA_RETENCAO_DIAS: z.coerce.number().int().min(1).default(90),
   INTERVALO_FILA_MS: z.coerce.number().int().positive().default(2000),
 });
 

@@ -1,20 +1,25 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { AjudaFlutuante } from "@/components/layout/ajuda-flutuante";
 import { BarraSuperior } from "@/components/layout/barra-superior";
 import { MenuInferior } from "@/components/layout/menu-inferior";
 import { MenuLateral } from "@/components/layout/menu-lateral";
+import { LiaChat } from "@/components/lia-chat/lia-chat";
 import { AvisoLimite } from "@/components/plano/aviso-limite";
 import { ProvedorPlano } from "@/components/plano/provedor-plano";
 import { Toaster } from "@/components/ui/sonner";
 import { contadoresMenu } from "@/lib/contadores-menu";
+import { contarVencendo } from "@/lib/lia/contexto";
 import { lerPlano } from "@/lib/plano-servidor";
 import { exigirUsuario, rotuloOab } from "@/lib/sessao";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const usuario = await exigirUsuario();
   if (!usuario.oab_numero) redirect("/onboarding/perfil");
-  const [estado, contadores] = await Promise.all([lerPlano(), contadoresMenu()]);
+  const [estado, contadores, vencendo] = await Promise.all([
+    lerPlano(),
+    contadoresMenu(),
+    contarVencendo(),
+  ]);
 
   return (
     <ProvedorPlano estado={estado}>
@@ -32,7 +37,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </main>
         </div>
         <MenuInferior />
-        <AjudaFlutuante />
+        <LiaChat vencendo={vencendo} />
         <Toaster />
       </div>
     </ProvedorPlano>

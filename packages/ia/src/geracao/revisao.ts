@@ -45,16 +45,68 @@ export function marcarProblemas(secoes: SecaoPeca[], problemas: ProblemaCitacao[
   return { secoes: resultado, inseridos };
 }
 
+const MENCAO_DE_PRAZO = new RegExp(
+  [
+    "tempestiv",
+    "dentro do prazo",
+    "prazo legal",
+    "revelia",
+    "prazo (para|a) (contestar|recorrer|impugnar|manifestar|apresentar)",
+    "in[íi]cio (do|da) (prazo|contagem)",
+    "contagem do prazo",
+    "juntada (aos autos )?d[oa] (comprovante|mandado|aviso|carta)",
+    "data da juntada",
+  ].join("|"),
+  "i",
+);
+const MARCADOR_PRAZO = " [CONFIRMAR: o prazo é controlado pelo sistema, não pelo texto da peça]";
+
+export function marcarMencaoDePrazo(secoes: SecaoPeca[], trechosDoAdvogado: string[]) {
+  if (trechosDoAdvogado.some((texto) => MENCAO_DE_PRAZO.test(texto))) {
+    return { secoes, inseridos: 0 };
+  }
+  let inseridos = 0;
+  const resultado = secoes.map((secao) => {
+    const paragrafos = secao.texto.split("\n\n").map((paragrafo) => {
+      if (!MENCAO_DE_PRAZO.test(paragrafo) || paragrafo.includes(MARCADOR_PRAZO.trim())) {
+        return paragrafo;
+      }
+      inseridos += 1;
+      return paragrafo + MARCADOR_PRAZO;
+    });
+    return { ...secao, texto: paragrafos.join("\n\n") };
+  });
+  return { secoes: resultado, inseridos };
+}
+
 export async function revisarCitacoes(
   cliente: ClienteIa,
-  entrada: { secoes: SecaoPeca[]; textoIntimacao: string; trechos: TrechoReferencia[] },
+  entrada: {
+    secoes: SecaoPeca[];
+    textoIntimacao: string;
+    trechos: TrechoReferencia[];
+    advogado?: { nome: string; oab: string } | null;
+    qualificacaoCliente?: string | null;
+  },
 ): Promise<ResultadoEtapa<ProblemaCitacao[]>> {
   const rascunho = entrada.secoes.map((s) => `${s.titulo}\n${s.texto}`.trim()).join("\n\n");
   const trechos = entrada.trechos.map((t) => t.texto).join("\n---\n") || "Nenhum.";
   const etapa = await chamarEtapa(cliente, {
     schema: revisaoSchema,
     sistema: INSTRUCOES_REVISAO,
-    conteudo: `<documento_do_caso>\n${entrada.textoIntimacao}\n</documento_do_caso>\n<pecas_do_advogado>\n${trechos}\n</pecas_do_advogado>\n<rascunho>\n${rascunho}\n</rascunho>`,
+    conteudo: [
+      `<documento_do_caso>\n${entrada.textoIntimacao}\n</documento_do_caso>`,
+      `<pecas_do_advogado>\n${trechos}\n</pecas_do_advogado>`,
+      entrada.advogado
+        ? `<dados_do_advogado>\nNome: ${entrada.advogado.nome}\nOAB: ${entrada.advogado.oab}\n</dados_do_advogado>`
+        : "",
+      entrada.qualificacaoCliente
+        ? `<qualificacao_cliente>\n${entrada.qualificacaoCliente}\n</qualificacao_cliente>`
+        : "",
+      `<rascunho>\n${rascunho}\n</rascunho>`,
+    ]
+      .filter(Boolean)
+      .join("\n"),
     versaoPrompt: VERSAO_REVISAO,
     esforco: "low",
   });

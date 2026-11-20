@@ -9,6 +9,7 @@ import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from 
 import { analisarIntimacao } from "./tarefas/analisar-intimacao.js";
 import { ajustarPecaTarefa } from "./tarefas/ajustar-peca.js";
 import { gerarPecaTarefa } from "./tarefas/gerar-peca.js";
+import { gerarExemploEstiloTarefa } from "./tarefas/gerar-exemplo-estilo.js";
 import { gerarPerfilEstiloTarefa } from "./tarefas/gerar-perfil-estilo.js";
 import { processarPecaEstilo } from "./tarefas/processar-peca-estilo.js";
 import type { Contexto, Tarefa } from "./tarefas/tipos.js";
@@ -16,6 +17,7 @@ import type { Contexto, Tarefa } from "./tarefas/tipos.js";
 const tarefas: Record<string, Tarefa> = {
   analisar_intimacao: analisarIntimacao,
   processar_peca_estilo: processarPecaEstilo,
+  gerar_exemplo_estilo: gerarExemploEstiloTarefa,
   gerar_perfil_estilo: gerarPerfilEstiloTarefa,
   gerar_peca: gerarPecaTarefa,
   ajustar_peca: ajustarPecaTarefa,
@@ -83,6 +85,7 @@ async function laco() {
   let ultimaConferenciaAlertas = 0;
   let diaAlertas = "";
   let ultimaBuscaDjen = 0;
+  let diaLimpezaLia = "";
   while (ativo) {
     try {
       if (Date.now() - ultimaConferenciaAlertas > 3_600_000 || ultimaConferenciaAlertas === 0) {
@@ -106,6 +109,13 @@ async function laco() {
           { registrar, avisarErro: (erro) => Sentry.captureException(erro) },
           hojeBrasilia(),
         );
+      }
+      if (hojeBrasilia() !== diaLimpezaLia && horaBrasilia() >= 3) {
+        diaLimpezaLia = hojeBrasilia();
+        const { rows } = await contexto.db.query("select lia_apagar_antigas($1) as apagadas", [
+          ambiente.LIA_RETENCAO_DIAS,
+        ]);
+        registrar("conversas_lia_apagadas", { quantidade: rows[0]?.apagadas ?? 0 });
       }
       if (Date.now() - ultimaLimpeza > 60_000) {
         const devolvidos = await devolverPresos(contexto.db);

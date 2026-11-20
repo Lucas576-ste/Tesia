@@ -1,11 +1,32 @@
 export {
+  formatarTelefone,
+  mascararEmail,
+  mascararNome,
+  mascararOab,
+  mascararTelefone,
+} from "./mascara";
+export {
   analiseGravadaSchema,
   memoriaCalculoSchema,
   nomePartes,
   type AnaliseGravada,
   type MemoriaCalculo,
 } from "./analise";
-export { perfilEstiloSchema, type PerfilEstilo } from "./estilo";
+export { PECA_EXEMPLO } from "./peca-exemplo";
+export {
+  idAprendizado,
+  NIVEIS_ESTILO,
+  nivelEstilo,
+  PARTES_APRENDIZADO,
+  perfilEstiloSchema,
+  perfilGravadoSchema,
+  proximaAcaoEstilo,
+  ROTULOS_PARTE,
+  type NivelEstilo,
+  type ParteAprendizado,
+  type PerfilEstilo,
+  type PerfilGravado,
+} from "./estilo";
 export {
   conteudoPecaSchema,
   documentoDoConteudo,

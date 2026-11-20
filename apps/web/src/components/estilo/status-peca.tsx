@@ -22,7 +22,6 @@ export function StatusPeca({ peca }: { peca: PecaEstilo }) {
     >
       <Icone aria-hidden className={cn("size-4 shrink-0", !lido && "animate-spin")} />
       {ROTULOS_PECA_ESTILO[peca.status]}
-      {lido && peca.trechos > 0 && ` · ${peca.trechos} trechos`}
     </span>
   );
 }

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { salvarDjen } from "@/app/app/configuracoes/alertas-acoes";
 import { usePlano } from "@/components/plano/provedor-plano";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import type { DadosDjen } from "@/lib/alertas";
 import { isoParaData } from "@/lib/prazo-interno";
 
@@ -40,17 +41,15 @@ export function BuscaDjen({ djen }: { djen: DadosDjen }) {
               : "Cadastre sua OAB no perfil para ligar a busca automática."}
           </p>
         </div>
-        <label className="flex shrink-0 items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            role="switch"
-            className="size-5 accent-primary"
+        <div className="flex shrink-0 items-center gap-2 text-sm font-medium">
+          <Switch
+            id="busca-djen"
             checked={ativo}
             disabled={salvando || !plano.recursosPro || !djen.oab}
-            onChange={(evento) => mudar(evento.target.checked)}
+            onCheckedChange={mudar}
           />
-          {ativo ? "Ligada" : "Desligada"}
-        </label>
+          <label htmlFor="busca-djen">{ativo ? "Ligada" : "Desligada"}</label>
+        </div>
       </div>
       {!plano.recursosPro && (
         <p className="text-sm text-texto-secundario">A busca automática faz parte do plano Pro.</p>

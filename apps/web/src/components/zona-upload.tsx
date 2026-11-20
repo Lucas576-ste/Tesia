@@ -9,6 +9,7 @@ type ZonaUploadProps = {
   descricao: string;
   accept: string;
   multiple?: boolean;
+  className?: string;
   aoEscolher: (arquivos: File[]) => void;
 };
 
@@ -17,6 +18,7 @@ export function ZonaUpload({
   descricao,
   accept,
   multiple = true,
+  className,
   aoEscolher,
 }: ZonaUploadProps) {
   const [arrastando, setArrastando] = useState(false);
@@ -43,6 +45,7 @@ export function ZonaUpload({
       className={cn(
         "flex cursor-pointer flex-col items-center gap-1 rounded-xl border-2 border-dashed border-borda-upload bg-card p-5 text-center transition-colors focus-within:ring-[3px] focus-within:ring-ring/50 hover:border-primaria",
         arrastando && "border-primaria bg-primaria/5",
+        className,
       )}
     >
       <Upload aria-hidden className="size-6 text-primaria" />

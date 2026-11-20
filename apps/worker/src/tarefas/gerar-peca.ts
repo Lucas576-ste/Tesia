@@ -1,7 +1,9 @@
 import {
   acharPendencias,
   ehErroDefinitivoDaApi,
+  marcarMencaoDePrazo,
   marcarProblemas,
+  pontosSemPrazo,
   revisarCitacoes,
   ErroEmbeddingsDefinitivo,
   gerarEmbeddings,
@@ -18,13 +20,19 @@ import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ peca_id: z.uuid() });
 
+const advogadoSchema = z.object({
+  nome: z.string(),
+  oab_numero: z.string().min(1),
+  oab_uf: z.string().nullable(),
+});
+
 const clienteSchema = z.object({
   nome: z.string(),
   documento: z.string().nullable(),
   tipo_pessoa: z.enum(["pf", "pj"]),
   qualificacao: z.unknown(),
 });
-const MAXIMO_TRECHOS = 3;
+const MAXIMO_TRECHOS = 6;
 
 const pecaSchema = z.object({
   intimacao_id: z.uuid().nullable(),
@@ -97,10 +105,15 @@ async function buscarTrechos(
   const vetor = embedding.vetores[0];
   if (!vetor) return [];
   const { rows } = await db.query(
-    `select t.id, coalesce(nullif(d.nome_arquivo, ''), 'peça') as documento, t.secao, t.texto
-     from estilo_trechos t join estilo_documentos d on d.id = t.estilo_documento_id
-     where t.escritorio_id = $1 and d.usuario_id = $2 and t.embedding is not null
-     order by t.embedding <=> $3::vector
+    `select id, documento, secao, texto from (
+       select distinct on (t.secao) t.id, coalesce(nullif(d.nome_arquivo, ''), 'peça') as documento,
+         t.secao, t.texto, (t.embedding <=> $3::vector) as distancia
+       from estilo_trechos t join estilo_documentos d on d.id = t.estilo_documento_id
+       where t.escritorio_id = $1 and d.usuario_id = $2 and t.embedding is not null
+         and t.secao <> 'outra'
+       order by t.secao, t.embedding <=> $3::vector
+     ) melhores
+     order by distancia
      limit ${MAXIMO_TRECHOS}`,
     [job.escritorio_id, usuarioId, vetorParaPgvector(vetor)],
   );
@@ -137,24 +150,33 @@ async function executar(job: Job, contexto: Contexto) {
   );
   const perfil = perfilEstiloSchema.safeParse(perfis[0]?.guia).data ?? null;
 
-  const { rows: prazos } = await db.query(
-    "select to_char(data_vencimento, 'DD/MM/YYYY') as vencimento from prazos where id = $1 and escritorio_id = $2",
-    [peca.data.prazo_id, job.escritorio_id],
-  );
-  const vencimento = z.object({ vencimento: z.string() }).safeParse(prazos[0]).data?.vencimento;
-
-  const { rows: clientes } = await db.query(
-    `select c.nome, c.documento, c.tipo_pessoa::text as tipo_pessoa, c.qualificacao
-     from intimacoes i
-     join processos p on p.id = i.processo_id and p.escritorio_id = i.escritorio_id
-     join clientes c on c.id = p.cliente_id and c.escritorio_id = p.escritorio_id
-     where i.id = $1 and i.escritorio_id = $2`,
-    [peca.data.intimacao_id, job.escritorio_id],
-  );
+  const temQualificacao = peca.data.estrutura.includes("qualificacao");
+  const { rows: clientes } = temQualificacao
+    ? await db.query(
+        `select c.nome, c.documento, c.tipo_pessoa::text as tipo_pessoa, c.qualificacao
+         from intimacoes i
+         join processos p on p.id = i.processo_id and p.escritorio_id = i.escritorio_id
+         join clientes c on c.id = p.cliente_id and c.escritorio_id = p.escritorio_id
+         where i.id = $1 and i.escritorio_id = $2`,
+        [peca.data.intimacao_id, job.escritorio_id],
+      )
+    : { rows: [] };
   const clienteDaPeca = clienteSchema.safeParse(clientes[0]);
   const qualificacaoCliente = clienteDaPeca.success ? textoQualificacao(clienteDaPeca.data) : null;
 
-  const pontos = analise.data.resumo.pontos_ataque;
+  const { rows: advogados } = await db.query(
+    "select nome, oab_numero, oab_uf from usuarios where id = $1 and escritorio_id = $2",
+    [peca.data.responsavel_id, job.escritorio_id],
+  );
+  const dadosAdvogado = advogadoSchema.safeParse(advogados[0]);
+  const advogado = dadosAdvogado.success
+    ? {
+        nome: dadosAdvogado.data.nome,
+        oab: `OAB/${dadosAdvogado.data.oab_uf ?? "[CONFIRMAR: UF]"} nº ${dadosAdvogado.data.oab_numero}`,
+      }
+    : null;
+
+  const pontos = pontosSemPrazo(analise.data.resumo.pontos_ataque);
   const trechos = await buscarTrechos(
     contexto,
     job,
@@ -174,8 +196,8 @@ async function executar(job: Job, contexto: Contexto) {
       dados: { ...analise.data.dados, pontos: undefined },
       textoIntimacao: intimacao.data.texto ?? "",
       pontosAtacar: pontos,
-      prazo: vencimento ? { vencimento, fundamento: analise.data.prazo?.fundamento ?? "" } : null,
       qualificacaoCliente,
+      advogado,
     }),
   );
   await registrarUso(db, job, { etapa: "geracao_peca", ...resultado });
@@ -186,6 +208,8 @@ async function executar(job: Job, contexto: Contexto) {
       secoes,
       textoIntimacao: intimacao.data.texto ?? "",
       trechos: trechos.map(({ documento, secao, texto }) => ({ documento, secao, texto })),
+      advogado,
+      qualificacaoCliente,
     });
     await registrarUso(db, job, { etapa: "revisao_citacoes", ...revisao });
     const marcadas = marcarProblemas(secoes, revisao.resultado);
@@ -201,6 +225,13 @@ async function executar(job: Job, contexto: Contexto) {
       erro: erro instanceof Error ? erro.message : String(erro),
     });
   }
+  const prazoMarcado = marcarMencaoDePrazo(
+    secoes,
+    trechos.map(({ texto }) => texto),
+  );
+  secoes = prazoMarcado.secoes;
+  if (prazoMarcado.inseridos > 0)
+    registrar("mencao_de_prazo_marcada", { job_id: job.id, marcadas: prazoMarcado.inseridos });
   const pendencias = acharPendencias(secoes);
 
   const aviso =

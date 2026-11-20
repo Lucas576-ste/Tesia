@@ -30,6 +30,7 @@ export default async function PrazosPage({ searchParams }: PainelPageProps) {
       idsComAnalise={prazos.filter((prazo) => prazo.id !== prazo.prazoId).map(({ id }) => id)}
       processos={processos}
       novoPrazo={parametros.novo === "prazo"}
+      processoInicial={typeof parametros.processo === "string" ? parametros.processo : undefined}
       urlSemNovo={urlSemNovo(parametros, "/app/prazos")}
       modo="prazos"
       intimacoes={intimacoes}

@@ -20,18 +20,34 @@ export type ResultadoPerfil = {
 export const MINIMO_FRASES_EXIBICAO = 4;
 export const MAXIMO_FRASES_EXIBICAO = 6;
 
-export function montarConteudoPerfil(pecas: PecaParaPerfil[]) {
-  return pecas
+export type CorrecaoEstilo = {
+  parte: string;
+  texto_item: string;
+  avaliacao: "certo" | "errado";
+  correcao: string | null;
+};
+
+export function montarConteudoPerfil(pecas: PecaParaPerfil[], correcoes: CorrecaoEstilo[] = []) {
+  const texto = pecas
     .map(
       (peca, indice) =>
         `<peca numero="${indice + 1}" arquivo="${peca.nome}">\n${peca.texto}\n</peca>`,
     )
     .join("\n\n");
+  if (correcoes.length === 0) return texto;
+  const bloco = correcoes.map(({ parte, texto_item, avaliacao, correcao }) => ({
+    parte,
+    item: texto_item,
+    avaliacao,
+    como_faz: correcao,
+  }));
+  return `${texto}\n\n<correcoes>\n${JSON.stringify(bloco)}\n</correcoes>`;
 }
 
 export async function gerarPerfilEstilo(
   cliente: ClienteIa,
   pecas: PecaParaPerfil[],
+  correcoes: CorrecaoEstilo[] = [],
 ): Promise<ResultadoPerfil> {
   if (pecas.length === 0) throw new Error("Nenhuma peça para gerar o perfil");
   const inicio = Date.now();
@@ -43,7 +59,7 @@ export async function gerarPerfilEstilo(
     fallbacks: "default",
     system: INSTRUCOES_PERFIL,
     output_config: { effort: "medium", format: betaZodOutputFormat(perfilEstiloSchema) },
-    messages: [{ role: "user", content: montarConteudoPerfil(pecas) }],
+    messages: [{ role: "user", content: montarConteudoPerfil(pecas, correcoes) }],
   });
 
   if (resposta.stop_reason === "refusal") throw new RespostaInvalidaDaIa("A IA recusou as peças");
@@ -58,7 +74,16 @@ export async function gerarPerfilEstilo(
     throw new RespostaInvalidaDaIa("O perfil veio com poucas frases para mostrar");
 
   return {
-    perfil: { ...perfil, frases_exibicao: frases.slice(0, MAXIMO_FRASES_EXIBICAO) },
+    perfil: {
+      ...perfil,
+      aprendizados: perfil.aprendizados
+        .map((grupo) => ({
+          ...grupo,
+          itens: grupo.itens.map((item) => item.trim()).filter(Boolean),
+        }))
+        .filter((grupo) => grupo.itens.length > 0),
+      frases_exibicao: frases.slice(0, MAXIMO_FRASES_EXIBICAO),
+    },
     uso: calcularCusto(modelo, resposta.usage),
     versaoPrompt: VERSAO_PERFIL,
     duracaoMs: Date.now() - inicio,

@@ -71,6 +71,8 @@ export function usePecasEstilo(escritorioId: string, usuarioId: string, iniciais
         id: crypto.randomUUID(),
         nome: arquivo.name,
         data: hojeFormatado(),
+        criadaEm: new Date().toISOString(),
+        tipo: null,
         trechos: 0,
         temporaria: true,
       };

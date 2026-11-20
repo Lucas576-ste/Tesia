@@ -15,8 +15,8 @@ export type EntradaGeracao = {
   dados: Record<string, unknown>;
   textoIntimacao: string;
   pontosAtacar: { titulo: string; explicacao?: string }[];
-  prazo: { vencimento: string; fundamento: string } | null;
   qualificacaoCliente?: string | null;
+  advogado?: { nome: string; oab: string } | null;
 };
 
 export type ResultadoGeracao = {
@@ -75,15 +75,14 @@ export function montarPedidoGeracao(entrada: EntradaGeracao) {
         .map((p) => `- ${p.titulo}${p.explicacao ? `: ${p.explicacao}` : ""}`)
         .join("\n")
     : "- Nenhum ponto específico; desenvolva a tese cabível a partir da decisão.";
-  const prazo = entrada.prazo
-    ? `Prazo confirmado: vence em ${entrada.prazo.vencimento} (${entrada.prazo.fundamento}).`
-    : "Prazo: confirmado pelo advogado.";
   const conteudo = [
     `<trechos_do_advogado>\n${trechos}\n</trechos_do_advogado>`,
     `<dados_do_caso>\n${JSON.stringify(entrada.dados)}\n</dados_do_caso>`,
     `<documento_do_caso>\n${entrada.textoIntimacao}\n</documento_do_caso>`,
     `<pontos_a_atacar>\n${pontos}\n</pontos_a_atacar>`,
-    prazo,
+    entrada.advogado
+      ? `<advogado>\nNome: ${entrada.advogado.nome}\nOAB: ${entrada.advogado.oab}\n</advogado>`
+      : "",
     entrada.qualificacaoCliente
       ? `<qualificacao_cliente>\n${entrada.qualificacaoCliente}\n</qualificacao_cliente>`
       : "",

@@ -61,3 +61,13 @@ Os textos devem ser revisados por um advogado. Sugestão: oferecer meses grátis
 
 - O conteúdo gerado segue as regras de publicidade da OAB: caráter informativo, sem promessa de resultado, sem captação de clientela, sem menção a preços.
 - A checagem automática é uma ajuda. A responsabilidade pela publicação é do advogado, e isso aparece nos termos de uso.
+
+## Pedidos de exportação e exclusão (MVP)
+- Em Configurações → Dados, o advogado pede a exportação ou a exclusão da conta. O pedido fica em `pedidos_dados` e chega por e-mail ao suporte.
+- O suporte responde em até 15 dias, confirma a identidade por e-mail e só então exporta ou apaga. Nada é apagado automaticamente.
+- Dados pessoais exibidos na aba Dados ficam mascarados até o advogado pedir para ver.
+
+## Chat da Lia
+- Cada usuário vê só as próprias conversas (RLS por usuário). Conversas apagadas depois de 90 dias (configurável) e removíveis pelo usuário.
+- Ao responder, a pergunta, a rota e dados ligados à tela aberta são enviados ao provedor de IA. Nomes de partes só vão no detalhe do item aberto.
+- Detalhes em `21-lia-chat.md`.

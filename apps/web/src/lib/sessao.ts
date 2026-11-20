@@ -13,6 +13,10 @@ const usuarioSchema = z.object({
   areas: z.array(z.string()),
   whatsapp: z.string().nullable(),
   modelo_docx_path: z.string().nullable(),
+  modelo_status: z.enum(["processando", "ativo", "erro"]).nullable(),
+  modelo_nome: z.string().nullable(),
+  modelo_enviado_em: z.string().nullable(),
+  modelo_erro: z.string().nullable(),
   calendario_token: z.string(),
   alerta_email: z.boolean(),
   alerta_dias: z.array(z.string()),
@@ -30,7 +34,7 @@ export const usuarioAtual = cache(async (): Promise<UsuarioSessao | null> => {
   const { data: linha } = await supabase
     .from("usuarios")
     .select(
-      "id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path, calendario_token, alerta_email, alerta_dias, djen_ativo, djen_buscado_ate",
+      "id, escritorio_id, nome, email, oab_numero, oab_uf, areas, whatsapp, modelo_docx_path, modelo_status, modelo_nome, modelo_enviado_em, modelo_erro, calendario_token, alerta_email, alerta_dias, djen_ativo, djen_buscado_ate",
     )
     .eq("auth_user_id", data.user.id)
     .maybeSingle();

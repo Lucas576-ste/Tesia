@@ -78,7 +78,7 @@ const suspensoesSchema = z.array(
 
 type SupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
-async function buscarCalendario(
+export async function buscarCalendario(
   supabase: SupabaseServidor,
   local: { tribunal: string | null; uf: string | null; municipio: string | null } | null,
   rito: string,

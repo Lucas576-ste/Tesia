@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,8 @@ import {
   type ProcessoResumo,
 } from "@/lib/prazo-manual";
 import { DIAS_PRAZO_INTERNO } from "@/lib/prazo-interno";
+import { cn } from "@/lib/utils";
+import { CalculoPrazo } from "./calculo-prazo";
 
 const valoresIniciais: PrazoManual = {
   tipo: "prazo",
@@ -43,20 +46,36 @@ const valoresIniciais: PrazoManual = {
 
 type ModalPrazoManualProps = {
   aberto: boolean;
+  processoInicial?: string;
   processos: ProcessoResumo[];
   aoFechar: () => void;
   aoSalvar: (dados: PrazoManual) => void | Promise<void>;
 };
 
+const modos = [
+  { valor: "calcular", rotulo: "Calcular pela publicação" },
+  { valor: "informar", rotulo: "Informar a data" },
+] as const;
+
 function FormularioPrazoManual({
   processos,
+  processoInicial,
   aoSalvar,
-}: Pick<ModalPrazoManualProps, "processos" | "aoSalvar">) {
+}: Pick<ModalPrazoManualProps, "processos" | "processoInicial" | "aoSalvar">) {
+  const hoje = hojeBrasilia();
   const form = useForm<PrazoManual>({
-    resolver: zodResolver(esquemaPrazoManual(hojeBrasilia())),
-    defaultValues: valoresIniciais,
+    resolver: zodResolver(esquemaPrazoManual(hoje)),
+    defaultValues: { ...valoresIniciais, processoId: processoInicial ?? "" },
   });
+  const [modo, setModo] = useState<"calcular" | "informar">("calcular");
   const ehPrazo = useWatch({ control: form.control, name: "tipo" }) === "prazo";
+  const processoId = useWatch({ control: form.control, name: "processoId" });
+  const calculando = ehPrazo && modo === "calcular";
+
+  function trocarModo(novo: "calcular" | "informar") {
+    setModo(novo);
+    if (novo === "informar") form.setValue("calculo", undefined);
+  }
 
   return (
     <Form {...form}>
@@ -93,6 +112,50 @@ function FormularioPrazoManual({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="processoId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Processo (opcional)</FormLabel>
+              <FormControl>
+                <SelectNativo {...field}>
+                  <option value="">Sem processo</option>
+                  {processos.map(({ id, partes }) => (
+                    <option key={id} value={id}>
+                      {partes}
+                    </option>
+                  ))}
+                </SelectNativo>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {ehPrazo && (
+          <div
+            role="radiogroup"
+            aria-label="Como definir o prazo"
+            className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+          >
+            {modos.map(({ valor, rotulo }) => (
+              <button
+                key={valor}
+                type="button"
+                role="radio"
+                aria-checked={modo === valor}
+                onClick={() => trocarModo(valor)}
+                className={cn(
+                  "rounded-md px-2 py-1.5 text-sm font-medium text-texto-secundario",
+                  modo === valor && "bg-card text-foreground shadow-xs",
+                )}
+              >
+                {rotulo}
+              </button>
+            ))}
+          </div>
+        )}
+        {calculando && <CalculoPrazo form={form} processoId={processoId} hoje={hoje} />}
         <div className="grid grid-cols-2 gap-3">
           <FormField
             control={form.control}
@@ -136,48 +199,26 @@ function FormularioPrazoManual({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="inicio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Início da contagem (opcional)</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!calculando && (
+              <FormField
+                control={form.control}
+                name="inicio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Início da contagem (opcional)</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <p className="col-span-2 text-xs text-texto-secundario">
               Em branco, o prazo interno fica {DIAS_PRAZO_INTERNO} dias úteis antes do fatal.
             </p>
           </div>
         )}
-        <FormField
-          control={form.control}
-          name="processoId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Processo (opcional)</FormLabel>
-              <FormControl>
-                <SelectNativo {...field}>
-                  <option value="">Sem processo</option>
-                  {processos.map(({ id, partes }) => (
-                    <option key={id} value={id}>
-                      {partes}
-                    </option>
-                  ))}
-                </SelectNativo>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <label className="flex items-center gap-2 text-sm text-texto-secundario">
-          <input type="checkbox" disabled />
-          Calcular a partir da disponibilização (em breve)
-        </label>
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline">
@@ -193,7 +234,13 @@ function FormularioPrazoManual({
   );
 }
 
-export function ModalPrazoManual({ aberto, processos, aoFechar, aoSalvar }: ModalPrazoManualProps) {
+export function ModalPrazoManual({
+  aberto,
+  processoInicial,
+  processos,
+  aoFechar,
+  aoSalvar,
+}: ModalPrazoManualProps) {
   return (
     <Dialog
       open={aberto}
@@ -201,14 +248,19 @@ export function ModalPrazoManual({ aberto, processos, aoFechar, aoSalvar }: Moda
         if (!valor) aoFechar();
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Novo prazo manual</DialogTitle>
+          <DialogTitle>Novo prazo</DialogTitle>
           <DialogDescription>
-            A data é a que você informar. Ela entra no painel como confirmada.
+            A Tesia sugere o vencimento, mas a data final é sempre a que você confirmar. Ela entra
+            no painel como confirmada.
           </DialogDescription>
         </DialogHeader>
-        <FormularioPrazoManual processos={processos} aoSalvar={aoSalvar} />
+        <FormularioPrazoManual
+          processos={processos}
+          processoInicial={processoInicial}
+          aoSalvar={aoSalvar}
+        />
       </DialogContent>
     </Dialog>
   );

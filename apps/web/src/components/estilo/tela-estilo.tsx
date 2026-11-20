@@ -1,41 +1,77 @@
 "use client";
 
-import { FileText, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { pedirAtualizacaoEstilo } from "@/app/app/estilo/acoes";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { EstadoVazio } from "@/components/estado-vazio";
-import { PainelAprendizado } from "@/components/onboarding/painel-aprendizado";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ZonaUpload } from "@/components/zona-upload";
-import {
-  ACEITOS_PECA_ESTILO,
-  MAXIMO_PECAS_ESTILO,
-  MINIMO_PECAS_ESTILO,
-  type PecaEstilo,
-} from "@/lib/estilo";
-import type { EstadoPerfil } from "@/lib/perfil-estilo";
-import { StatusPeca } from "./status-peca";
+import { avaliarAprendizado, pedirAtualizacaoEstilo } from "@/app/app/estilo/acoes";
+import type { EstadoExemplo } from "@/lib/estilo-servidor";
+import { MAXIMO_PECAS_ESTILO, type PecaEstilo } from "@/lib/estilo";
+import type { EstadoPerfil, ItemAprendizado, PerfilPronto } from "@/lib/perfil-estilo";
+import { AprendizadosLia } from "./aprendizados-lia";
+import { CardAprendizadoContinuo } from "./card-aprendizado-continuo";
+import { CardStatusEstilo } from "./card-status-estilo";
+import { EstadoVazioEstilo } from "./estado-vazio-estilo";
+import { ExemploEstilo } from "./exemplo-estilo";
+import { ListaPecas } from "./lista-pecas";
 import { usePecasEstilo } from "./usar-pecas-estilo";
+
+const INTERVALO_MS = 4000;
 
 type TelaEstiloProps = {
   escritorioId: string;
   usuarioId: string;
   pecasIniciais: PecaEstilo[];
   perfil: EstadoPerfil;
+  novidades: { pecas: number; correcoes: number };
+  aprenderRevisoes: boolean;
+  exemplo: EstadoExemplo;
 };
 
-export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais, perfil }: TelaEstiloProps) {
-  const { pecas, adicionar, remover, lidas, validas } = usePecasEstilo(
+function verExemplo() {
+  document.getElementById("exemplo-estilo")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function prontoDe(perfil: EstadoPerfil): PerfilPronto | null {
+  if (perfil.estado === "pronto") return perfil;
+  return perfil.estado === "atualizando" ? perfil.anterior : null;
+}
+
+export function TelaEstilo({
+  escritorioId,
+  usuarioId,
+  pecasIniciais,
+  perfil,
+  novidades,
+  aprenderRevisoes,
+  exemplo,
+}: TelaEstiloProps) {
+  const { pecas, adicionar, remover, lidas } = usePecasEstilo(
     escritorioId,
     usuarioId,
     pecasIniciais,
   );
-  const [usarRevisadas, setUsarRevisadas] = useState(true);
   const [pedindo, iniciar] = useTransition();
+  const [salvando, setSalvando] = useState(false);
+  const [avaliacoes, setAvaliacoes] = useState<Record<string, ItemAprendizado>>({});
   const router = useRouter();
+  const atualizando = perfil.estado === "atualizando";
+  const anterior = useRef(perfil.estado);
+  const pronto = prontoDe(perfil);
+
+  useEffect(() => {
+    if (!atualizando) return;
+    const intervalo = setInterval(() => router.refresh(), INTERVALO_MS);
+    return () => clearInterval(intervalo);
+  }, [atualizando, router]);
+
+  useEffect(() => {
+    if (anterior.current === "atualizando" && perfil.estado === "pronto") {
+      toast.success("Estilo atualizado. Os próximos rascunhos já saem assim.", {
+        action: { label: "Ver exemplo", onClick: verExemplo },
+      });
+    }
+    anterior.current = perfil.estado;
+  }, [perfil.estado]);
 
   function atualizarEstilo() {
     iniciar(async () => {
@@ -44,78 +80,73 @@ export function TelaEstilo({ escritorioId, usuarioId, pecasIniciais, perfil }: T
         toast.error(resultado.erro);
         return;
       }
-      toast.success("Vou reler suas peças e atualizar o seu estilo.");
       router.refresh();
     });
   }
 
+  async function avaliar(item: ItemAprendizado, avaliacao: "certo" | "errado", correcao?: string) {
+    const parte = pronto?.aprendizados.find((grupo) =>
+      grupo.itens.some(({ id }) => id === item.id),
+    )?.parte;
+    if (!parte) return false;
+    setSalvando(true);
+    const resultado = await avaliarAprendizado({ parte, texto: item.texto, avaliacao, correcao });
+    setSalvando(false);
+    if ("erro" in resultado) {
+      toast.error(resultado.erro);
+      return false;
+    }
+    setAvaliacoes((atuais) => ({
+      ...atuais,
+      [item.id]: {
+        ...item,
+        avaliacao,
+        correcao: avaliacao === "errado" ? (correcao ?? null) : null,
+      },
+    }));
+    toast.success(
+      avaliacao === "errado"
+        ? "Anotado. A Lia vai considerar isso na próxima análise."
+        : "Anotado.",
+    );
+    router.refresh();
+    return true;
+  }
+
+  if (pecas.length === 0) return <EstadoVazioEstilo aoEscolher={adicionar} />;
+
+  const perfilComAvaliacoes: PerfilPronto | null = pronto && {
+    ...pronto,
+    aprendizados: pronto.aprendizados.map((grupo) => ({
+      ...grupo,
+      itens: grupo.itens.map((item) => avaliacoes[item.id] ?? item),
+    })),
+  };
+
   return (
-    <div className="grid items-start gap-4 md:grid-cols-[1fr_20rem]">
-      <div className="flex flex-col gap-4">
-        <ZonaUpload
-          titulo="Adicionar peças"
-          descricao={`De ${MINIMO_PECAS_ESTILO} a ${MAXIMO_PECAS_ESTILO} peças em PDF ou Word (.docx)`}
-          accept={ACEITOS_PECA_ESTILO}
-          aoEscolher={adicionar}
+    <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <div className="flex min-w-0 flex-col gap-5">
+        <CardStatusEstilo
+          lidas={lidas}
+          cheio={pecas.filter(({ status }) => status !== "erro").length >= MAXIMO_PECAS_ESTILO}
+          novidades={novidades}
+          atualizadoEm={pronto?.atualizadoEm ?? null}
+          atualizando={atualizando}
+          pedindo={pedindo}
+          aoAdicionar={adicionar}
+          aoAtualizar={atualizarEstilo}
         />
-        {validas < MINIMO_PECAS_ESTILO && (
-          <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
-            Com menos de {MINIMO_PECAS_ESTILO} peças, o rascunho fica mais genérico.
-          </p>
-        )}
-        <p className="text-sm font-medium tabular-nums">
-          {lidas} {lidas === 1 ? "peça lida" : "peças lidas"} de {MAXIMO_PECAS_ESTILO}
-        </p>
-        {pecas.length === 0 ? (
-          <EstadoVazio
-            titulo="Nenhuma peça enviada"
-            descricao="Adicione suas peças para a Lia aprender o seu estilo."
-          />
-        ) : (
-          <Card className="gap-0 py-0">
-            <ul aria-live="polite">
-              {pecas.map((peca) => (
-                <li
-                  key={peca.id}
-                  className="flex flex-wrap items-center gap-2 border-b p-3 text-sm last:border-b-0"
-                >
-                  <FileText aria-hidden className="size-4 shrink-0 text-texto-secundario" />
-                  <span className="min-w-0 flex-1 break-all">{peca.nome}</span>
-                  <StatusPeca peca={peca} />
-                  <span className="hidden text-xs text-texto-secundario tabular-nums sm:inline">
-                    {peca.data}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Remover ${peca.nome}`}
-                    onClick={() => void remover(peca.id)}
-                  >
-                    <X aria-hidden />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
+        <AprendizadosLia
+          perfil={perfilComAvaliacoes}
+          atualizando={atualizando}
+          salvando={salvando}
+          aoAvaliar={avaliar}
+        />
+        {pronto && <ExemploEstilo inicial={exemplo} perfilGeradoEm={pronto.atualizadoEm} />}
       </div>
-      <div className="flex flex-col gap-4">
-        <PainelAprendizado perfil={perfil} comDetalhes />
-        <Button
-          disabled={lidas === 0 || pedindo || perfil.estado === "atualizando"}
-          onClick={atualizarEstilo}
-        >
-          {perfil.estado === "atualizando" ? "Atualizando..." : "Atualizar meu estilo"}
-        </Button>
-        <label className="flex cursor-pointer items-start gap-2 rounded-md border bg-card p-3 text-sm has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50">
-          <input
-            type="checkbox"
-            checked={usarRevisadas}
-            onChange={(evento) => setUsarRevisadas(evento.target.checked)}
-            className="mt-0.5 accent-primaria"
-          />
-          Usar as peças que eu revisar na Tesia para melhorar o meu estilo
-        </label>
+      <div className="flex min-w-0 flex-col gap-5">
+        <ListaPecas pecas={pecas} aoRemover={(id) => void remover(id)} />
+        <CardAprendizadoContinuo inicial={aprenderRevisoes} />
       </div>
     </div>
   );

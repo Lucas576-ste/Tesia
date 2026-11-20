@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { Perfil } from "@/lib/onboarding";
 
 export const ABAS_CONFIGURACOES = {
   perfil: "Perfil",
@@ -17,15 +16,6 @@ export type AbaConfiguracoes = keyof typeof ABAS_CONFIGURACOES;
 export const abaConfiguracoesSchema = z
   .enum(Object.keys(ABAS_CONFIGURACOES) as [AbaConfiguracoes, ...AbaConfiguracoes[]])
   .catch("perfil");
-
-export const perfilContaExemplo: Perfil = {
-  nome: "Ana Souza",
-  oab: "00.000",
-  uf: "DF",
-  areas: ["Cível e consumidor", "Trabalhista", "Previdenciário"],
-  tribunais: ["TJDFT", "TRT10"],
-  whatsapp: "",
-};
 
 export const DIAS_ANTECEDENCIA = [
   "5 dias úteis antes",
@@ -49,12 +39,6 @@ export const feriadosExemplo: FeriadoProprio[] = [
 export const sessoesExemplo = [
   { id: "1", dispositivo: "Chrome no computador", local: "Brasília, DF", atual: true },
   { id: "2", dispositivo: "Safari no celular", local: "Brasília, DF", atual: false },
-];
-
-export const passosAgenda = [
-  { nome: "Google Agenda", passo: "Outras agendas → Do URL → cole o link." },
-  { nome: "Apple Calendário", passo: "Arquivo → Nova assinatura de calendário → cole o link." },
-  { nome: "Outlook", passo: "Adicionar calendário → Assinar da Web → cole o link." },
 ];
 
 export const planoAtualExemplo = {

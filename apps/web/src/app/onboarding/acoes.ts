@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { usuarioAtual } from "@/lib/sessao";
 import { CODIGO_AREA, perfilSchema, type Perfil } from "@/lib/onboarding";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
@@ -11,11 +12,13 @@ export async function salvarPerfil(perfil: Perfil): Promise<{ erro?: string }> {
   const resultado = perfilSchema.safeParse(perfil);
   if (!resultado.success) return { erro: "Confira os dados informados." };
 
-  const { oab, uf, areas, whatsapp } = resultado.data;
+  const { nome, oab, uf, areas, tribunais, whatsapp } = resultado.data;
   const supabase = await criarClienteServidor();
   const { error } = await supabase
     .from("usuarios")
     .update({
+      ...(nome ? { nome } : {}),
+      tribunais,
       oab_numero: oab,
       oab_uf: uf,
       areas: areas.map((area) => CODIGO_AREA[area]),
@@ -23,5 +26,7 @@ export async function salvarPerfil(perfil: Perfil): Promise<{ erro?: string }> {
     })
     .eq("id", usuario.id);
 
-  return error ? { erro: "Não foi possível salvar agora. Tente de novo." } : {};
+  if (error) return { erro: "Não foi possível salvar agora. Tente de novo." };
+  revalidatePath("/app/configuracoes");
+  return {};
 }
