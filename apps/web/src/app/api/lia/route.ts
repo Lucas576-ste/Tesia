@@ -8,6 +8,7 @@ import { separarAcoes, type IdsDaTela } from "@/lib/lia/acoes";
 import { montarContexto } from "@/lib/lia/contexto";
 import { registrarUsoLia } from "@/lib/lia/custo";
 import { codificarEvento, type EventoLia } from "@/lib/lia/eventos";
+import { descreverValor, extrairChave } from "@/lib/lia/chave";
 import { resumirFalha } from "@/lib/lia/falha";
 import { limiteLia, MAXIMO_CARACTERES } from "@/lib/lia/limites";
 import { montarSistema, VERSAO_PROMPT_LIA } from "@/lib/lia/prompt";
@@ -154,9 +155,16 @@ export async function POST(requisicao: Request) {
         return;
       }
 
-      const chave = process.env.ANTHROPIC_API_KEY;
+      const valorBruto = process.env.ANTHROPIC_API_KEY;
+      const chave = extrairChave(valorBruto);
       if (!chave) {
-        console.error(JSON.stringify({ evento: "lia_sem_chave" }));
+        console.error(
+          JSON.stringify(
+            valorBruto
+              ? { evento: "lia_chave_invalida", ...descreverValor(valorBruto) }
+              : { evento: "lia_sem_chave" },
+          ),
+        );
         enviar({ tipo: "erro", mensagem: MENSAGEM_ERRO });
         controlador.close();
         return;
