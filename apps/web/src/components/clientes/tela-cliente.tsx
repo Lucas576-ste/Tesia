@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { editarCliente, juntarClientes } from "@/app/app/clientes/acoes";
+import { juntarClientes } from "@/app/app/clientes/acoes";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { SelectNativo } from "@/components/ui/select-nativo";
-import type { DadosCliente } from "@/lib/cliente-tipos";
 import type { ClienteResumo } from "@/lib/clientes";
 import { mascararDocumento, tituloNome } from "@tesia/shared";
 import { resumoCliente } from "@/lib/resumo-cliente";
@@ -27,7 +26,7 @@ import { EnviarAtualizacao } from "./enviar-atualizacao";
 import { CardExtras } from "./card-extras";
 import { CardProcesso } from "./card-processo";
 import { CardQualificacao } from "./card-qualificacao";
-import { FormularioCliente } from "./formulario-cliente";
+import { useDrawerCliente } from "./provedor-cliente";
 
 type TelaClienteProps = {
   cliente: ClienteResumo;
@@ -37,24 +36,12 @@ type TelaClienteProps = {
 
 export function TelaCliente({ cliente, outros, movimentacao }: TelaClienteProps) {
   const router = useRouter();
-  const [editando, setEditando] = useState(false);
+  const { abrirEdicao } = useDrawerCliente();
   const [juntando, setJuntando] = useState(false);
   const [duplicado, setDuplicado] = useState(outros[0]?.id ?? "");
   const [salvando, iniciar] = useTransition();
   const abertos = cliente.processos.filter((processo) => processo.etapa !== "encerrado");
   const encerrados = cliente.processos.filter((processo) => processo.etapa === "encerrado");
-
-  async function salvar(dados: DadosCliente) {
-    const resultado = await editarCliente(cliente.id, dados);
-    if ("erro" in resultado) {
-      toast.error(resultado.erro);
-      return false;
-    }
-    toast.success("Dados do cliente salvos.");
-    setEditando(false);
-    router.refresh();
-    return true;
-  }
 
   function juntar() {
     iniciar(async () => {
@@ -114,7 +101,7 @@ export function TelaCliente({ cliente, outros, movimentacao }: TelaClienteProps)
             movimentacao={movimentacao}
             proximoPrazo={resumoCliente(cliente).proximo?.vencimento ?? null}
           />
-          <Button variant="outline" size="sm" onClick={() => setEditando(true)}>
+          <Button variant="outline" size="sm" onClick={() => abrirEdicao(cliente.id)}>
             <Pencil aria-hidden />
             Editar dados
           </Button>
@@ -155,24 +142,6 @@ export function TelaCliente({ cliente, outros, movimentacao }: TelaClienteProps)
           </div>
         </Card>
       )}
-      <Dialog open={editando} onOpenChange={setEditando}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Dados do cliente</DialogTitle>
-            <DialogDescription>Usados só por você, para identificar o cliente.</DialogDescription>
-          </DialogHeader>
-          <FormularioCliente
-            inicial={{
-              tipo_pessoa: cliente.tipo_pessoa,
-              nome: cliente.nome,
-              documento: cliente.documento ?? "",
-              telefone: cliente.contato?.telefone ?? "",
-              email: cliente.contato?.email ?? "",
-            }}
-            aoSalvar={salvar}
-          />
-        </DialogContent>
-      </Dialog>
       <Dialog open={juntando} onOpenChange={setJuntando}>
         <DialogContent>
           <DialogHeader>

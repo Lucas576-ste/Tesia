@@ -26,7 +26,7 @@ export async function ligarCliente(
   if (rows[0]?.cliente_id) return;
   const normalizado = normalizarNome(nome);
   const existente = await db.query(
-    "select id from clientes where escritorio_id = $1 and nome_normalizado = $2 order by criado_em limit 1",
+    "select id from clientes where escritorio_id = $1 and nome_normalizado = $2 and excluido_em is null order by criado_em limit 1",
     [escritorioId, normalizado],
   );
   let clienteId = z.object({ id: z.uuid() }).safeParse(existente.rows[0]).data?.id;

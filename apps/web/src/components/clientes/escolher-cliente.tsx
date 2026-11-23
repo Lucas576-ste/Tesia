@@ -42,7 +42,7 @@ export function EscolherCliente({
     iniciar(async () => {
       let clienteId = escolha;
       if (escolha === NOVO) {
-        const criado = await criarCliente({ nome });
+        const criado = await criarCliente({ nome, origem: "outro" });
         if ("erro" in criado || !criado.id) {
           toast.error("erro" in criado ? criado.erro : "Não foi possível cadastrar.");
           return;

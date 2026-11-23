@@ -3,23 +3,14 @@
 import { ETAPAS, tituloNome, type CodigoEtapa } from "@tesia/shared";
 import { LayoutGrid, List, Search, UserPlus, Users } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
-import { toast } from "sonner";
-import { criarCliente } from "@/app/app/clientes/acoes";
+import { useState } from "react";
 import { AvisoInfo } from "@/components/aviso-info";
 import { EstadoVazio } from "@/components/estado-vazio";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ClienteResumo, ProcessoAcompanhado } from "@/lib/clientes";
+import type { FiltrosLista, PaginaClientes } from "@/lib/clientes-lista";
 import type { Processo } from "@/lib/processo-tipos";
 import { ListaProcessos } from "@/components/processo/lista-processos";
 import { cn } from "@/lib/utils";
@@ -27,8 +18,9 @@ import { resumoCliente } from "@/lib/resumo-cliente";
 import { CardCliente } from "./card-cliente";
 import { CardProcesso } from "./card-processo";
 import { EscolherCliente } from "./escolher-cliente";
-import { TabelaClientes } from "./tabela-clientes";
-import { FormularioCliente } from "./formulario-cliente";
+import { ListaClientes } from "./lista-clientes";
+import { useDrawerCliente } from "./provedor-cliente";
+import { useExibicaoClientes } from "./usar-exibicao-clientes";
 
 type TelaClientesProps = {
   clientes: ClienteResumo[];
@@ -37,13 +29,15 @@ type TelaClientesProps = {
   listaProcessos: Processo[];
   abaInicial: "cliente" | "fase" | "processos";
   novoProcesso: boolean;
+  clienteInicial: { id: string; nome: string } | null;
+  paginaClientes: PaginaClientes;
+  filtrosLista: FiltrosLista;
 };
 
 function normalizar(texto: string) {
   return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-type Exibicao = "cards" | "lista";
 type FiltroRapido = "semana" | "sem-contato";
 
 const FILTROS_RAPIDOS: { id: FiltroRapido; rotulo: string }[] = [
@@ -59,43 +53,27 @@ function passaNoFiltro(cliente: ClienteResumo, filtro: FiltroRapido | null) {
   return resumo.proximo.diasAtraso > 0 || resumo.proximo.diasUteis <= 5;
 }
 
-const EVENTO_EXIBICAO = "tesia-clientes-exibicao";
-
-function assinarExibicao(aoMudar: () => void) {
-  window.addEventListener(EVENTO_EXIBICAO, aoMudar);
-  window.addEventListener("storage", aoMudar);
-  return () => {
-    window.removeEventListener(EVENTO_EXIBICAO, aoMudar);
-    window.removeEventListener("storage", aoMudar);
-  };
-}
-
-function lerExibicao(): Exibicao {
-  try {
-    return localStorage.getItem("tesia-clientes-exibicao") === "lista" ? "lista" : "cards";
-  } catch {
-    return "cards";
-  }
-}
-
-function PorCliente({ clientes }: { clientes: ClienteResumo[] }) {
-  const exibicao = useSyncExternalStore(assinarExibicao, lerExibicao, () => "cards" as const);
+function PorCliente({
+  clientes,
+  pagina,
+  filtros,
+}: {
+  clientes: ClienteResumo[];
+  pagina: PaginaClientes;
+  filtros: FiltrosLista;
+}) {
+  const [exibicao, trocar] = useExibicaoClientes();
   const [filtro, setFiltro] = useState<FiltroRapido | null>(null);
   const visiveis = clientes.filter((cliente) => passaNoFiltro(cliente, filtro));
-
-  function trocar(valor: Exibicao) {
-    try {
-      localStorage.setItem("tesia-clientes-exibicao", valor);
-    } catch {
-      return;
-    }
-    window.dispatchEvent(new Event(EVENTO_EXIBICAO));
-  }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div role="group" aria-label="Filtros rápidos" className="flex flex-wrap gap-1.5">
+        <div
+          role="group"
+          aria-label="Filtros rápidos"
+          className={cn("flex flex-wrap gap-1.5", exibicao === "lista" && "hidden")}
+        >
           {FILTROS_RAPIDOS.map(({ id, rotulo }) => (
             <button
               key={id}
@@ -113,7 +91,11 @@ function PorCliente({ clientes }: { clientes: ClienteResumo[] }) {
             </button>
           ))}
         </div>
-        <div role="group" aria-label="Exibição" className="flex rounded-lg border bg-card p-0.5">
+        <div
+          role="group"
+          aria-label="Exibição"
+          className="ml-auto flex rounded-lg border bg-card p-0.5"
+        >
           {(
             [
               ["cards", LayoutGrid, "Cards"],
@@ -136,10 +118,10 @@ function PorCliente({ clientes }: { clientes: ClienteResumo[] }) {
           ))}
         </div>
       </div>
-      {visiveis.length === 0 ? (
+      {exibicao === "lista" ? (
+        <ListaClientes pagina={pagina} filtros={filtros} />
+      ) : visiveis.length === 0 ? (
         <p className="text-sm text-texto-secundario">Nenhum cliente encontrado.</p>
-      ) : exibicao === "lista" ? (
-        <TabelaClientes clientes={visiveis} />
       ) : (
         <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {visiveis.map((cliente) => (
@@ -257,6 +239,9 @@ export function TelaClientes({
   listaProcessos,
   abaInicial,
   novoProcesso,
+  clienteInicial,
+  paginaClientes,
+  filtrosLista,
 }: TelaClientesProps) {
   const [aba, setAba] = useState<string>(abaInicial);
 
@@ -268,9 +253,9 @@ export function TelaClientes({
       `/app/clientes${valor === "cliente" ? "" : `?aba=${valor}`}`,
     );
   }
-  const router = useRouter();
+  const { abrirNovo } = useDrawerCliente();
+  const [exibicao] = useExibicaoClientes();
   const [busca, setBusca] = useState("");
-  const [novo, setNovo] = useState(false);
   const termo = normalizar(busca.trim());
   const clientesVisiveis = clientes.filter(
     (cliente) =>
@@ -288,18 +273,6 @@ export function TelaClientes({
       ),
   );
 
-  async function salvarNovo(dados: Parameters<typeof criarCliente>[0]) {
-    const resultado = await criarCliente(dados);
-    if ("erro" in resultado) {
-      toast.error(resultado.erro);
-      return false;
-    }
-    toast.success("Cliente cadastrado.");
-    setNovo(false);
-    router.push(`/app/clientes/${resultado.id}`);
-    return true;
-  }
-
   if (clientes.length === 0 && processos.length === 0 && !novoProcesso) {
     return (
       <EstadoVazio
@@ -307,7 +280,11 @@ export function TelaClientes({
         descricao="Conforme as intimações chegam, eu identifico o cliente de cada processo e acompanho a fase até o fim."
         acao={
           <div className="flex flex-wrap justify-center gap-2">
-            <Button asChild>
+            <Button onClick={abrirNovo}>
+              <UserPlus aria-hidden />
+              Cadastrar cliente
+            </Button>
+            <Button asChild variant="outline">
               <Link href="/app/intimacoes/nova">Enviar intimação</Link>
             </Button>
             <Button asChild variant="outline">
@@ -322,7 +299,9 @@ export function TelaClientes({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative sm:w-80">
+        <div
+          className={cn("relative sm:w-80", aba === "cliente" && exibicao === "lista" && "hidden")}
+        >
           <Search
             aria-hidden
             className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-texto-secundario"
@@ -336,7 +315,7 @@ export function TelaClientes({
             className="pl-8"
           />
         </div>
-        <Button onClick={() => setNovo(true)}>
+        <Button onClick={abrirNovo} className="sm:ml-auto">
           <UserPlus aria-hidden />
           Novo cliente
         </Button>
@@ -354,26 +333,19 @@ export function TelaClientes({
           <TabsTrigger value="processos">Todos os processos</TabsTrigger>
         </TabsList>
         <TabsContent value="cliente" className="pt-2">
-          <PorCliente clientes={clientesVisiveis} />
+          <PorCliente clientes={clientesVisiveis} pagina={paginaClientes} filtros={filtrosLista} />
         </TabsContent>
         <TabsContent value="fase" className="pt-2">
           <QuadroFases processos={processosVisiveis} />
         </TabsContent>
         <TabsContent value="processos" className="pt-2">
-          <ListaProcessos processosIniciais={listaProcessos} novoProcesso={novoProcesso} />
+          <ListaProcessos
+            processosIniciais={listaProcessos}
+            novoProcesso={novoProcesso}
+            clienteInicial={clienteInicial}
+          />
         </TabsContent>
       </Tabs>
-      <Dialog open={novo} onOpenChange={setNovo}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Novo cliente</DialogTitle>
-            <DialogDescription>
-              Depois, ligue os processos dele pela página de cada processo.
-            </DialogDescription>
-          </DialogHeader>
-          <FormularioCliente inicial={{ nome: "" }} aoSalvar={salvarNovo} rotulo="Cadastrar" />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { tituloNome } from "@tesia/shared";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -123,9 +124,14 @@ function TabelaProcessos({ processos }: { processos: Processo[] }) {
 type ListaProcessosProps = {
   processosIniciais: Processo[];
   novoProcesso: boolean;
+  clienteInicial?: { id: string; nome: string } | null;
 };
 
-export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcessosProps) {
+export function ListaProcessos({
+  processosIniciais,
+  novoProcesso,
+  clienteInicial,
+}: ListaProcessosProps) {
   const router = useRouter();
   const processos = processosIniciais;
   const [busca, setBusca] = useState("");
@@ -139,7 +145,7 @@ export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcess
   }
 
   async function salvarNovo(dados: DadosProcesso) {
-    const resultado = await criarProcesso(dados);
+    const resultado = await criarProcesso(dados, clienteInicial?.id);
     if ("erro" in resultado) {
       toast.error(resultado.erro);
       return;
@@ -160,7 +166,11 @@ export function ListaProcessos({ processosIniciais, novoProcesso }: ListaProcess
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Novo processo</DialogTitle>
-            <DialogDescription>Informe os dados principais do processo.</DialogDescription>
+            <DialogDescription>
+              {clienteInicial
+                ? `Este processo já fica vinculado a ${tituloNome(clienteInicial.nome)}.`
+                : "Informe os dados principais do processo."}
+            </DialogDescription>
           </DialogHeader>
           <FormularioProcesso dados={processoEmBranco} aoSalvar={salvarNovo} />
         </DialogContent>

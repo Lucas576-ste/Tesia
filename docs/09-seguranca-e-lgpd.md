@@ -5,6 +5,7 @@
 - **Advogado/escritório:** controlador dos dados dos clientes dele.
 - **Tesia:** operadora, trata os dados em nome do advogado.
 - **Provedores (Supabase, Anthropic, provedor de embeddings, Asaas, Resend):** suboperadores.
+- **Consultas públicas (BrasilAPI para CNPJ e ViaCEP para endereço):** recebem só o número consultado (o CNPJ ou o CEP), que é dado público, e nenhum dado do cliente do advogado. A consulta de CNPJ sai do servidor, com limite de 20 por minuto por usuário e tempo máximo de 8 segundos.
 
 ## Segurança técnica (obrigatória desde o MVP)
 

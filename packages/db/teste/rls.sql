@@ -563,4 +563,77 @@ begin
 end;
 $$;
 
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  b uuid := current_setting('teste.esc_b')::uuid;
+  id_original uuid;
+  id_nova uuid;
+  ativos_a int;
+begin
+  insert into clientes (escritorio_id, nome, nome_normalizado, documento, origem)
+  values (a, 'Maria Duplicada', 'maria duplicada', '52998224725', 'indicacao')
+  returning id into id_original;
+
+  begin
+    insert into clientes (escritorio_id, nome, nome_normalizado, documento)
+    values (a, 'Outra Maria', 'outra maria', '52998224725');
+    assert false, 'Documento repetido no mesmo escritório deveria ser bloqueado';
+  exception when unique_violation then null;
+  end;
+
+  insert into clientes (escritorio_id, nome, nome_normalizado, documento)
+  values (b, 'Maria do Outro', 'maria do outro', '52998224725');
+
+  update clientes set excluido_em = now() where id = id_original;
+  insert into clientes (escritorio_id, nome, nome_normalizado, documento)
+  values (a, 'Maria Nova', 'maria nova', '52998224725')
+  returning id into id_nova;
+
+  begin
+    update clientes set excluido_em = null where id = id_original;
+    assert false, 'Restaurar um cliente com documento já usado por outro ativo deveria falhar';
+  exception when unique_violation then null;
+  end;
+
+  begin
+    insert into clientes (escritorio_id, nome, nome_normalizado, papel, origem)
+    values (a, 'Papel torto', 'papel torto', 'parte_contraria', 'outro');
+    assert false, 'Parte contrária só pode ter a origem parte contrária';
+  exception when check_violation then null;
+  end;
+
+  insert into clientes (escritorio_id, nome, nome_normalizado, papel, origem, observacoes)
+  values (a, 'Fulano Adverso', 'fulano adverso', 'parte_contraria', 'parte_contraria', 'parte #adversa');
+
+  insert into clientes (escritorio_id, nome, nome_normalizado, observacoes, contato, qualificacao)
+  select a, 'Lista ' || n, 'lista ' || n,
+    case when n % 5 = 0 then 'veio por #indicacao' end,
+    jsonb_build_object('email', 'lista' || n || '@exemplo.com'),
+    jsonb_build_object('endereco', jsonb_build_object('cidade', case when n % 2 = 0 then 'Brasília' else 'Goiânia' end, 'uf', 'DF'))
+  from generate_series(1, 25) n;
+
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+
+  select count(*) into ativos_a from clientes where excluido_em is null;
+  assert (select max(total) from listar_clientes(p_tamanho => 10)) = ativos_a, 'O total da lista deveria ser o de clientes ativos';
+  assert (select count(*) from listar_clientes(p_tamanho => 10, p_pagina => 1)) = 10, 'A primeira página deveria ter 10 linhas';
+  assert (select count(*) from listar_clientes(p_tamanho => 10, p_pagina => 3)) = ativos_a - 20, 'A terceira página deveria ter o resto';
+  assert (select count(*) from listar_clientes(p_busca => '#indicacao', p_tamanho => 50)) = 5, 'A busca por hashtag deveria achar 5';
+  assert (select count(*) from listar_clientes(p_busca => '52998224725', p_digitos => '52998224725', p_tamanho => 50)) = 1, 'A busca por documento deveria achar só o cliente ativo';
+  assert (select count(*) from listar_clientes(p_busca => 'lista7@exemplo', p_tamanho => 50)) = 1, 'A busca por e-mail deveria achar 1';
+  assert (select count(*) from listar_clientes(p_busca => 'lista 1', p_nome_normalizado => 'lista 1', p_tamanho => 50)) = 11, 'A busca por nome deveria achar Lista 1 e Lista 10 a 19';
+  assert (select count(*) from listar_clientes(p_papel => 'parte_contraria', p_tamanho => 50)) = 1, 'O filtro de papel deveria achar a parte contrária';
+  assert (select count(*) from listar_clientes(p_origem => 'indicacao', p_excluidos => true, p_tamanho => 50)) = 1, 'A lista de excluídos deveria trazer o cliente excluído';
+  assert (select count(*) from listar_clientes(p_excluidos => false, p_origem => 'indicacao', p_tamanho => 50)) = 0, 'Excluído não deveria aparecer na lista normal';
+  assert (select cidade from listar_clientes(p_ordem => 'cidade', p_direcao => 'asc', p_busca => 'lista', p_nome_normalizado => 'lista', p_tamanho => 1)) = 'Brasília', 'A ordenação por cidade deveria começar por Brasília';
+
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+  assert (select count(*) from listar_clientes(p_busca => 'lista', p_nome_normalizado => 'lista', p_tamanho => 50)) = 0, 'B não deveria ver clientes de A na lista';
+  assert (select max(total) from listar_clientes(p_tamanho => 50)) = (select count(*) from clientes where excluido_em is null), 'B deveria ver só os próprios clientes';
+  reset role;
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

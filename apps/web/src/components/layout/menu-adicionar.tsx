@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarPlus, ChevronDown, FilePlus2, FolderPlus, UserPlus } from "lucide-react";
+import { CalendarPlus, ChevronDown, FilePlus2, FolderPlus } from "lucide-react";
 import Link from "next/link";
 import { SeloPro } from "@/components/plano/aviso-pro";
 import { usePlano } from "@/components/plano/provedor-plano";
@@ -20,7 +20,6 @@ const outras = [
     icone: FolderPlus,
     pro: false,
   },
-  { rotulo: "Novo cliente", href: "/app/clientes", icone: UserPlus, pro: false },
 ];
 
 export function MenuAdicionar() {

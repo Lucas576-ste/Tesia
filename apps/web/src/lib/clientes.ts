@@ -33,6 +33,8 @@ const clienteSchema = z.object({
   pix: z.string().nullable().catch(null),
   observacoes: z.string().nullable().catch(null),
   ultimo_contato_em: z.string().nullable().catch(null),
+  papel: z.string().catch("cliente"),
+  excluido_em: z.string().nullable().catch(null),
 });
 
 export type ProcessoAcompanhado = {
@@ -121,7 +123,7 @@ function paraAcompanhado(
 }
 
 const COLUNAS_CLIENTE =
-  "id, nome, documento, contato, tipo_pessoa, qualificacao, pix, observacoes, ultimo_contato_em";
+  "id, nome, documento, contato, tipo_pessoa, qualificacao, pix, observacoes, ultimo_contato_em, papel, excluido_em";
 const COLUNAS_PROCESSO =
   "id, numero_cnj, partes, parte_contraria, rito, area, fase, fase_origem, fase_atualizada_em, encerrado_em, atualizado_em, cliente_id, prazos(status, data_vencimento)";
 
@@ -131,8 +133,16 @@ export async function listarAcompanhamento() {
     supabase.from("clientes").select(COLUNAS_CLIENTE).order("nome"),
     supabase.from("processos").select(COLUNAS_PROCESSO).is("excluido_em", null),
   ]);
-  const listaClientes = z.array(clienteSchema).safeParse(clientes).data ?? [];
-  const nomes = new Map(listaClientes.map((cliente) => [cliente.id, cliente.nome]));
+  const todosOsClientes = z.array(clienteSchema).safeParse(clientes).data ?? [];
+  const listaClientes = todosOsClientes.filter(
+    (cliente) => !cliente.excluido_em && cliente.papel === "cliente",
+  );
+  const nomes = new Map(
+    todosOsClientes.map((cliente) => [
+      cliente.id,
+      cliente.excluido_em ? `${cliente.nome} (cliente excluído)` : cliente.nome,
+    ]),
+  );
   const listaProcessos = (z.array(processoSchema).safeParse(processos).data ?? []).map((linha) =>
     paraAcompanhado(linha, nomes),
   );
@@ -150,7 +160,12 @@ export async function buscarCliente(id: string): Promise<ClienteResumo | null> {
   if (!z.uuid().safeParse(id).success) return null;
   const supabase = await criarClienteServidor();
   const [{ data: cliente }, { data: processos }] = await Promise.all([
-    supabase.from("clientes").select(COLUNAS_CLIENTE).eq("id", id).maybeSingle(),
+    supabase
+      .from("clientes")
+      .select(COLUNAS_CLIENTE)
+      .eq("id", id)
+      .is("excluido_em", null)
+      .maybeSingle(),
     supabase
       .from("processos")
       .select(COLUNAS_PROCESSO)
@@ -170,7 +185,11 @@ export async function buscarCliente(id: string): Promise<ClienteResumo | null> {
 
 export async function listarClientesSimples() {
   const supabase = await criarClienteServidor();
-  const { data } = await supabase.from("clientes").select("id, nome").order("nome");
+  const { data } = await supabase
+    .from("clientes")
+    .select("id, nome")
+    .is("excluido_em", null)
+    .order("nome");
   return z.array(z.object({ id: z.uuid(), nome: z.string() })).safeParse(data).data ?? [];
 }
 

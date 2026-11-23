@@ -109,8 +109,19 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 |---|---|---|
 | escritorio_id | uuid | |
 | nome | text | |
-| documento | text | CPF/CNPJ, opcional |
-| contato | jsonb | telefone, e-mail |
+| documento | text | CPF/CNPJ só com dígitos, opcional; único por escritório entre os clientes não excluídos (índice parcial) |
+| contato | jsonb | telefone (celular com DDD), e-mail |
+| tipo_pessoa | enum | `pf` ou `pj` |
+| papel | enum | `cliente`, `parte_contraria` ou `testemunha`; `parte_contraria` só quando a origem é parte contrária |
+| origem | enum | `indicacao`, `redes_sociais`, `google`, `parte_contraria`, `outro` (lista fixa; os cadastros antigos ficaram como `outro`) |
+| data_nascimento, genero | date, text | opcionais |
+| representante_id | uuid | outro cliente do mesmo escritório (ex.: quem assina pela empresa) |
+| qualificacao | jsonb | RG, estado civil, profissão, nacionalidade, endereço (cep, logradouro, número, complemento, bairro, cidade, uf) e dados da PJ |
+| pix, observacoes | text | observações aceitam #hashtags (busca) |
+| ultimo_contato_em | timestamptz | gravado ao copiar a mensagem de atualização |
+| excluido_em | timestamptz | exclusão que preserva o cadastro; "restaurar" zera o campo |
+
+A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome, documento, e-mail e #hashtag, os filtros de papel, origem e excluídos, a ordenação por nome, cidade e cadastro e a paginação, e devolve o total de linhas.
 
 ### processos
 | Campo | Tipo | Observação |

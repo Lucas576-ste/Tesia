@@ -23,8 +23,10 @@ const processoSchema = z.object({
   encerrado_em: z.string().nullable(),
   clientes: z
     .union([
-      z.object({ id: z.uuid(), nome: z.string() }),
-      z.array(z.object({ id: z.uuid(), nome: z.string() })),
+      z.object({ id: z.uuid(), nome: z.string(), excluido_em: z.string().nullable().optional() }),
+      z.array(
+        z.object({ id: z.uuid(), nome: z.string(), excluido_em: z.string().nullable().optional() }),
+      ),
     ])
     .nullable()
     .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor)),
@@ -65,7 +67,14 @@ function resumoDoProcesso(prazos: LinhaPrazo[]): {
 function acompanhamento(processo: z.infer<typeof processoSchema>) {
   const encerrado = Boolean(processo.encerrado_em);
   return {
-    cliente: processo.clientes,
+    cliente: processo.clientes
+      ? {
+          id: processo.clientes.id,
+          nome: processo.clientes.excluido_em
+            ? `${processo.clientes.nome} (cliente excluído)`
+            : processo.clientes.nome,
+        }
+      : null,
     rito: processo.rito,
     fase: processo.fase,
     nomeFase: encerrado
@@ -85,7 +94,7 @@ export async function listarProcessos(): Promise<Processo[]> {
   const { data } = await supabase
     .from("processos")
     .select(
-      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome)",
+      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome, excluido_em)",
     )
     .is("excluido_em", null)
     .order("criado_em", { ascending: false });
@@ -123,7 +132,7 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
   const { data } = await supabase
     .from("processos")
     .select(
-      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome)",
+      "id, numero_cnj, partes, parte_contraria, area, tribunal, orgao, rito, fase, fase_origem, fase_atualizada_em, encerrado_em, clientes(id, nome, excluido_em)",
     )
     .eq("id", id)
     .is("excluido_em", null)

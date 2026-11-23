@@ -76,3 +76,18 @@ export {
   type Qualificacao,
 } from "./qualificacao";
 export { iniciais, tituloNome } from "./nomes";
+export {
+  CODIGOS_GENERO,
+  CODIGOS_ORIGEM,
+  CODIGOS_PAPEL,
+  extrairHashtags,
+  GENEROS,
+  mascaraTelefoneEntrada,
+  ORIGENS,
+  PAPEIS,
+  papelDaOrigem,
+  validarCelular,
+  type GeneroCliente,
+  type OrigemCliente,
+  type PapelCliente,
+} from "./clientes";

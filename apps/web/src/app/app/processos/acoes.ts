@@ -25,15 +25,34 @@ function mensagemErro(codigo: string | undefined) {
     : "Não foi possível salvar o processo.";
 }
 
-export async function criarProcesso(entrada: DadosProcesso): Promise<Resultado> {
+export async function criarProcesso(
+  entrada: DadosProcesso,
+  clienteId?: string,
+): Promise<Resultado> {
   const usuario = await usuarioAtual();
   if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
   const dados = dadosProcessoSchema.safeParse(entrada);
   if (!dados.success) return { erro: dados.error.issues[0]?.message ?? "Dados inválidos." };
   const supabase = await criarClienteServidor();
+  let clienteVinculado: string | null = null;
+  if (clienteId) {
+    if (!z.uuid().safeParse(clienteId).success) return { erro: "Cliente não encontrado." };
+    const { data: cliente } = await supabase
+      .from("clientes")
+      .select("id")
+      .eq("id", clienteId)
+      .is("excluido_em", null)
+      .maybeSingle();
+    if (!cliente) return { erro: "Cliente não encontrado." };
+    clienteVinculado = clienteId;
+  }
   const { data, error } = await supabase
     .from("processos")
-    .insert({ ...colunas(dados.data), escritorio_id: usuario.escritorio_id })
+    .insert({
+      ...colunas(dados.data),
+      escritorio_id: usuario.escritorio_id,
+      cliente_id: clienteVinculado,
+    })
     .select("id")
     .single();
   const linha = z.object({ id: z.uuid() }).safeParse(data);
