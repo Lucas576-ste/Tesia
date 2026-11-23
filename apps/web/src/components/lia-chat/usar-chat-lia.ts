@@ -9,6 +9,7 @@ import {
 } from "@/app/app/lia-acoes";
 import type { AcaoLia } from "@/lib/lia/acoes";
 import { ocultarMarcadores } from "@/lib/lia/acoes";
+import { acrescentarResposta } from "./acrescentar-resposta";
 import { enviarPergunta } from "./cliente-lia";
 
 export type MensagemChat = {
@@ -91,7 +92,6 @@ export function useChatLia(rota: string, ativo: boolean) {
       }
       const abortador = new AbortController();
       controle.current = abortador;
-      let criada = false;
 
       const resultado = await enviarPergunta({
         pedido: { conversaId, mensagem, rota, reenvio },
@@ -100,27 +100,7 @@ export function useChatLia(rota: string, ativo: boolean) {
           if (evento.tipo === "inicio") setConversaId(evento.conversaId);
           if (evento.tipo === "texto") {
             setRecebendo(true);
-            setMensagens((atuais) => {
-              if (!criada) {
-                criada = true;
-                return [
-                  ...atuais,
-                  {
-                    chave: chaveResposta,
-                    mensagemId: null,
-                    papel: "lia",
-                    conteudo: evento.valor,
-                    acoes: [],
-                    avaliacao: null,
-                  },
-                ];
-              }
-              return atuais.map((item) =>
-                item.chave === chaveResposta
-                  ? { ...item, conteudo: item.conteudo + evento.valor }
-                  : item,
-              );
-            });
+            setMensagens((atuais) => acrescentarResposta(atuais, chaveResposta, evento.valor));
           }
           if (evento.tipo === "fim") {
             setUso(evento.uso);

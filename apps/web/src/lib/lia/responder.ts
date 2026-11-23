@@ -52,6 +52,7 @@ export async function gerarResposta(
   cliente: ClienteChat,
   { sistema, mensagens, signal }: PedidoResposta,
   aoTexto: (pedaco: string) => void,
+  aoFalhar?: (erro: unknown) => void,
 ): Promise<ResultadoResposta> {
   let texto = "";
   try {
@@ -73,8 +74,9 @@ export async function gerarResposta(
     }
     const final = await fluxo.finalMessage();
     return { texto, uso: final.usage, interrompida: false, falhou: false };
-  } catch {
+  } catch (erro) {
     const interrompida = Boolean(signal?.aborted);
+    if (!interrompida) aoFalhar?.(erro);
     return { texto, uso: null, interrompida, falhou: !interrompida };
   }
 }
