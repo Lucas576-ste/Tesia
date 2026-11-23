@@ -110,14 +110,14 @@ export async function buscarCalendario(
          or (abrangencia = 'estadual' and uf = $3)
          or (abrangencia = 'municipal' and uf = $3 and lower(municipio) = lower($4))
          or (abrangencia = 'nacional')
-         or (escritorio_id = $1)
+         or (escritorio_id = $1 and tribunal is null)
        )`,
     [escritorioId, tribunal, uf, municipio],
   );
   const { rows: suspensoes } = await db.query(
     `select to_char(data_inicio, 'YYYY-MM-DD') as inicio, to_char(data_fim, 'YYYY-MM-DD') as fim, motivo
      from suspensoes_tribunal
-     where (escritorio_id is null or escritorio_id = $1) and (tribunal = $2 or escritorio_id = $1)`,
+     where (escritorio_id is null or escritorio_id = $1) and (tribunal = $2 or (escritorio_id = $1 and tribunal is null))`,
     [escritorioId, tribunal],
   );
   return {

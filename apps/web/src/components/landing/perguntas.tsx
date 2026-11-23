@@ -44,11 +44,9 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
     resposta: (
       <>
         O cálculo é feito por regras fixas, não pela IA, e você vê a conta inteira antes de
-        confirmar: publicação, início, dias úteis, feriados e vencimento.{" "}
-        <Confirmar motivo="cadastro de feriado não está no cronograma">
-          Se o seu tribunal tiver um feriado ou suspensão que não está na lista, você cadastra e a
-          conta é refeita.
-        </Confirmar>
+        confirmar: publicação, início, dias úteis, feriados e vencimento. Se o seu tribunal tiver um
+        feriado ou suspensão que não está na lista, você cadastra em Configurações e os próximos
+        cálculos já contam essa data.
       </>
     ),
   },

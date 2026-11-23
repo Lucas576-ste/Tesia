@@ -37,6 +37,8 @@ export const ROTULOS_FORMA: Record<FormaRecebimento, string> = {
 
 const DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
 
+export const FUNDAMENTO_INFORMADO = "Prazo informado por você";
+
 export function recalcularPrazo(
   regra: RegraPrazo | null,
   calendarioPrazo: CalendarioPrazo,
@@ -58,7 +60,7 @@ export function recalcularPrazo(
       dataAbertura: abertura,
       dias: regra.dias,
       contagem: regra.contagem,
-      fundamento: regra.fundamento,
+      fundamento: regra.fundamento.trim() || FUNDAMENTO_INFORMADO,
     },
     calendario,
   );

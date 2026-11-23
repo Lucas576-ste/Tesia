@@ -24,18 +24,6 @@ export const DIAS_ANTECEDENCIA = [
   "No dia do prazo interno",
 ] as const;
 
-export const novoFeriadoSchema = z.object({
-  data: z.iso.date("Informe a data."),
-  descricao: z.string().trim().min(3, "Descreva o feriado ou a suspensão.").max(120),
-});
-
-export type FeriadoProprio = z.infer<typeof novoFeriadoSchema> & { id: string };
-
-export const feriadosExemplo: FeriadoProprio[] = [
-  { id: "1", data: "2026-12-08", descricao: "Dia da Justiça (exemplo)" },
-  { id: "2", data: "2026-12-21", descricao: "Suspensão de prazos do tribunal (exemplo)" },
-];
-
 export const sessoesExemplo = [
   { id: "1", dispositivo: "Chrome no computador", local: "Brasília, DF", atual: true },
   { id: "2", dispositivo: "Safari no celular", local: "Brasília, DF", atual: false },

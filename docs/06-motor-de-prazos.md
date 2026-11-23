@@ -56,7 +56,7 @@ O motor considera como dia não útil:
 - feriados nacionais (fixos e móveis, calculados a partir da Páscoa)
 - feriados estaduais e municipais do local do processo
 - suspensões e pontos facultativos do tribunal (tabela `suspensoes_tribunal`)
-- feriados e suspensões cadastrados pelo próprio advogado
+- feriados e suspensões cadastrados pelo próprio advogado (um dia vai para `feriados`, um período para `suspensoes_tribunal`; sem tribunal valem para todos os processos do escritório, com tribunal só para os processos dele). Entram nos próximos cálculos; prazos já calculados não são refeitos sozinhos, e a tela avisa quantos prazos abertos vencem depois da data cadastrada
 
 Manutenção:
 - **MVP:** feriados nacionais por algoritmo + tribunais do DF (TJDFT, TRF1/SJDF, TRT10) cadastrados manualmente.

@@ -84,8 +84,10 @@ export async function buscarCalendario(
   rito: string,
 ): Promise<CalendarioPrazo> {
   const recessoCivil = rito !== "criminal";
-  const filtros = ["escritorio_id.not.is.null"];
-  if (local?.tribunal) filtros.push(`and(abrangencia.eq.tribunal,tribunal.eq.${local.tribunal})`);
+  const filtros = ["and(escritorio_id.not.is.null,tribunal.is.null)"];
+  if (local?.tribunal) {
+    filtros.push(`and(abrangencia.eq.tribunal,tribunal.eq.${local.tribunal})`);
+  }
   if (local?.uf) filtros.push(`and(abrangencia.in.(estadual,municipal),uf.eq.${local.uf})`);
   const { data: feriados } = await supabase
     .from("feriados")
@@ -98,12 +100,12 @@ export async function buscarCalendario(
       feriado.municipio?.toLocaleLowerCase("pt-BR") === municipio,
   );
 
-  const { data: suspensoes } = local?.tribunal
-    ? await supabase
-        .from("suspensoes_tribunal")
-        .select("inicio:data_inicio, fim:data_fim, motivo")
-        .or(`tribunal.eq.${local.tribunal},escritorio_id.not.is.null`)
-    : { data: [] };
+  const filtrosSuspensao = ["and(escritorio_id.not.is.null,tribunal.is.null)"];
+  if (local?.tribunal) filtrosSuspensao.push(`tribunal.eq.${local.tribunal}`);
+  const { data: suspensoes } = await supabase
+    .from("suspensoes_tribunal")
+    .select("inicio:data_inicio, fim:data_fim, motivo")
+    .or(filtrosSuspensao.join(","));
   return {
     feriados: lista.map(({ data, nome }) => ({ data, nome })),
     suspensoes: suspensoesSchema.safeParse(suspensoes).data ?? [],

@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ABAS_CONFIGURACOES, type AbaConfiguracoes } from "@/lib/conta-exemplo";
 import { AbaAgenda, type DadosAgenda } from "./aba-agenda";
 import { AbaAlertas } from "./aba-alertas";
+import type { ItemCalendario } from "@/lib/calendario-proprio";
 import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
@@ -26,17 +27,20 @@ function conteudosDasAbas(
   agenda: DadosAgenda,
   alertas: PreferenciasAlerta,
   djen: DadosDjen,
+  calendario: CalendarioProprio,
 ): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
   return {
     alertas: <AbaAlertas alertas={alertas} djen={djen} />,
     agenda: <AbaAgenda agenda={agenda} />,
     equipe: <AbaEquipe />,
     modelo: <AbaModelo modelo={modelo} />,
-    calendario: <AbaCalendario />,
+    calendario: <AbaCalendario itens={calendario.itens} tribunais={calendario.tribunais} />,
     seguranca: <AbaSeguranca />,
     dados: <AbaDados conta={conta} resumo={resumo} />,
   };
 }
+
+export type CalendarioProprio = { itens: ItemCalendario[]; tribunais: string[] };
 
 const atalhos = [
   { rotulo: "Plano e uso", href: "/app/plano" },
@@ -53,6 +57,7 @@ export function TelaConfiguracoes({
   agenda,
   alertas,
   djen,
+  calendario,
 }: {
   abaInicial: AbaConfiguracoes;
   conta: PerfilConta;
@@ -61,8 +66,9 @@ export function TelaConfiguracoes({
   agenda: DadosAgenda;
   alertas: PreferenciasAlerta;
   djen: DadosDjen;
+  calendario: CalendarioProprio;
 }) {
-  const conteudos = conteudosDasAbas(conta, resumo, modelo, agenda, alertas, djen);
+  const conteudos = conteudosDasAbas(conta, resumo, modelo, agenda, alertas, djen, calendario);
   const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);

@@ -288,8 +288,10 @@ O job `gerar_perfil_estilo` é criado por gatilho quando uma peça vira `lido` o
 | fonte | text | link ou portaria |
 | escritorio_id | uuid | preenchido quando cadastrado pelo próprio advogado |
 
+Feriado do advogado (Configurações > Calendário): grava `abrangencia = 'tribunal'` com `tribunal` nulo (vale para todos os processos do escritório) ou com o tribunal escolhido (vale só para os processos dele). O RLS deixa ler o global ou o próprio e escrever só o próprio.
+
 ### suspensoes_tribunal
-`tribunal`, `data_inicio`, `data_fim`, `motivo`, `fonte`, `escritorio_id` (opcional).
+`tribunal`, `data_inicio`, `data_fim`, `motivo`, `fonte`, `escritorio_id` (opcional). Desde a migration 0027, `tribunal` pode ser nulo, mas só quando `escritorio_id` está preenchido (suspensão própria que vale para todos os processos). Uma suspensão própria igual (mesmo tribunal, início e fim) é bloqueada por índice único.
 
 ## Assinatura e uso
 

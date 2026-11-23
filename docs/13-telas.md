@@ -230,7 +230,7 @@ Abas:
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso, divisão por área
 - **Modelo de documento:** quatro estados pelo status real do timbrado: sem timbrado (envio grande com miniatura), processando ("Lendo seu timbrado…"), ativo (prévia A4 com o arquivo real à esquerda e card "Timbrado em uso" com baixar peça de teste, trocar e remover) e erro (mensagem de como resolver e "Tentar outro arquivo"). Só .docx; PDF é recusado com orientação
-- **Calendário:** feriados e suspensões próprios do escritório
+- **Calendário:** feriados (um dia) e suspensões (período) próprios do escritório, para todos os processos ou só de um tribunal, com aviso de quantos prazos abertos vencem depois da data e remoção com confirmação (**feito em 2026-11-23**)
 - **Segurança:** senha, sessões ativas
 - **Dados:** exportar tudo e excluir conta
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { preferenciasAlertaSchema } from "@/lib/alertas";
 import { TelaConfiguracoes } from "@/components/configuracoes/tela-configuracoes";
+import { listarCalendarioProprio, tribunaisDoEscritorio } from "@/lib/calendario-proprio-servidor";
 import { abaConfiguracoesSchema } from "@/lib/conta-exemplo";
 import { buscarPerfilConta, buscarResumoDados } from "@/lib/perfil-conta";
 import { exigirUsuario } from "@/lib/sessao";
@@ -15,7 +16,12 @@ type ConfiguracoesPageProps = {
 export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesPageProps) {
   const { aba } = await searchParams;
   const usuario = await exigirUsuario();
-  const [conta, resumo] = await Promise.all([buscarPerfilConta(usuario), buscarResumoDados()]);
+  const [conta, resumo, itensCalendario, tribunais] = await Promise.all([
+    buscarPerfilConta(usuario),
+    buscarResumoDados(),
+    listarCalendarioProprio(),
+    tribunaisDoEscritorio(),
+  ]);
   const cabecalhos = await headers();
   const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host") ?? "localhost:3000";
   const protocolo =
@@ -33,6 +39,7 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
         abaInicial={abaConfiguracoesSchema.parse(aba)}
         conta={conta}
         resumo={resumo}
+        calendario={{ itens: itensCalendario, tribunais }}
         agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
         djen={{
           ativo: usuario.djen_ativo,

@@ -17,7 +17,7 @@ Estes ajustes prevalecem sobre os textos abaixo:
 
 - **Título do hero:** "Da intimação à peça, no seu estilo." "Nenhum prazo perdido" soa como garantia, e a Tesia não busca intimações sozinha.
 - **`[CONFIRMAR]`:** a frase inteira só aparece em desenvolvimento. Em produção não é publicada ou usa um texto alternativo.
-- **Também tratados como `[CONFIRMAR]`:** "30 minutos" (CTA final), "menos do que uma hora" (preços) e o cadastro de feriado pelo advogado (perguntas).
+- **Também tratados como `[CONFIRMAR]`:** "30 minutos" (CTA final) e "menos do que uma hora" (preços). O cadastro de feriado pelo advogado deixou de ser `[CONFIRMAR]` em 2026-11-23, quando passou a funcionar de verdade.
 - **Preços:** "Recomendado" no lugar de "Mais escolhido", porque ainda não há clientes. Plus como "em breve".
 - **Dados:** "Onde ficam os meus dados?" declara o processamento fora do Brasil, como exige `09-seguranca-e-lgpd.md`.
 - **Formulário:** sem banco, simula o sucesso em desenvolvimento e avisa que as inscrições não abriram em produção. Nunca registrar dados pessoais em log. Inclui aviso de uso dos dados.
@@ -234,7 +234,7 @@ A Tesia é instruída a usar apenas os fatos dos documentos do processo e as ref
 Você. A Tesia entrega rascunhos e sugestões de prazo. Nenhum prazo entra no painel sem a sua confirmação e nada é protocolado sem você.
 
 **E se o prazo estiver errado?**
-O cálculo é feito por regras fixas, não pela IA, e você vê a conta inteira: publicação, início, dias úteis, feriados e vencimento. Se o seu tribunal tiver um feriado ou suspensão que não está na lista, você cadastra e a conta é refeita.
+O cálculo é feito por regras fixas, não pela IA, e você vê a conta inteira: publicação, início, dias úteis, feriados e vencimento. Se o seu tribunal tiver um feriado ou suspensão que não está na lista, você cadastra em Configurações e os próximos cálculos já contam essa data.
 
 **A OAB permite usar IA na advocacia?**
 O Conselho Federal da OAB publicou recomendações para o uso de IA na advocacia, com foco em supervisão humana, sigilo e proteção de dados. A Tesia segue essa linha: você revisa tudo, e os dados ficam restritos ao seu escritório. `[CONFIRMAR: citar o documento oficial da OAB]`

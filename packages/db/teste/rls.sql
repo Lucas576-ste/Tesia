@@ -727,4 +727,111 @@ begin
 end;
 $$;
 
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  b uuid := current_setting('teste.esc_b')::uuid;
+  achados int;
+begin
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+
+  insert into feriados (escritorio_id, data, nome, abrangencia, tribunal)
+  values (a, '2027-06-10', 'Feriado próprio para todos', 'tribunal', null),
+         (a, '2027-06-11', 'Feriado próprio só do TJDFT', 'tribunal', 'TJDFT');
+  insert into suspensoes_tribunal (escritorio_id, tribunal, data_inicio, data_fim, motivo)
+  values (a, null, '2027-07-01', '2027-07-03', 'Suspensão própria para todos'),
+         (a, 'TRT10', '2027-08-01', '2027-08-02', 'Suspensão própria só do TRT10');
+
+  begin
+    insert into feriados (escritorio_id, data, nome, abrangencia, tribunal)
+    values (a, '2027-06-10', 'Duplicado', 'tribunal', null);
+    assert false, 'O mesmo dia com o mesmo escopo deveria ser bloqueado';
+  exception when unique_violation then null;
+  end;
+
+  begin
+    insert into suspensoes_tribunal (escritorio_id, tribunal, data_inicio, data_fim, motivo)
+    values (a, null, '2027-07-01', '2027-07-03', 'Duplicada');
+    assert false, 'A mesma suspensão deveria ser bloqueada, mesmo sem tribunal';
+  exception when unique_violation then null;
+  end;
+
+  begin
+    insert into suspensoes_tribunal (escritorio_id, tribunal, data_inicio, data_fim, motivo)
+    values (a, null, '2027-09-05', '2027-09-01', 'Invertida');
+    assert false, 'Período com fim antes do início deveria falhar';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into feriados (escritorio_id, data, nome, abrangencia)
+    values (b, '2027-06-21', 'Em nome de B', 'tribunal');
+    assert false, 'A não deveria gravar feriado em nome de B';
+  exception when insufficient_privilege then null;
+  end;
+
+  assert (select count(*) from feriados where escritorio_id = a and data between '2027-06-01' and '2027-06-30') = 2, 'A deveria ver os seus 2 feriados';
+  assert (select count(*) from suspensoes_tribunal where escritorio_id = a and data_inicio >= '2027-07-01') = 2, 'A deveria ver as suas 2 suspensões';
+
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+  assert (select count(*) from feriados where nome like 'Feriado próprio%') = 0, 'B não deveria ver feriados de A';
+  assert (select count(*) from suspensoes_tribunal where motivo like 'Suspensão própria%') = 0, 'B não deveria ver suspensões de A';
+  delete from feriados where nome like 'Feriado próprio%';
+  delete from suspensoes_tribunal where motivo like 'Suspensão própria%';
+
+  reset role;
+  assert (select count(*) from feriados where nome like 'Feriado próprio%') = 2, 'B não deveria ter apagado feriados de A';
+  assert (select count(*) from suspensoes_tribunal where motivo like 'Suspensão própria%') = 2, 'B não deveria ter apagado suspensões de A';
+
+  select count(*) into achados from feriados
+   where (escritorio_id is null or escritorio_id = a)
+     and (
+       (abrangencia = 'tribunal' and tribunal = 'TJDFT')
+       or (abrangencia = 'estadual' and uf = 'DF')
+       or (abrangencia = 'nacional')
+       or (escritorio_id = a and tribunal is null)
+     )
+     and nome like 'Feriado próprio%';
+  assert achados = 2, 'Para o TJDFT deveriam valer o feriado de todos e o do TJDFT';
+
+  select count(*) into achados from feriados
+   where (escritorio_id is null or escritorio_id = a)
+     and (
+       (abrangencia = 'tribunal' and tribunal = 'TRT10')
+       or (abrangencia = 'nacional')
+       or (escritorio_id = a and tribunal is null)
+     )
+     and nome like 'Feriado próprio%';
+  assert achados = 1, 'Para o TRT10 deveria valer só o feriado de todos';
+
+  select count(*) into achados from feriados
+   where (escritorio_id is null or escritorio_id = a)
+     and (
+       (abrangencia = 'tribunal' and tribunal = null)
+       or (escritorio_id = a and tribunal is null)
+     )
+     and nome like 'Feriado próprio%';
+  assert achados = 1, 'Sem tribunal no processo deveria valer só o feriado de todos';
+
+  select count(*) into achados from suspensoes_tribunal
+   where (escritorio_id is null or escritorio_id = a)
+     and (tribunal = 'TRT10' or (escritorio_id = a and tribunal is null))
+     and motivo like 'Suspensão própria%';
+  assert achados = 2, 'Para o TRT10 deveriam valer a suspensão de todos e a do TRT10';
+
+  select count(*) into achados from suspensoes_tribunal
+   where (escritorio_id is null or escritorio_id = a)
+     and (tribunal = 'TJDFT' or (escritorio_id = a and tribunal is null))
+     and motivo like 'Suspensão própria%';
+  assert achados = 1, 'Para o TJDFT deveria valer só a suspensão de todos';
+
+  select count(*) into achados from suspensoes_tribunal
+   where (escritorio_id is null or escritorio_id = b)
+     and (tribunal = 'TRT10' or (escritorio_id = b and tribunal is null))
+     and motivo like 'Suspensão própria%';
+  assert achados = 0, 'O escritório B não deveria receber suspensões de A';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;
