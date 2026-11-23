@@ -41,6 +41,10 @@ export type RegraParaPreset = {
   revisada: boolean;
 };
 
+export function nomeDaPeca(nomes: Map<string, string>, area: string, codigo: string) {
+  return nomes.get(`${area}|${codigo}`) ?? nomes.get(`geral|${codigo}`) ?? codigo;
+}
+
 export function rotuloPreset({ peca, dias, contagem, fundamento }: PresetPrazo) {
   return `${peca} · ${dias} dias ${contagem === "uteis" ? "úteis" : "corridos"} (${fundamento})`;
 }

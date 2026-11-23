@@ -9,6 +9,7 @@ import {
   calculoPrazoSchema,
   esquemaPrazoManual,
   hojeBrasilia,
+  nomeDaPeca,
   type CalculoPrazo,
   type PrazoManual,
   type PresetPrazo,
@@ -105,7 +106,7 @@ export async function presetsDePrazo(): Promise<PresetPrazo[]> {
   return agruparPresets(
     (z.array(regraDoPresetSchema).safeParse(regras).data ?? []).map((regra) => ({
       id: regra.id,
-      peca: nomes.get(`${regra.area}|${regra.tipo_peca_codigo}`) ?? regra.tipo_peca_codigo,
+      peca: nomeDaPeca(nomes, regra.area, regra.tipo_peca_codigo),
       dias: regra.dias,
       contagem: regra.contagem,
       fundamento: regra.fundamento,
