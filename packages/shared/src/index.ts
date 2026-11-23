@@ -78,15 +78,18 @@ export {
 export { iniciais, tituloNome } from "./nomes";
 export {
   CODIGOS_GENERO,
+  CODIGOS_FAIXA,
   CODIGOS_ORIGEM,
   CODIGOS_PAPEL,
   extrairHashtags,
+  FAIXAS_ETARIAS,
   GENEROS,
   mascaraTelefoneEntrada,
   ORIGENS,
   PAPEIS,
   papelDaOrigem,
   validarCelular,
+  type FaixaEtaria,
   type GeneroCliente,
   type OrigemCliente,
   type PapelCliente,

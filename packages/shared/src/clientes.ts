@@ -33,6 +33,19 @@ export type GeneroCliente = keyof typeof GENEROS;
 
 export const CODIGOS_GENERO = Object.keys(GENEROS) as [GeneroCliente, ...GeneroCliente[]];
 
+export const FAIXAS_ETARIAS = {
+  ate_25: "Até 25 anos",
+  "26_35": "26 a 35 anos",
+  "36_50": "36 a 50 anos",
+  "51_65": "51 a 65 anos",
+  "66_mais": "66 anos ou mais",
+  sem_data: "Sem data",
+} as const;
+
+export type FaixaEtaria = keyof typeof FAIXAS_ETARIAS;
+
+export const CODIGOS_FAIXA = Object.keys(FAIXAS_ETARIAS) as [FaixaEtaria, ...FaixaEtaria[]];
+
 export function papelDaOrigem(
   origem: OrigemCliente,
   papelEscolhido: PapelCliente = "cliente",

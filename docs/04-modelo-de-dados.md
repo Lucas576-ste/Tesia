@@ -121,7 +121,7 @@ O cadastro no Supabase Auth dispara um gatilho (`0004_novo_usuario.sql`) que cri
 | ultimo_contato_em | timestamptz | gravado ao copiar a mensagem de atualização |
 | excluido_em | timestamptz | exclusão que preserva o cadastro; "restaurar" zera o campo |
 
-A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome, documento, e-mail e #hashtag, os filtros de papel, origem e excluídos, a ordenação por nome, cidade e cadastro e a paginação, e devolve o total de linhas.
+A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome, documento, e-mail e #hashtag, os filtros de papel, origem e excluídos, a ordenação por nome, cidade e cadastro e a paginação, e devolve o total de linhas. A migration 0026 acrescenta os filtros por com/sem processo, UF, cidade (comparação sem diferenciar caixa), período de cadastro e aniversário (hoje ou mês, com 29/02 comemorado em 28/02 nos anos comuns), a coluna `aniversario_hoje`, e a função `metricas_clientes()` (só clientes com papel cliente e não excluídos: total, novos no mês e no anterior, com e sem processo, top 5 de origens e de profissões, faixas etárias, UFs e cidades existentes).
 
 ### processos
 | Campo | Tipo | Observação |

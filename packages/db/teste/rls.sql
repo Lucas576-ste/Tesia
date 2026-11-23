@@ -636,4 +636,95 @@ begin
 end;
 $$;
 
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  b uuid := current_setting('teste.esc_b')::uuid;
+  hoje date := (now() at time zone 'America/Sao_Paulo')::date;
+  outro_dia date;
+  id_com uuid;
+  esperado_total int;
+  esperado_com int;
+  esperado_novos int;
+  linha record;
+begin
+  assert aniversaria_em('2000-02-29', '2027-02-28', 'hoje'), '29/02 deveria comemorar em 28/02 de ano comum';
+  assert not aniversaria_em('2000-02-29', '2028-02-28', 'hoje'), '29/02 não deveria comemorar em 28/02 de ano bissexto';
+  assert aniversaria_em('2000-02-29', '2028-02-29', 'hoje'), '29/02 deveria comemorar em 29/02';
+  assert aniversaria_em('2000-02-29', '2027-02-10', 'mes'), '29/02 deveria cair no mês de fevereiro';
+  assert not aniversaria_em('1990-01-05', '2027-12-31', 'mes'), 'Janeiro não deveria cair em dezembro';
+  assert not aniversaria_em(null, '2027-12-31', 'hoje'), 'Sem data não deveria aniversariar';
+
+  outro_dia := make_date(
+    extract(year from hoje)::int - 40,
+    extract(month from hoje)::int,
+    case when extract(day from hoje) = 15 then 16 else 15 end
+  );
+
+  insert into clientes (escritorio_id, nome, nome_normalizado, data_nascimento, qualificacao, criado_em)
+  values
+    (a, 'Metrica Hoje', 'metrica hoje', (hoje - interval '30 years')::date,
+      '{"profissao":"Advogado","endereco":{"cidade":"Santos","uf":"sp"}}', now()),
+    (a, 'Metrica Mes', 'metrica mes', outro_dia,
+      '{"profissao":"advogado","endereco":{"cidade":"santos","uf":"SP"}}', now() - interval '45 days'),
+    (a, 'Metrica Outro Mes', 'metrica outro mes', (hoje + interval '2 months' - interval '25 years')::date,
+      '{"profissao":"Médica","endereco":{"cidade":"Niterói","uf":"RJ"}}', now() - interval '3 days'),
+    (a, 'Metrica Sem Data', 'metrica sem data', null,
+      '{"profissao":"ADVOGADO"}', now());
+
+  insert into clientes (escritorio_id, nome, nome_normalizado, papel, origem)
+  values (a, 'Metrica Testemunha', 'metrica testemunha', 'testemunha', 'outro');
+
+  select id into id_com from clientes where escritorio_id = a and nome = 'Metrica Hoje';
+  insert into processos (escritorio_id, cliente_id, numero_cnj) values (a, id_com, 'METRICA-0001');
+
+  select count(*) into esperado_total from clientes where escritorio_id = a and excluido_em is null and papel = 'cliente';
+  select count(*) into esperado_com from clientes c
+    where escritorio_id = a and excluido_em is null and papel = 'cliente'
+      and exists (select 1 from processos p where p.cliente_id = c.id and p.excluido_em is null);
+  select count(*) into esperado_novos from clientes
+    where escritorio_id = a and excluido_em is null and papel = 'cliente'
+      and date_trunc('month', criado_em at time zone 'America/Sao_Paulo') = date_trunc('month', hoje);
+
+  set local role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+
+  assert (select count(*) from listar_clientes(p_busca => 'metrica', p_nome_normalizado => 'metrica', p_com_processo => 'com', p_tamanho => 50)) = 1, 'Com processo deveria achar 1';
+  assert (select count(*) from listar_clientes(p_busca => 'metrica', p_nome_normalizado => 'metrica', p_com_processo => 'sem', p_tamanho => 50)) = 4, 'Sem processo deveria achar 4';
+  assert (select count(*) from listar_clientes(p_uf => 'sp', p_tamanho => 50)) = 2, 'UF sem diferenciar caixa deveria achar 2';
+  assert (select count(*) from listar_clientes(p_cidade => 'SANTOS', p_tamanho => 50)) = 2, 'Cidade sem diferenciar caixa deveria achar 2';
+  assert (select count(*) from listar_clientes(p_cidade => 'Niterói', p_uf => 'SP', p_tamanho => 50)) = 0, 'Cidade e UF juntas deveriam se somar';
+  assert (select count(*) from listar_clientes(p_busca => 'metrica', p_nome_normalizado => 'metrica', p_cadastro_de => hoje - 10, p_tamanho => 50)) = 4, 'Cadastro recente deveria excluir o antigo';
+  assert (select count(*) from listar_clientes(p_busca => 'metrica', p_nome_normalizado => 'metrica', p_cadastro_ate => hoje - 30, p_tamanho => 50)) = 1, 'Cadastro até 30 dias atrás deveria achar só o antigo';
+  assert (select count(*) from listar_clientes(p_busca => 'metrica', p_nome_normalizado => 'metrica', p_cadastro_de => hoje - 50, p_cadastro_ate => hoje - 40, p_tamanho => 50)) = 1, 'O período fechado deveria achar o antigo';
+  assert (select count(*) from listar_clientes(p_aniversario => 'hoje', p_busca => 'metrica', p_nome_normalizado => 'metrica', p_tamanho => 50)) = 1, 'Aniversário de hoje deveria achar 1';
+  assert (select count(*) from listar_clientes(p_aniversario => 'mes', p_busca => 'metrica', p_nome_normalizado => 'metrica', p_tamanho => 50)) = 2, 'Aniversário do mês deveria achar 2';
+  assert (select aniversario_hoje from listar_clientes(p_busca => 'metrica hoje', p_nome_normalizado => 'metrica hoje', p_tamanho => 5) limit 1), 'A linha deveria marcar aniversário hoje';
+  assert (select nome from listar_clientes(p_aniversario => 'mes', p_busca => 'metrica', p_nome_normalizado => 'metrica', p_tamanho => 50) limit 1)
+    = case when extract(day from hoje) < extract(day from outro_dia) then 'Metrica Hoje' else 'Metrica Mes' end,
+    'Aniversariantes do mês deveriam vir em ordem de dia';
+
+  select * into linha from metricas_clientes();
+  assert linha.total = esperado_total, 'O total das métricas deveria bater com os clientes ativos';
+  assert linha.com_processo = esperado_com, 'Com processo deveria bater';
+  assert linha.com_processo + linha.sem_processo = linha.total, 'Com e sem processo deveriam somar o total';
+  assert linha.novos_mes_atual = esperado_novos, 'Novos do mês deveriam bater';
+  assert (select count(*) from jsonb_array_elements(linha.top_profissoes) e where lower(e ->> 'chave') = 'advogado') = 1, 'Profissões iguais com caixa diferente deveriam agrupar';
+  assert (select (e ->> 'total')::int from jsonb_array_elements(linha.top_profissoes) e where lower(e ->> 'chave') = 'advogado') = 3, 'Advogado deveria somar 3';
+  assert jsonb_array_length(linha.top_origens) <= 5, 'Top de origens deveria ter no máximo 5';
+  assert jsonb_array_length(linha.top_profissoes) <= 5, 'Top de profissões deveria ter no máximo 5';
+  assert (select (e ->> 'total')::int from jsonb_array_elements(linha.faixas_etarias) e where e ->> 'chave' = 'ate_25') >= 1, 'Faixa até 25 deveria ter ao menos 1';
+  assert (select (e ->> 'total')::int from jsonb_array_elements(linha.faixas_etarias) e where e ->> 'chave' = 'sem_data') >= 1, 'Sem data deveria contar';
+  assert linha.ufs ? 'SP' and linha.ufs ? 'RJ', 'As UFs deveriam vir em maiúsculas e sem repetir';
+  assert (select count(*) from jsonb_array_elements_text(linha.cidades) c where lower(c) = 'santos') = 1, 'Cidades iguais com caixa diferente deveriam agrupar';
+
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+  select * into linha from metricas_clientes();
+  assert linha.total = (select count(*) from clientes where escritorio_id = b and excluido_em is null and papel = 'cliente'), 'B deveria ver só as suas métricas';
+  assert not (linha.ufs ? 'SP'), 'B não deveria ver UFs de A';
+  assert (select count(*) from listar_clientes(p_uf => 'SP', p_tamanho => 50)) = 0, 'B não deveria achar clientes de A por UF';
+  reset role;
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

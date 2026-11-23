@@ -22,6 +22,12 @@ export async function listarClientesPaginado(filtros: FiltrosLista): Promise<Pag
     p_direcao: filtros.direcao,
     p_pagina: filtros.pagina,
     p_tamanho: TAMANHO_PAGINA,
+    p_com_processo: filtros.processo,
+    p_uf: filtros.uf,
+    p_cidade: filtros.cidade,
+    p_cadastro_de: filtros.de,
+    p_cadastro_ate: filtros.ate,
+    p_aniversario: filtros.aniversario,
   });
   const lidas = z.array(linhaListaSchema).safeParse(data).data ?? [];
   const total = lidas[0]?.total ?? 0;

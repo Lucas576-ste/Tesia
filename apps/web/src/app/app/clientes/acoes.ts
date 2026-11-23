@@ -1,6 +1,12 @@
 "use server";
 
-import { fasesDoRito, somenteDigitos, validarCnpj, validarCpf } from "@tesia/shared";
+import {
+  faseDoProcesso,
+  fasesDoRito,
+  somenteDigitos,
+  validarCnpj,
+  validarCpf,
+} from "@tesia/shared";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { brasilApiCnpjSchema, dadosDoCnpj, type DadosCnpj } from "@/lib/brasilapi";
@@ -215,6 +221,48 @@ export async function buscarClienteParaEdicao(
     .maybeSingle();
   const valores = formularioDoCliente(data);
   return valores ? { ok: true, valores } : { erro: "Cliente não encontrado." };
+}
+
+export type ProcessoDoCliente = { id: string; cnj: string; partes: string; fase: string };
+
+const processoDoClienteSchema = z.object({
+  id: z.uuid(),
+  numero_cnj: z.string(),
+  partes: z.string().nullable(),
+  parte_contraria: z.string().nullable(),
+  rito: z.string().nullable(),
+  fase: z.string().nullable(),
+  encerrado_em: z.string().nullable(),
+});
+
+export async function processosDoCliente(
+  clienteId: string,
+): Promise<{ ok: true; processos: ProcessoDoCliente[] } | { erro: string }> {
+  const usuario = await usuarioAtual();
+  if (!usuario || !z.uuid().safeParse(clienteId).success)
+    return { erro: "Cliente não encontrado." };
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .from("processos")
+    .select("id, numero_cnj, partes, parte_contraria, rito, fase, encerrado_em")
+    .eq("cliente_id", clienteId)
+    .is("excluido_em", null)
+    .order("encerrado_em", { ascending: false, nullsFirst: true })
+    .order("atualizado_em", { ascending: false })
+    .limit(50);
+  if (error) return { erro: "Não consegui carregar os processos." };
+  const lidos = z.array(processoDoClienteSchema).safeParse(data).data ?? [];
+  return {
+    ok: true,
+    processos: lidos.map((linha) => ({
+      id: linha.id,
+      cnj: linha.numero_cnj,
+      partes: linha.partes ?? linha.parte_contraria ?? "Partes não informadas",
+      fase: linha.encerrado_em
+        ? "Encerrado"
+        : (faseDoProcesso(linha.rito, linha.fase)?.nome ?? "Fase não identificada"),
+    })),
+  };
 }
 
 export async function clientesParaRepresentante(): Promise<Duplicado[]> {

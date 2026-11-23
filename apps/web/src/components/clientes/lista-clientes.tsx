@@ -8,7 +8,17 @@ import {
   PAPEIS,
   tituloNome,
 } from "@tesia/shared";
-import { ArrowDown, ArrowUp, FolderPlus, Pencil, RotateCcw, Search, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Cake,
+  ChevronRight,
+  FolderPlus,
+  Pencil,
+  RotateCcw,
+  Search,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -32,10 +42,19 @@ import {
   type LinhaCliente,
   type PaginaClientes,
 } from "@/lib/clientes-lista";
+import type { MetricasClientes } from "@/lib/clientes-metricas";
+import { cn } from "@/lib/utils";
 import { AvatarCliente } from "./avatar-cliente";
+import { FiltrosClientes } from "./filtros-clientes";
+import { MetricasDeClientes } from "./metricas-clientes";
+import { ProcessosDoCliente } from "./processos-do-cliente";
 import { useDrawerCliente } from "./provedor-cliente";
 
-type ListaClientesProps = { pagina: PaginaClientes; filtros: FiltrosLista };
+type ListaClientesProps = {
+  pagina: PaginaClientes;
+  filtros: FiltrosLista;
+  metricas: MetricasClientes | null;
+};
 
 function dataCurta(iso: string) {
   return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
@@ -53,88 +72,116 @@ function LinhaDaLista({
   aoRestaurar: (cliente: LinhaCliente) => void;
 }) {
   const { abrirEdicao } = useDrawerCliente();
+  const [aberto, setAberto] = useState(false);
   const nome = tituloNome(cliente.nome);
+  const expansivel = !excluidos && cliente.processos > 0;
   const local = [cliente.cidade, cliente.uf].filter(Boolean).join("/");
 
   return (
-    <li className="group flex items-center gap-3 border-b px-3 py-2.5 last:border-b-0 hover:bg-muted/40 focus-within:bg-muted/40">
-      <AvatarCliente nome={nome} className="size-9" />
-      <div className="grid min-w-0 flex-1 gap-x-4 gap-y-0.5 md:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.3fr)]">
-        <div className="flex min-w-0 flex-col">
-          <span className="flex min-w-0 items-center gap-2">
-            {excluidos ? (
-              <span className="truncate font-medium text-texto-secundario">{nome}</span>
-            ) : (
-              <Link
-                href={`/app/clientes/${cliente.id}`}
-                className="truncate font-medium text-titulo hover:underline"
-              >
-                {nome}
-              </Link>
-            )}
-            {cliente.papel !== "cliente" && (
-              <Badge variant="secondary" className="shrink-0">
-                {PAPEIS[cliente.papel]}
-              </Badge>
-            )}
-          </span>
-          <span className="truncate text-xs text-texto-secundario">
-            {cliente.documento
-              ? mascararDocumento(cliente.documento, cliente.tipo_pessoa)
-              : "Sem documento"}{" "}
-            · {ORIGENS[cliente.origem]}
-          </span>
-        </div>
-        <div className="flex min-w-0 flex-col text-xs text-texto-secundario">
-          <span className="truncate">{cliente.email ?? "Sem e-mail"}</span>
-          <span className="truncate">{cliente.telefone ?? "Sem celular"}</span>
-        </div>
-        <span className="truncate text-xs text-texto-secundario">{local || "Sem cidade"}</span>
-        <span className="text-xs text-texto-secundario">
-          {cliente.processos === 1 ? "1 processo" : `${cliente.processos} processos`} · desde{" "}
-          {dataCurta(cliente.criado_em)}
-        </span>
-      </div>
-      <div className="flex shrink-0 gap-0.5 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
-        {excluidos ? (
-          <Button variant="outline" size="sm" onClick={() => aoRestaurar(cliente)}>
-            <RotateCcw aria-hidden />
-            Restaurar
-          </Button>
+    <li className="group border-b last:border-b-0">
+      <div className="flex items-center gap-3 px-3 py-2.5 hover:bg-muted/40 focus-within:bg-muted/40">
+        {expansivel ? (
+          <button
+            type="button"
+            aria-expanded={aberto}
+            aria-label={`${aberto ? "Ocultar" : "Ver"} os processos de ${nome}`}
+            onClick={() => setAberto((valor) => !valor)}
+            className="rounded p-0.5 text-texto-secundario hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            <ChevronRight
+              aria-hidden
+              className={cn("size-4 transition-transform", aberto && "rotate-90")}
+            />
+          </button>
         ) : (
-          <>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Editar ${nome}`}
-              onClick={() => abrirEdicao(cliente.id)}
-            >
-              <Pencil aria-hidden />
-            </Button>
-            <Button asChild variant="ghost" size="icon-sm">
-              <Link
-                href={`/app/clientes?aba=processos&novo=1&cliente=${cliente.id}`}
-                aria-label={`Novo processo de ${nome}`}
-              >
-                <FolderPlus aria-hidden />
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Excluir ${nome}`}
-              onClick={() => aoExcluir(cliente)}
-            >
-              <Trash2 aria-hidden />
-            </Button>
-          </>
+          <span aria-hidden className="size-5" />
         )}
+        <AvatarCliente nome={nome} className="size-9" />
+        <div className="grid min-w-0 flex-1 gap-x-4 gap-y-0.5 md:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1.3fr)]">
+          <div className="flex min-w-0 flex-col">
+            <span className="flex min-w-0 items-center gap-2">
+              {excluidos ? (
+                <span className="truncate font-medium text-texto-secundario">{nome}</span>
+              ) : (
+                <Link
+                  href={`/app/clientes/${cliente.id}`}
+                  className="truncate font-medium text-titulo hover:underline"
+                >
+                  {nome}
+                </Link>
+              )}
+              {cliente.aniversario_hoje && (
+                <Cake
+                  role="img"
+                  aria-label="Aniversário hoje"
+                  className="size-3.5 shrink-0 text-primaria"
+                />
+              )}
+              {cliente.papel !== "cliente" && (
+                <Badge variant="secondary" className="shrink-0">
+                  {PAPEIS[cliente.papel]}
+                </Badge>
+              )}
+            </span>
+            <span className="truncate text-xs text-texto-secundario">
+              {cliente.documento
+                ? mascararDocumento(cliente.documento, cliente.tipo_pessoa)
+                : "Sem documento"}{" "}
+              · {ORIGENS[cliente.origem]}
+            </span>
+          </div>
+          <div className="flex min-w-0 flex-col text-xs text-texto-secundario">
+            <span className="truncate">{cliente.email ?? "Sem e-mail"}</span>
+            <span className="truncate">{cliente.telefone ?? "Sem celular"}</span>
+          </div>
+          <span className="truncate text-xs text-texto-secundario">{local || "Sem cidade"}</span>
+          <span className="text-xs text-texto-secundario">
+            {cliente.processos === 1 ? "1 processo" : `${cliente.processos} processos`} · desde{" "}
+            {dataCurta(cliente.criado_em)}
+          </span>
+        </div>
+        <div className="flex shrink-0 gap-0.5 transition-opacity md:opacity-0 md:group-focus-within:opacity-100 md:group-hover:opacity-100">
+          {excluidos ? (
+            <Button variant="outline" size="sm" onClick={() => aoRestaurar(cliente)}>
+              <RotateCcw aria-hidden />
+              Restaurar
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Editar ${nome}`}
+                onClick={() => abrirEdicao(cliente.id)}
+              >
+                <Pencil aria-hidden />
+              </Button>
+              <Button asChild variant="ghost" size="icon-sm">
+                <Link
+                  href={`/app/clientes?aba=processos&novo=1&cliente=${cliente.id}`}
+                  aria-label={`Novo processo de ${nome}`}
+                >
+                  <FolderPlus aria-hidden />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Excluir ${nome}`}
+                onClick={() => aoExcluir(cliente)}
+              >
+                <Trash2 aria-hidden />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
+      {aberto && expansivel && <ProcessosDoCliente clienteId={cliente.id} />}
     </li>
   );
 }
 
-export function ListaClientes({ pagina, filtros }: ListaClientesProps) {
+export function ListaClientes({ pagina, filtros, metricas }: ListaClientesProps) {
   const router = useRouter();
   const [busca, setBusca] = useState(filtros.busca);
   const [excluindo, setExcluindo] = useState<LinhaCliente | null>(null);
@@ -192,6 +239,9 @@ export function ListaClientes({ pagina, filtros }: ListaClientesProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {metricas && !filtros.excluidos && (
+        <MetricasDeClientes metricas={metricas} filtros={filtros} />
+      )}
       <div className="flex flex-wrap items-end gap-2">
         <div className="relative min-w-52 flex-1 sm:max-w-sm">
           <Search
@@ -264,6 +314,12 @@ export function ListaClientes({ pagina, filtros }: ListaClientesProps) {
           Mostrar excluídos
         </label>
       </div>
+      <FiltrosClientes
+        filtros={filtros}
+        ufs={metricas?.ufs ?? []}
+        cidades={metricas?.cidades ?? []}
+        aoMudar={ir}
+      />
       {linhas.length === 0 ? (
         <p className="rounded-xl border bg-card p-6 text-sm text-texto-secundario">
           {filtros.excluidos

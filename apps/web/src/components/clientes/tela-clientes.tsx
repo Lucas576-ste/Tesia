@@ -18,6 +18,7 @@ import { resumoCliente } from "@/lib/resumo-cliente";
 import { CardCliente } from "./card-cliente";
 import { CardProcesso } from "./card-processo";
 import { EscolherCliente } from "./escolher-cliente";
+import type { MetricasClientes } from "@/lib/clientes-metricas";
 import { ListaClientes } from "./lista-clientes";
 import { useDrawerCliente } from "./provedor-cliente";
 import { useExibicaoClientes } from "./usar-exibicao-clientes";
@@ -32,6 +33,7 @@ type TelaClientesProps = {
   clienteInicial: { id: string; nome: string } | null;
   paginaClientes: PaginaClientes;
   filtrosLista: FiltrosLista;
+  metricas: MetricasClientes | null;
 };
 
 function normalizar(texto: string) {
@@ -57,10 +59,12 @@ function PorCliente({
   clientes,
   pagina,
   filtros,
+  metricas,
 }: {
   clientes: ClienteResumo[];
   pagina: PaginaClientes;
   filtros: FiltrosLista;
+  metricas: MetricasClientes | null;
 }) {
   const [exibicao, trocar] = useExibicaoClientes();
   const [filtro, setFiltro] = useState<FiltroRapido | null>(null);
@@ -119,7 +123,7 @@ function PorCliente({
         </div>
       </div>
       {exibicao === "lista" ? (
-        <ListaClientes pagina={pagina} filtros={filtros} />
+        <ListaClientes pagina={pagina} filtros={filtros} metricas={metricas} />
       ) : visiveis.length === 0 ? (
         <p className="text-sm text-texto-secundario">Nenhum cliente encontrado.</p>
       ) : (
@@ -242,6 +246,7 @@ export function TelaClientes({
   clienteInicial,
   paginaClientes,
   filtrosLista,
+  metricas,
 }: TelaClientesProps) {
   const [aba, setAba] = useState<string>(abaInicial);
 
@@ -333,7 +338,12 @@ export function TelaClientes({
           <TabsTrigger value="processos">Todos os processos</TabsTrigger>
         </TabsList>
         <TabsContent value="cliente" className="pt-2">
-          <PorCliente clientes={clientesVisiveis} pagina={paginaClientes} filtros={filtrosLista} />
+          <PorCliente
+            clientes={clientesVisiveis}
+            pagina={paginaClientes}
+            filtros={filtrosLista}
+            metricas={metricas}
+          />
         </TabsContent>
         <TabsContent value="fase" className="pt-2">
           <QuadroFases processos={processosVisiveis} />
