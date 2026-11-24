@@ -5,6 +5,8 @@ import { clienteFalso as clienteFalsoDeEtapa } from "./cliente-falso.js";
 import { pontosSemPrazo } from "../src/geracao/pontos.js";
 import { marcarMencaoDePrazo } from "../src/geracao/revisao.js";
 import { acharPendencias, separarSecoes } from "../src/geracao/secoes.js";
+import { INSTRUCOES_GERACAO } from "../src/prompts/geracao.js";
+import { INSTRUCOES_REVISAO, VERSAO_REVISAO } from "../src/prompts/revisao.js";
 import { RespostaInvalidaDaIa } from "../src/transcricao.js";
 
 const resposta = `<secao titulo="">
@@ -90,6 +92,18 @@ describe("montarPedidoGeracao", () => {
     );
   });
 
+  it("envia o tamanho de referência só quando ele existe", () => {
+    expect(montarPedidoGeracao(entrada).conteudo).not.toContain("<tamanho_de_referencia>");
+    expect(montarPedidoGeracao({ ...entrada, tamanhoReferencia: null }).conteudo).not.toContain(
+      "<tamanho_de_referencia>",
+    );
+    const { conteudo } = montarPedidoGeracao({ ...entrada, tamanhoReferencia: 1750 });
+    expect(conteudo).toContain(
+      "<tamanho_de_referencia>\n1750 caracteres\n</tamanho_de_referencia>",
+    );
+    expect(conteudo).not.toMatch(/prazo/i);
+  });
+
   it("põe instruções, perfil e tipo de peça em 3 blocos com cache, nesta ordem", () => {
     const { sistema, conteudo } = montarPedidoGeracao(entrada);
     expect(sistema).toHaveLength(3);
@@ -111,7 +125,7 @@ describe("gerarPeca", () => {
     expect(pedido?.fallbacks).toBe("default");
     expect(resultado.secoes).toHaveLength(3);
     expect(resultado.pendencias).toHaveLength(2);
-    expect(resultado.versaoPrompt).toBe("geracao@5");
+    expect(resultado.versaoPrompt).toBe("geracao@6");
     expect(resultado.uso.custoEstimado).toBeCloseTo(0.0485, 6);
   });
 
@@ -203,5 +217,30 @@ describe("pontosSemPrazo", () => {
       "Prescrição quinquenal",
       "Prazo prescricional de 5 anos",
     ]);
+  });
+});
+
+describe("instruções de geração e revisão", () => {
+  it("manda o modelo seguir só a forma dos trechos e não afirmar o que a inicial contém", () => {
+    expect(INSTRUCOES_GERACAO).toContain(
+      "Nunca reaproveite deles argumento, fato, nome, número ou valor",
+    );
+    expect(INSTRUCOES_GERACAO).toContain("não afirme o que a inicial contém ou deixa de conter");
+    expect(INSTRUCOES_GERACAO).toContain(
+      "no máximo uma marca [CONFIRMAR: conferir na inicial] por seção",
+    );
+  });
+
+  it("explica como usar o tamanho de referência", () => {
+    expect(INSTRUCOES_GERACAO).toContain("<tamanho_de_referencia>");
+    expect(INSTRUCOES_GERACAO).toContain("entre 0,8 e 1,1 vez esse número de caracteres");
+  });
+
+  it("limita e agrupa os apontamentos da revisão", () => {
+    expect(VERSAO_REVISAO).toBe("revisao@4");
+    expect(INSTRUCOES_REVISAO).toContain("No máximo 5 apontamentos");
+    expect(INSTRUCOES_REVISAO).toContain("devolva um só");
+    expect(INSTRUCOES_REVISAO).toContain("Não aponte o que o documento do caso sustenta");
+    expect(INSTRUCOES_REVISAO).toContain("fórmulas de estilo do advogado não são problema");
   });
 });

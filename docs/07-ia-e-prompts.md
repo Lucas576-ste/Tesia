@@ -80,7 +80,7 @@ Regras do prompt:
 
 ## Como as etapas 1 a 3 rodam
 
-- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@4`, `resumo@2`, `geracao@2`).
+- Código em `packages/ia/src/analise/`; prompts em `packages/ia/src/prompts/` (`extracao@4`, `resumo@2`, `geracao@6`, `revisao@4`).
 - Saída estruturada da API (`messages.parse` com o schema zod), validada antes de usar.
 - Listas fechadas iguais às do banco: área (`civel`, `trabalhista`, `previdenciario`, `familia`), rito (`rito_processo`) e tipo de ato (os de `regras_prazo` mais `outro`).
 - Data fora do formato `AAAA-MM-DD` ou inexistente vira `null`.
@@ -111,11 +111,13 @@ Regras do prompt:
 - Qualquer dado que falte vira `[CONFIRMAR: descrição do que falta]`.
 - Saída em seções, no formato definido, para o editor e o .docx.
 
-**Implementação (`packages/ia/src/geracao/`, prompt `geracao@2`):**
+**Implementação (`packages/ia/src/geracao/`, prompt `geracao@6`):**
 - Sonnet 5.5 em streaming, esforço `medium` e fallback automático do servidor.
 - Sistema em 3 blocos com cache: instruções fixas, perfil de estilo e tipo de peça.
-- Os 3 trechos mais parecidos vêm do pgvector com o embedding de busca (Voyage, `input_type` `query`) montado a partir do nome da peça, do resumo e dos pontos a atacar.
+- Até 6 trechos (o melhor de cada seção) vêm do pgvector com o embedding de busca (Voyage, `input_type` `query`) montado a partir do nome da peça, do resumo e dos pontos a atacar.
 - Resposta em `<secao titulo="...">`, separada pelo código. Endereçamento, qualificação e fechamento vêm sem título, e os demais títulos seguem os do advogado (nunca os códigos internos); cada `[CONFIRMAR: ...]` vira pendência com a seção.
+- Tamanho: o worker calcula o tamanho médio das peças já lidas do advogado (do mesmo tipo e, na falta, de todas; entre 800 e 12.000 caracteres) e envia como `<tamanho_de_referencia>`; a peça deve ter de 0,8 a 1,1 vez esse tamanho.
+- Marcação: `[CONFIRMAR]` só para dado que a peça precisa e o caso não informa e para jurisprudência. Quando o documento do caso não é a petição inicial, a peça não afirma o que a inicial contém ou omite (no máximo uma marca "conferir na inicial" por seção). Trechos e peças do advogado servem só de forma, nunca de argumento ou fato.
 - Sem perfil ou sem peças, gera mesmo assim e avisa que o rascunho saiu genérico.
 
 **Ajustes (`packages/ia/src/geracao/ajuste.ts`, prompt `ajuste@1`):** Sonnet com o perfil de estilo e a peça em seções numeradas; devolve só as seções alteradas (`<secao indice="N">`), juntadas pelo código. Até 3 ajustes por peça sem custo; do 4º em diante, cada ajuste conta 1 peça no mês. Recurso do Pro (e do teste grátis).
@@ -128,7 +130,7 @@ Regras do prompt:
 **Entrada:** peça gerada + documentos.
 **Saída:** lista de afirmações e citações sem sustentação nos documentos. Cada item vira uma pendência destacada no editor.
 
-Implementação (`packages/ia/src/geracao/revisao.ts`, prompt `revisao@1`): roda dentro da geração, logo depois do Sonnet. O Haiku devolve `{ trecho_exato, motivo }`; o código insere ` [CONFIRMAR: motivo]` logo depois do trecho, sem duplicar marcação existente. Se a revisão falhar, a peça é gravada mesmo assim.
+Implementação (`packages/ia/src/geracao/revisao.ts`, prompt `revisao@4`): roda dentro da geração, logo depois do Sonnet. Aponta no máximo 5 itens, agrupa os que têm a mesma causa e não aponta o que o documento do caso sustenta nem fórmulas de estilo do advogado. O Haiku devolve `{ trecho_exato, motivo }`; o código insere ` [CONFIRMAR: motivo]` logo depois do trecho, sem duplicar marcação existente. Se a revisão falhar, a peça é gravada mesmo assim.
 
 ## Conteúdo para Instagram (Plus)
 

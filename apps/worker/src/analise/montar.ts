@@ -185,6 +185,17 @@ export function hojeEmBrasilia(agora = new Date()) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(agora);
 }
 
+export const TAMANHO_MINIMO_REFERENCIA = 800;
+export const TAMANHO_MAXIMO_REFERENCIA = 12000;
+
+export function limitarTamanhoReferencia(media: number | null | undefined) {
+  if (typeof media !== "number" || !Number.isFinite(media) || media <= 0) return null;
+  return Math.min(
+    TAMANHO_MAXIMO_REFERENCIA,
+    Math.max(TAMANHO_MINIMO_REFERENCIA, Math.round(media / 50) * 50),
+  );
+}
+
 export function textoBuscaEstilo(
   nomePeca: string,
   resumo: string | null,

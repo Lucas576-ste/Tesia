@@ -14,7 +14,11 @@ import {
 import { analiseGravadaSchema, perfilEstiloSchema, textoQualificacao } from "@tesia/shared";
 import { z } from "zod";
 import { registrarUso } from "../analise/banco.js";
-import { competenciaEmBrasilia, textoBuscaEstilo } from "../analise/montar.js";
+import {
+  competenciaEmBrasilia,
+  limitarTamanhoReferencia,
+  textoBuscaEstilo,
+} from "../analise/montar.js";
 import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
@@ -35,6 +39,7 @@ const clienteSchema = z.object({
 const MAXIMO_TRECHOS = 6;
 
 const pecaSchema = z.object({
+  tipo_peca_id: z.uuid().nullable(),
   intimacao_id: z.uuid().nullable(),
   responsavel_id: z.uuid().nullable(),
   prazo_id: z.uuid().nullable(),
@@ -120,11 +125,33 @@ async function buscarTrechos(
   return z.array(trechoSchema).parse(rows);
 }
 
+export async function tamanhoMedioDasPecas(
+  db: Contexto["db"],
+  escritorioId: string,
+  usuarioId: string | null,
+  tipoPecaId: string | null,
+) {
+  if (!usuarioId) return null;
+  const { rows } = await db.query(
+    `select coalesce(
+       (select avg(length(d.texto)) from estilo_documentos d
+         where d.escritorio_id = $1 and d.usuario_id = $2 and d.status = 'lido'
+           and d.texto is not null and d.tipo_peca_id = $3),
+       (select avg(length(d.texto)) from estilo_documentos d
+         where d.escritorio_id = $1 and d.usuario_id = $2 and d.status = 'lido'
+           and d.texto is not null)
+     )::float8 as media`,
+    [escritorioId, usuarioId, tipoPecaId],
+  );
+  const lida = z.array(z.object({ media: z.number().nullable() })).parse(rows)[0]?.media ?? null;
+  return limitarTamanhoReferencia(lida);
+}
+
 async function executar(job: Job, contexto: Contexto) {
   const { db, ia, registrar } = contexto;
   const pecaId = pecaDoJob(job);
   const { rows } = await db.query(
-    `select p.intimacao_id, p.responsavel_id, p.prazo_id, t.nome,
+    `select p.tipo_peca_id, p.intimacao_id, p.responsavel_id, p.prazo_id, t.nome,
        coalesce((select array_agg(x) from jsonb_array_elements_text(t.estrutura) x), '{}') as estrutura,
        t.instrucoes
      from pecas p join tipos_peca t on t.id = p.tipo_peca_id
@@ -184,6 +211,13 @@ async function executar(job: Job, contexto: Contexto) {
     textoBuscaEstilo(peca.data.nome, analise.data.resumo.o_que_aconteceu, pontos),
   );
 
+  const tamanhoReferencia = await tamanhoMedioDasPecas(
+    db,
+    job.escritorio_id,
+    peca.data.responsavel_id,
+    peca.data.tipo_peca_id,
+  );
+
   const resultado = await definitivo(() =>
     gerarPeca(ia, {
       peca: {
@@ -198,6 +232,7 @@ async function executar(job: Job, contexto: Contexto) {
       pontosAtacar: pontos,
       qualificacaoCliente,
       advogado,
+      tamanhoReferencia,
     }),
   );
   await registrarUso(db, job, { etapa: "geracao_peca", ...resultado });

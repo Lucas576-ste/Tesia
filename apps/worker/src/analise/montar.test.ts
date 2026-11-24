@@ -9,6 +9,7 @@ import {
   ritoParaRegra,
   corrigirRito,
   competenciaEmBrasilia,
+  limitarTamanhoReferencia,
   textoBuscaEstilo,
   siglaTribunal,
   type OpcaoBanco,
@@ -157,5 +158,24 @@ describe("textoBuscaEstilo e competenciaEmBrasilia", () => {
 
   it("usa o mês de Brasília", () => {
     expect(competenciaEmBrasilia(new Date("2026-12-01T02:00:00Z"))).toBe("2026-11");
+  });
+});
+
+describe("limitarTamanhoReferencia", () => {
+  it("arredonda para a casa de 50 caracteres", () => {
+    expect(limitarTamanhoReferencia(1752)).toBe(1750);
+    expect(limitarTamanhoReferencia(2630.4)).toBe(2650);
+  });
+
+  it("não deixa a referência ficar pequena nem enorme", () => {
+    expect(limitarTamanhoReferencia(120)).toBe(800);
+    expect(limitarTamanhoReferencia(90000)).toBe(12000);
+  });
+
+  it("devolve nulo quando não há peças para medir", () => {
+    expect(limitarTamanhoReferencia(null)).toBeNull();
+    expect(limitarTamanhoReferencia(undefined)).toBeNull();
+    expect(limitarTamanhoReferencia(0)).toBeNull();
+    expect(limitarTamanhoReferencia(Number.NaN)).toBeNull();
   });
 });

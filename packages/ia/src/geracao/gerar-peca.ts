@@ -17,6 +17,7 @@ export type EntradaGeracao = {
   pontosAtacar: { titulo: string; explicacao?: string }[];
   qualificacaoCliente?: string | null;
   advogado?: { nome: string; oab: string } | null;
+  tamanhoReferencia?: number | null;
 };
 
 export type ResultadoGeracao = {
@@ -82,6 +83,9 @@ export function montarPedidoGeracao(entrada: EntradaGeracao) {
     `<pontos_a_atacar>\n${pontos}\n</pontos_a_atacar>`,
     entrada.advogado
       ? `<advogado>\nNome: ${entrada.advogado.nome}\nOAB: ${entrada.advogado.oab}\n</advogado>`
+      : "",
+    entrada.tamanhoReferencia
+      ? `<tamanho_de_referencia>\n${entrada.tamanhoReferencia} caracteres\n</tamanho_de_referencia>`
       : "",
     entrada.qualificacaoCliente
       ? `<qualificacao_cliente>\n${entrada.qualificacaoCliente}\n</qualificacao_cliente>`
