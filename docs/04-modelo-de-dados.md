@@ -159,6 +159,44 @@ A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome
 | extracao | jsonb | análise gravada pelo worker: `versao`, `dados` (extração), `resumo`, `pecas` (recomendada e alternativas), `prazo` (dias, contagem, fundamento, `regra_revisada`) e `motivo_sem_prazo`. Schema em `packages/shared/src/analise.ts` |
 | resumo | text | |
 | status | enum | `recebida`, `processando`, `analisada`, `erro` |
+| concluida_em | timestamptz | quando o advogado concluiu a intimação sem confirmar prazo; sai da lista de pendentes |
+| tratamento | enum | `pendente`, `concluida`, `ignorada` |
+| termo_id | uuid | termo monitorado que trouxe a publicação |
+| fonte | enum | `diario` ou `eletronico` |
+| tribunal, uf, tipo_publicacao | text | vêm da publicação (o tipo é o `tipoDocumento` do DJEN) |
+| numero_processo | text | CNJ só com dígitos; vincula ao processo |
+| publicada_em | date | |
+| hash | text | sha256 de tribunal, CNJ, data e texto; único por escritório |
+| responsavel_id | uuid | quem trata (responsável do termo) |
+| tarefa_id | uuid | tarefa "Intimação Judicial" criada no recebimento (`prazos`, compromisso manual) |
+
+### termos_monitorados
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id | uuid | |
+| responsavel_id | uuid | recebe a tarefa e a notificação |
+| tipo | enum | `advogado` (OAB e UF), `pf` (CPF) ou `pj` (CNPJ); pf e pj exigem nome, pois a busca é pelo nome da parte |
+| oab_numero, oab_uf, documento, nome | text | |
+| ufs | text[] | estados dos diários; vazio = todos |
+| status | enum | `sincronizando`, `monitorando`, `falha_autenticacao`, `inativo` |
+| ultima_sincronizacao_em, ultimo_erro, buscado_ate | | controle do worker |
+
+Só `dono` e `advogado` escrevem (RLS por `papel_atual()`). Credenciais, certificado A1 e TOTP não existem ainda.
+
+### andamentos_processo
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id | uuid | |
+| processo_id | uuid | nulo até existir o processo; o gatilho `vincular_publicacoes` liga pelo CNJ |
+| numero_processo | text | só dígitos |
+| termo_id, djen_id, hash, tribunal, tipo_publicacao, texto, publicada_em | | `hash` único por escritório |
+
+### notificacoes
+| Campo | Tipo | Observação |
+|---|---|---|
+| escritorio_id, usuario_id | uuid | cada usuário lê só as suas; só o worker cria |
+| tipo, titulo, texto, href | text | |
+| lida_em | timestamptz | única coluna que o usuário altera |
 
 ### prazos
 | Campo | Tipo | Observação |

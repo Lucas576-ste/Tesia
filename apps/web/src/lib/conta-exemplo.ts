@@ -3,6 +3,7 @@ import { z } from "zod";
 export const ABAS_CONFIGURACOES = {
   perfil: "Perfil",
   alertas: "Alertas",
+  termos: "Termos monitorados",
   agenda: "Agenda",
   equipe: "Equipe",
   modelo: "Modelo de documento",

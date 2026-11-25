@@ -205,3 +205,45 @@ export async function gerarRascunho(
   if (error || !linha.success) return { erro: "Não foi possível começar o rascunho." };
   return { id: linha.data.id };
 }
+
+export async function concluirIntimacao(
+  intimacaoId: string,
+  concluida: boolean,
+): Promise<{ ok: true } | { erro: string }> {
+  const usuario = await usuarioAtual();
+  if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
+  if (!z.uuid().safeParse(intimacaoId).success) return { erro: "Pedido inválido." };
+
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .from("intimacoes")
+    .update({
+      concluida_em: concluida ? new Date().toISOString() : null,
+      tratamento: concluida ? "concluida" : "pendente",
+    })
+    .eq("id", intimacaoId)
+    .is("excluido_em", null)
+    .select("id, tarefa_id");
+  if (error || !data?.length) {
+    return { erro: "Não foi possível atualizar a intimação." };
+  }
+  const tarefaId = z.uuid().nullable().safeParse(data[0]?.tarefa_id).data ?? null;
+  if (tarefaId) {
+    await supabase
+      .from("prazos")
+      .update({ status: concluida ? "cumprido" : "confirmado" })
+      .eq("id", tarefaId);
+  }
+
+  if (concluida) {
+    await supabase
+      .from("prazos")
+      .update({ status: "descartado" })
+      .eq("intimacao_id", intimacaoId)
+      .eq("status", "sugerido");
+  }
+
+  revalidatePath("/app");
+  revalidatePath("/app/intimacoes");
+  return { ok: true };
+}

@@ -4,7 +4,8 @@ import { criarClienteIa } from "@tesia/ia";
 import pg from "pg";
 import { ambiente } from "./ambiente.js";
 import { enviarAlertas, horaBrasilia, hojeBrasilia } from "./alertas/enviar.js";
-import { importarDjen } from "./djen/importar.js";
+import { provedorDoTermo } from "./publicacoes/provedores.js";
+import { sincronizarTermos } from "./publicacoes/sincronizar.js";
 import { concluirJob, devolverPresos, pegarJob, registrarFalha, type Job } from "./fila.js";
 import { analisarIntimacao } from "./tarefas/analisar-intimacao.js";
 import { ajustarPecaTarefa } from "./tarefas/ajustar-peca.js";
@@ -104,9 +105,9 @@ async function laco() {
       const hora = horaBrasilia();
       if (Date.now() - ultimaBuscaDjen > 3 * 3_600_000 && hora >= 6 && hora < 22) {
         ultimaBuscaDjen = Date.now();
-        await importarDjen(
+        await sincronizarTermos(
           contexto.db,
-          { registrar, avisarErro: (erro) => Sentry.captureException(erro) },
+          { registrar, avisarErro: (erro) => Sentry.captureException(erro), provedorDoTermo },
           hojeBrasilia(),
         );
       }

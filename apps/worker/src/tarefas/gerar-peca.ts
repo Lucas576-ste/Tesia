@@ -11,7 +11,12 @@ import {
   RespostaInvalidaDaIa,
   vetorParaPgvector,
 } from "@tesia/ia";
-import { analiseGravadaSchema, perfilEstiloSchema, textoQualificacao } from "@tesia/shared";
+import {
+  analiseGravadaSchema,
+  htmlParaTexto,
+  perfilEstiloSchema,
+  textoQualificacao,
+} from "@tesia/shared";
 import { z } from "zod";
 import { registrarUso } from "../analise/banco.js";
 import {
@@ -228,7 +233,7 @@ async function executar(job: Job, contexto: Contexto) {
       perfil,
       trechos: trechos.map(({ documento, secao, texto }) => ({ documento, secao, texto })),
       dados: { ...analise.data.dados, pontos: undefined },
-      textoIntimacao: intimacao.data.texto ?? "",
+      textoIntimacao: htmlParaTexto(intimacao.data.texto ?? ""),
       pontosAtacar: pontos,
       qualificacaoCliente,
       advogado,

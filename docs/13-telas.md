@@ -182,6 +182,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - **O que aconteceu:** resumo em até 4 frases
 - **Pontos que podem ser atacados:** tópicos com link para o trecho da decisão
 - **Prazo sugerido:** prazo fatal, início da contagem, prazo interno, dias, tipo de contagem, fundamento legal e memória de cálculo expansível; botão "Confirmo o prazo" e opção de editar as datas
+- **Tratar esta intimação:** botões "Criar tarefa" (abre o novo prazo como compromisso, já com o processo e a descrição, e conclui a intimação ao salvar) e "Concluir intimação" (sai da lista de pendentes e descarta o prazo sugerido); intimação concluída mostra aviso com "Reabrir"
 - **Peça sugerida:** recomendada e alternativas (seleção única)
 - Visualizador do PDF original ao lado (ou em aba no celular)
 - Botão "Gerar rascunho no meu estilo" (mostra quantas peças restam no mês)
@@ -226,6 +227,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 ### 19. Configurações (`/app/configuracoes`) — MVP
 Abas:
 - **Perfil:** nome, OAB, UF, áreas, tribunais
+- **Termos monitorados:** lista de termos (OAB, CPF ou CNPJ) com status, responsável, estados e última busca; novo termo, editar, pausar, buscar de novo e excluir (só dono e advogado; estagiário só vê)
 - **Alertas:** canais (e-mail, WhatsApp), dias de antecedência e aviso no dia do prazo interno
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso, divisão por área

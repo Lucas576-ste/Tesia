@@ -20,11 +20,13 @@ const ESTILO_SITUACAO: Record<SituacaoIntimacao, string> = {
   lendo: "text-texto-secundario",
   aguardando: "text-atencao",
   confirmado: "text-sucesso",
+  concluida: "text-texto-secundario",
   erro: "text-erro",
 };
 
 function IconeSituacao({ situacao }: { situacao: SituacaoIntimacao }) {
-  if (situacao === "confirmado") return <CheckCircle2 aria-hidden className="size-4 shrink-0" />;
+  if (situacao === "confirmado" || situacao === "concluida")
+    return <CheckCircle2 aria-hidden className="size-4 shrink-0" />;
   if (situacao === "aguardando") return <Clock aria-hidden className="size-4 shrink-0" />;
   if (situacao === "erro") return <AlertCircle aria-hidden className="size-4 shrink-0" />;
   return <LoaderCircle aria-hidden className="size-4 shrink-0 animate-spin" />;
@@ -50,7 +52,7 @@ export function ListaIntimacoes({ itens, soPendentes }: ListaIntimacoesProps) {
     return soPendentes ? (
       <EstadoVazio
         titulo="Nada aguardando confirmação"
-        descricao="Todas as intimações analisadas já têm o prazo confirmado."
+        descricao="Todas as intimações analisadas já têm o prazo confirmado ou foram concluídas."
         acao={
           <Button asChild variant="outline">
             <Link href="/app/intimacoes">Ver todas</Link>

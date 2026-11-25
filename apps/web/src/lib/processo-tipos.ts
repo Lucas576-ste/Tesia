@@ -17,7 +17,7 @@ export type DadosProcesso = z.infer<typeof dadosProcessoSchema>;
 
 export type EventoProcesso = {
   data: string;
-  tipo: "intimacao" | "prazo" | "peca";
+  tipo: "intimacao" | "andamento" | "prazo" | "peca";
   titulo: string;
   descricao: string;
   link?: { href: string; rotulo: string };

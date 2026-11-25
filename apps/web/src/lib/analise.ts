@@ -1,4 +1,9 @@
-import { analiseGravadaSchema, memoriaCalculoSchema, nomePartes } from "@tesia/shared";
+import {
+  analiseGravadaSchema,
+  htmlParaTexto,
+  memoriaCalculoSchema,
+  nomePartes,
+} from "@tesia/shared";
 import { z } from "zod";
 import { hojeEmBrasilia } from "@/lib/datas-servidor";
 import { STATUS_INTIMACAO } from "@/lib/envio-intimacao";
@@ -29,6 +34,8 @@ export type Analise = {
   prazo: PrazoAnalise | null;
   motivoSemPrazo: string | null;
   confirmado: boolean;
+  concluida: boolean;
+  processoId: string | null;
   pecas: { codigo: string; nome: string; justificativa: string }[];
   documento: TrechoDocumento[];
   hoje: string;
@@ -44,6 +51,8 @@ const linhaSchema = z.object({
   id: z.uuid(),
   status: z.enum(STATUS_INTIMACAO),
   texto: z.string().nullable(),
+  concluida_em: z.string().nullable(),
+  processo_id: z.uuid().nullable(),
   extracao: z.unknown(),
   processos: z
     .union([
@@ -171,7 +180,9 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
   const supabase = await criarClienteServidor();
   const { data } = await supabase
     .from("intimacoes")
-    .select("id, status, texto, extracao, processos(tribunal, uf, municipio)")
+    .select(
+      "id, status, texto, concluida_em, processo_id, extracao, processos(tribunal, uf, municipio)",
+    )
     .eq("id", id)
     .is("excluido_em", null)
     .maybeSingle();
@@ -200,7 +211,7 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
     dados.forma_intimacao === "portal" || dados.forma_intimacao === "citacao"
       ? dados.forma_intimacao
       : "diario";
-  const documento = dividirDocumento(linha.data.texto ?? "");
+  const documento = dividirDocumento(htmlParaTexto(linha.data.texto ?? ""));
   const pontos = resumo.pontos_ataque.length
     ? resumo.pontos_ataque
     : dados.pontos.map((ponto) => ({ ...ponto, explicacao: undefined }));
@@ -221,6 +232,8 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       prazo: montarPrazo(prazo, gravada.data.prazo),
       motivoSemPrazo: gravada.data.motivo_sem_prazo,
       confirmado: prazo?.status === "confirmado" || prazo?.status === "cumprido",
+      concluida: linha.data.concluida_em !== null,
+      processoId: linha.data.processo_id,
       pecas: pecas.map(({ codigo, nome, justificativa }) => ({ codigo, nome, justificativa })),
       documento,
       hoje: hojeEmBrasilia(),

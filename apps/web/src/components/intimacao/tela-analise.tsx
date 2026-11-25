@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Analise } from "@/lib/analise";
 import type { UsoPecas } from "@/lib/uso-pecas";
+import type { ProcessoResumo } from "@/lib/prazo-manual";
 import { BlocoPrazo } from "./bloco-prazo";
 import { DocumentoOriginal } from "./documento-original";
 import { EscolhaPeca } from "./escolha-peca";
+import { TratarIntimacao } from "./tratar-intimacao";
 
 function textoPontos(quantidade: number) {
   const pontos = quantidade === 1 ? "1 ponto" : `${quantidade} pontos`;
@@ -25,7 +27,9 @@ function textoPontos(quantidade: number) {
 
 const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block";
 
-export function TelaAnalise({ analise, uso }: { analise: Analise; uso: UsoPecas }) {
+type TelaAnaliseProps = { analise: Analise; uso: UsoPecas; processos: ProcessoResumo[] };
+
+export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
   const [aba, setAba] = useState("analise");
   const [destaque, setDestaque] = useState<string | null>(null);
   const [confirmado, setConfirmado] = useState(analise.confirmado);
@@ -149,6 +153,13 @@ export function TelaAnalise({ analise, uso }: { analise: Analise; uso: UsoPecas 
                 recebimento={analise.recebimento}
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
+              />
+              <TratarIntimacao
+                intimacaoId={analise.id}
+                partes={analise.partes}
+                concluida={analise.concluida}
+                processoId={analise.processoId}
+                processos={processos}
               />
               <EscolhaPeca
                 pecas={plano.recursosPro ? analise.pecas : analise.pecas.slice(0, 1)}

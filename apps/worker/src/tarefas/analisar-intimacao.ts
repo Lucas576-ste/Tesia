@@ -7,7 +7,7 @@ import {
   resumirIntimacao,
   transcreverPdf,
 } from "@tesia/ia";
-import type { AnaliseGravada } from "@tesia/shared";
+import { htmlParaTexto, type AnaliseGravada } from "@tesia/shared";
 import { z } from "zod";
 import { buscarCalendario, buscarOpcoes, gravarAnalise, registrarUso } from "../analise/banco.js";
 import {
@@ -54,7 +54,7 @@ async function obterTexto(job: Job, intimacaoId: string, contexto: Contexto) {
   );
   const linha = linhaSchema.safeParse(rows[0]);
   if (!linha.success) throw new ErroDefinitivo("Intimação ou arquivo não encontrado");
-  if (linha.data.texto) return linha.data.texto;
+  if (linha.data.texto) return htmlParaTexto(linha.data.texto);
   if (!linha.data.arquivo_path) throw new ErroDefinitivo("Intimação sem texto e sem arquivo");
 
   const { data, error } = await supabase.storage

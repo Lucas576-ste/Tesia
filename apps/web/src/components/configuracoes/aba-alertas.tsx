@@ -6,13 +6,8 @@ import { salvarAlertas } from "@/app/app/configuracoes/alertas-acoes";
 import { GrupoOpcoes } from "@/components/onboarding/grupo-opcoes";
 import { usePlano } from "@/components/plano/provedor-plano";
 import { Button } from "@/components/ui/button";
-import {
-  MOMENTOS_ALERTA,
-  type DadosDjen,
-  type MomentoAlerta,
-  type PreferenciasAlerta,
-} from "@/lib/alertas";
-import { BuscaDjen } from "./busca-djen";
+import { Card } from "@/components/ui/card";
+import { MOMENTOS_ALERTA, type MomentoAlerta, type PreferenciasAlerta } from "@/lib/alertas";
 import { CampoLeitura, Chips } from "./campo-leitura";
 import { CartaoEditavel } from "./cartao-editavel";
 
@@ -85,7 +80,13 @@ function EdicaoAlertas({ atual, aoSalvar, aoCancelar }: EdicaoAlertasProps) {
   );
 }
 
-export function AbaAlertas({ alertas, djen }: { alertas: PreferenciasAlerta; djen: DadosDjen }) {
+export function AbaAlertas({
+  alertas,
+  aoAbrirTermos,
+}: {
+  alertas: PreferenciasAlerta;
+  aoAbrirTermos: () => void;
+}) {
   const [atual, setAtual] = useState(alertas);
   const { plano } = usePlano();
   const semAlerta = !atual.email || atual.dias.length === 0;
@@ -136,7 +137,18 @@ export function AbaAlertas({ alertas, djen }: { alertas: PreferenciasAlerta; dje
           />
         )}
       />
-      <BuscaDjen djen={djen} />
+      <Card className="flex flex-wrap items-center justify-between gap-3 p-4">
+        <div className="flex max-w-xl flex-col gap-1">
+          <h3 className="text-base font-semibold">Busca de intimações nos diários</h3>
+          <p className="text-sm text-texto-secundario">
+            A busca da sua OAB e de outros nomes fica em Termos monitorados. Lá você liga, pausa e
+            escolhe quem recebe cada intimação.
+          </p>
+        </div>
+        <Button variant="outline" onClick={aoAbrirTermos}>
+          Abrir termos monitorados
+        </Button>
+      </Card>
     </div>
   );
 }

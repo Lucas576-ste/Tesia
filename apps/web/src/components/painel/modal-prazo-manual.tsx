@@ -47,6 +47,9 @@ const valoresIniciais: PrazoManual = {
 type ModalPrazoManualProps = {
   aberto: boolean;
   processoInicial?: string;
+  descricaoInicial?: string;
+  tipoInicial?: PrazoManual["tipo"];
+  titulo?: string;
   processos: ProcessoResumo[];
   aoFechar: () => void;
   aoSalvar: (dados: PrazoManual) => void | Promise<void>;
@@ -60,12 +63,22 @@ const modos = [
 function FormularioPrazoManual({
   processos,
   processoInicial,
+  descricaoInicial,
+  tipoInicial,
   aoSalvar,
-}: Pick<ModalPrazoManualProps, "processos" | "processoInicial" | "aoSalvar">) {
+}: Pick<
+  ModalPrazoManualProps,
+  "processos" | "processoInicial" | "descricaoInicial" | "tipoInicial" | "aoSalvar"
+>) {
   const hoje = hojeBrasilia();
   const form = useForm<PrazoManual>({
     resolver: zodResolver(esquemaPrazoManual(hoje)),
-    defaultValues: { ...valoresIniciais, processoId: processoInicial ?? "" },
+    defaultValues: {
+      ...valoresIniciais,
+      tipo: tipoInicial ?? valoresIniciais.tipo,
+      descricao: descricaoInicial ?? "",
+      processoId: processoInicial ?? "",
+    },
   });
   const [modo, setModo] = useState<"calcular" | "informar">("calcular");
   const ehPrazo = useWatch({ control: form.control, name: "tipo" }) === "prazo";
@@ -237,6 +250,9 @@ function FormularioPrazoManual({
 export function ModalPrazoManual({
   aberto,
   processoInicial,
+  descricaoInicial,
+  tipoInicial,
+  titulo = "Novo prazo",
   processos,
   aoFechar,
   aoSalvar,
@@ -250,7 +266,7 @@ export function ModalPrazoManual({
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Novo prazo</DialogTitle>
+          <DialogTitle>{titulo}</DialogTitle>
           <DialogDescription>
             A Tesia sugere o vencimento, mas a data final é sempre a que você confirmar. Ela entra
             no painel como confirmada.
@@ -259,6 +275,8 @@ export function ModalPrazoManual({
         <FormularioPrazoManual
           processos={processos}
           processoInicial={processoInicial}
+          descricaoInicial={descricaoInicial}
+          tipoInicial={tipoInicial}
           aoSalvar={aoSalvar}
         />
       </DialogContent>

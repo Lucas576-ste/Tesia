@@ -14,9 +14,10 @@ import { AbaCalendario } from "./aba-calendario";
 import { AbaDados } from "./aba-dados";
 import { AbaEquipe } from "./aba-equipe";
 import type { DadosTimbrado } from "@/components/modelo/painel-timbrado";
-import type { DadosDjen, PreferenciasAlerta } from "@/lib/alertas";
+import type { PreferenciasAlerta } from "@/lib/alertas";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
+import { AbaTermos, type DadosTermos } from "./aba-termos";
 import type { PerfilConta, ResumoDados } from "@/lib/perfil-conta";
 import { AbaSeguranca } from "./aba-seguranca";
 
@@ -26,11 +27,13 @@ function conteudosDasAbas(
   modelo: DadosTimbrado,
   agenda: DadosAgenda,
   alertas: PreferenciasAlerta,
-  djen: DadosDjen,
+  aoAbrirTermos: () => void,
   calendario: CalendarioProprio,
+  termos: DadosTermos,
 ): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
   return {
-    alertas: <AbaAlertas alertas={alertas} djen={djen} />,
+    alertas: <AbaAlertas alertas={alertas} aoAbrirTermos={aoAbrirTermos} />,
+    termos: <AbaTermos termos={termos} />,
     agenda: <AbaAgenda agenda={agenda} />,
     equipe: <AbaEquipe />,
     modelo: <AbaModelo modelo={modelo} />,
@@ -56,8 +59,8 @@ export function TelaConfiguracoes({
   modelo,
   agenda,
   alertas,
-  djen,
   calendario,
+  termos,
 }: {
   abaInicial: AbaConfiguracoes;
   conta: PerfilConta;
@@ -65,10 +68,9 @@ export function TelaConfiguracoes({
   modelo: DadosTimbrado;
   agenda: DadosAgenda;
   alertas: PreferenciasAlerta;
-  djen: DadosDjen;
   calendario: CalendarioProprio;
+  termos: DadosTermos;
 }) {
-  const conteudos = conteudosDasAbas(conta, resumo, modelo, agenda, alertas, djen, calendario);
   const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
   const abas = todasAbas.filter((chave) => chave !== "equipe" || plano.equipe);
@@ -79,6 +81,17 @@ export function TelaConfiguracoes({
     setAba(nova);
     window.history.replaceState(null, "", `/app/configuracoes?aba=${nova}`);
   }
+
+  const conteudos = conteudosDasAbas(
+    conta,
+    resumo,
+    modelo,
+    agenda,
+    alertas,
+    () => trocarAba("termos"),
+    calendario,
+    termos,
+  );
 
   return (
     <div className="flex flex-col gap-4">

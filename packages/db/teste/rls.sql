@@ -834,4 +834,176 @@ begin
 end;
 $$;
 
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000c1', 'c@exemplo.com', '{"nome": "Estagiario C"}');
+update usuarios set escritorio_id = current_setting('teste.esc_a')::uuid, papel = 'estagiario'
+where auth_user_id = '00000000-0000-0000-0000-0000000000c1';
+
+reset role;
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  dono_a uuid;
+  achados int;
+begin
+  select id into dono_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+
+  insert into termos_monitorados (escritorio_id, responsavel_id, tipo, oab_numero, oab_uf)
+  values (a, dono_a, 'advogado', '12345', 'DF');
+  insert into termos_monitorados (escritorio_id, responsavel_id, tipo, documento, nome)
+  values (a, dono_a, 'pf', '52998224725', 'Maria da Silva');
+
+  begin
+    insert into termos_monitorados (escritorio_id, responsavel_id, tipo, oab_numero, oab_uf)
+    values (a, dono_a, 'advogado', '12345', 'DF');
+    assert false, 'OAB repetida no mesmo escritório deveria ser bloqueada';
+  exception when unique_violation then null;
+  end;
+
+  begin
+    insert into termos_monitorados (escritorio_id, tipo, documento, nome)
+    values (a, 'pf', '123', 'Documento curto');
+    assert false, 'CPF com tamanho errado deveria ser bloqueado';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into termos_monitorados (escritorio_id, tipo, documento)
+    values (a, 'pj', '11222333000181');
+    assert false, 'Termo de pessoa sem nome deveria ser bloqueado';
+  exception when check_violation then null;
+  end;
+
+  begin
+    insert into termos_monitorados (escritorio_id, tipo, oab_numero, oab_uf)
+    values (current_setting('teste.esc_b')::uuid, 'advogado', '999', 'SP');
+    assert false, 'Não deveria criar termo em outro escritório';
+  exception when insufficient_privilege then null;
+  end;
+
+  begin
+    update termos_monitorados set oab_numero = '777' where oab_numero = '12345';
+    assert false, 'Não deveria trocar a OAB de um termo';
+  exception when insufficient_privilege then null;
+  end;
+
+  update termos_monitorados set status = 'inativo' where oab_numero = '12345';
+  select count(*) into achados from termos_monitorados where status = 'inativo';
+  assert achados = 1, 'O dono deveria pausar o termo';
+end;
+$$;
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000c1', false);
+do $$
+declare
+  achados int;
+begin
+  select count(*) into achados from termos_monitorados;
+  assert achados = 2, 'O estagiário deveria ver os termos do escritório';
+  begin
+    insert into termos_monitorados (escritorio_id, tipo, oab_numero, oab_uf)
+    values (current_setting('teste.esc_a')::uuid, 'advogado', '555', 'DF');
+    assert false, 'Estagiário não deveria criar termo';
+  exception when insufficient_privilege then null;
+  end;
+  update termos_monitorados set status = 'monitorando';
+  select count(*) into achados from termos_monitorados where status = 'monitorando';
+  assert achados = 0, 'Estagiário não deveria alterar termo';
+end;
+$$;
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', false);
+do $$
+declare
+  achados int;
+begin
+  select count(*) into achados from termos_monitorados;
+  assert achados = 0, 'O escritório B não deveria ver termos de A';
+  select count(*) into achados from andamentos_processo;
+  assert achados = 0, 'O escritório B não deveria ver andamentos de A';
+end;
+$$;
+
+reset role;
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  termo uuid;
+  novo uuid;
+  vinculados int;
+begin
+  select id into termo from termos_monitorados where oab_numero = '12345';
+
+  insert into intimacoes (escritorio_id, origem, texto, termo_id, fonte, numero_processo, hash, status)
+  values (a, 'djen', 'Intimação', termo, 'diario', '07234567820268070001', 'hash-1', 'recebida');
+  insert into intimacoes (escritorio_id, origem, texto, termo_id, fonte, numero_processo, hash, status)
+  values (a, 'djen', 'Outra', termo, 'diario', '07234567820268070001', 'hash-1', 'recebida')
+  on conflict (escritorio_id, hash) where hash is not null do nothing;
+  assert (select count(*) from intimacoes where hash = 'hash-1') = 1,
+    'A mesma publicação duas vezes deveria virar uma só intimação';
+
+  insert into intimacoes (escritorio_id, origem, texto, hash, status)
+  values (current_setting('teste.esc_b')::uuid, 'djen', 'Mesma publicação em outro escritório', 'hash-1', 'recebida');
+  assert (select count(*) from intimacoes where hash = 'hash-1') = 2,
+    'O mesmo hash em outro escritório deveria ser aceito';
+
+  insert into andamentos_processo (escritorio_id, numero_processo, termo_id, hash, texto)
+  values (a, '07234567820268070001', termo, 'hash-2', 'Processo distribuído');
+  insert into andamentos_processo (escritorio_id, numero_processo, termo_id, hash, texto)
+  values (a, '07234567820268070001', termo, 'hash-2', 'Processo distribuído')
+  on conflict (escritorio_id, hash) do nothing;
+  assert (select count(*) from andamentos_processo where hash = 'hash-2') = 1,
+    'O mesmo andamento duas vezes deveria virar um só';
+
+  insert into processos (escritorio_id, numero_cnj, area, rito)
+  values (a, '0723456-78.2026.8.07.0001', 'civel', 'comum') returning id into novo;
+  select count(*) into vinculados from andamentos_processo where processo_id = novo;
+  assert vinculados = 1, 'Criar o processo deveria vincular os andamentos pelo CNJ';
+  select count(*) into vinculados from intimacoes where processo_id = novo and escritorio_id = a;
+  assert vinculados = 1, 'Criar o processo deveria vincular as intimações pelo CNJ';
+  assert (select processo_id from intimacoes where escritorio_id = current_setting('teste.esc_b')::uuid and hash = 'hash-1') is null,
+    'O processo de A não deveria vincular publicações de B';
+end;
+$$;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+do $$
+declare
+  dono_a uuid;
+  dono_b uuid;
+  nota uuid;
+begin
+  reset role;
+  select id into dono_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  select id into dono_b from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000b1';
+  insert into notificacoes (escritorio_id, usuario_id, tipo, titulo)
+  values (current_setting('teste.esc_a')::uuid, dono_a, 'intimacao', 'Nova intimação')
+  returning id into nota;
+  insert into notificacoes (escritorio_id, usuario_id, tipo, titulo)
+  values (current_setting('teste.esc_b')::uuid, dono_b, 'intimacao', 'Outra');
+  set role authenticated;
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+
+  assert (select count(*) from notificacoes) = 1, 'Cada usuário deveria ver só as próprias notificações';
+  update notificacoes set lida_em = now() where id = nota;
+  assert (select count(*) from notificacoes where lida_em is not null) = 1, 'Deveria marcar como lida';
+  begin
+    update notificacoes set titulo = 'Trocado' where id = nota;
+    assert false, 'Não deveria alterar o texto da notificação';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into notificacoes (escritorio_id, usuario_id, tipo, titulo)
+    values (current_setting('teste.esc_a')::uuid, dono_a, 'x', 'y');
+    assert false, 'Usuário não deveria criar notificação';
+  exception when insufficient_privilege then null;
+  end;
+end;
+$$;
+reset role;
+
 select 'RLS: todos os testes passaram' as resultado;

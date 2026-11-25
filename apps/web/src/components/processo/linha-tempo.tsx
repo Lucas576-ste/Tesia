@@ -1,9 +1,10 @@
-import { CalendarClock, FileSearch, FileText, type LucideIcon } from "lucide-react";
+import { CalendarClock, FileSearch, FileText, Newspaper, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { EventoProcesso } from "@/lib/processo-tipos";
 
 const icones: Record<EventoProcesso["tipo"], LucideIcon> = {
   intimacao: FileSearch,
+  andamento: Newspaper,
   prazo: CalendarClock,
   peca: FileText,
 };

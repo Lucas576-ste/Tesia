@@ -6,6 +6,8 @@ import { listarCalendarioProprio, tribunaisDoEscritorio } from "@/lib/calendario
 import { abaConfiguracoesSchema } from "@/lib/conta-exemplo";
 import { buscarPerfilConta, buscarResumoDados } from "@/lib/perfil-conta";
 import { exigirUsuario } from "@/lib/sessao";
+import { listarResponsaveis, listarTermos } from "@/lib/termos-servidor";
+import { podeGerenciarTermos } from "@tesia/shared";
 
 export const metadata: Metadata = { title: "Configurações · Tesia" };
 
@@ -16,11 +18,13 @@ type ConfiguracoesPageProps = {
 export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesPageProps) {
   const { aba } = await searchParams;
   const usuario = await exigirUsuario();
-  const [conta, resumo, itensCalendario, tribunais] = await Promise.all([
+  const [conta, resumo, itensCalendario, tribunais, termos, responsaveis] = await Promise.all([
     buscarPerfilConta(usuario),
     buscarResumoDados(),
     listarCalendarioProprio(),
     tribunaisDoEscritorio(),
+    listarTermos(),
+    listarResponsaveis(),
   ]);
   const cabecalhos = await headers();
   const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host") ?? "localhost:3000";
@@ -40,13 +44,17 @@ export default async function ConfiguracoesPage({ searchParams }: ConfiguracoesP
         conta={conta}
         resumo={resumo}
         calendario={{ itens: itensCalendario, tribunais }}
-        agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
-        djen={{
-          ativo: usuario.djen_ativo,
-          buscadoAte: usuario.djen_buscado_ate,
-          oab:
-            usuario.oab_numero && usuario.oab_uf ? `${usuario.oab_numero}/${usuario.oab_uf}` : null,
+        termos={{
+          itens: termos,
+          responsaveis,
+          podeGerenciar: podeGerenciarTermos(usuario.papel),
+          usuarioId: usuario.id,
+          minhaOab:
+            usuario.oab_numero && usuario.oab_uf
+              ? { numero: usuario.oab_numero, uf: usuario.oab_uf }
+              : null,
         }}
+        agenda={{ token: usuario.calendario_token, origem: `${protocolo}://${host}` }}
         alertas={preferenciasAlertaSchema.parse({
           email: usuario.alerta_email,
           dias: usuario.alerta_dias,

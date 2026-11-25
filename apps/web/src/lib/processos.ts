@@ -39,6 +39,13 @@ const intimacaoSchema = z.object({
   status: z.string(),
 });
 
+const andamentoSchema = z.object({
+  id: z.uuid(),
+  texto: z.string(),
+  publicada_em: z.string().nullable(),
+  criado_em: z.string(),
+});
+
 const pecaSchema = z.object({
   id: z.uuid(),
   titulo: z.string(),
@@ -140,7 +147,7 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
   const processo = processoSchema.safeParse(data);
   if (!processo.success) return null;
 
-  const [prazos, { data: intimacoes }, { data: pecas }] = await Promise.all([
+  const [prazos, { data: intimacoes }, { data: pecas }, { data: andamentos }] = await Promise.all([
     listarPrazosConfirmados(id),
     supabase
       .from("intimacoes")
@@ -152,6 +159,12 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
       .select("id, titulo, status, criado_em")
       .eq("processo_id", id)
       .is("excluido_em", null),
+    supabase
+      .from("andamentos_processo")
+      .select("id, texto, publicada_em, criado_em")
+      .eq("processo_id", id)
+      .order("publicada_em", { ascending: false })
+      .limit(100),
   ]);
 
   const eventos: EventoProcesso[] = [
@@ -161,6 +174,15 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
       titulo: "Intimação recebida",
       descricao: intimacao.resumo?.split(/(?<=\.)\s/)[0] ?? "Análise em andamento.",
       link: { href: `/app/intimacoes/${intimacao.id}`, rotulo: "Ver análise" },
+    })),
+    ...(z.array(andamentoSchema).safeParse(andamentos).data ?? []).map((andamento) => ({
+      data: andamento.publicada_em
+        ? isoParaData(andamento.publicada_em)
+        : dataBrasilia(andamento.criado_em),
+      tipo: "andamento" as const,
+      titulo: "Andamento publicado",
+      descricao:
+        andamento.texto.length > 240 ? `${andamento.texto.slice(0, 240)}…` : andamento.texto,
     })),
     ...prazos.map((prazo) => ({
       data: prazo.vencimento,

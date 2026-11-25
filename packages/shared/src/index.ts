@@ -12,6 +12,16 @@ export {
   type AnaliseGravada,
   type MemoriaCalculo,
 } from "./analise";
+export { htmlParaTexto } from "./html-para-texto";
+export {
+  classificarPublicacao,
+  formatarCnj,
+  normalizarCnj,
+  podeDesvincularProcesso,
+  podeGerenciarTermos,
+  type PapelUsuario,
+  type TipoPublicacao,
+} from "./publicacao";
 export { PECA_EXEMPLO } from "./peca-exemplo";
 export {
   idAprendizado,

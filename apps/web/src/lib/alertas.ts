@@ -15,5 +15,3 @@ export const preferenciasAlertaSchema = z.object({
 });
 
 export type PreferenciasAlerta = z.infer<typeof preferenciasAlertaSchema>;
-
-export type DadosDjen = { ativo: boolean; buscadoAte: string | null; oab: string | null };

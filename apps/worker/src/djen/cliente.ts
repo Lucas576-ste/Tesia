@@ -7,8 +7,9 @@ const MAX_PAGINAS = 20;
 export class FormatoDjenMudou extends Error {}
 
 type Opcoes = {
-  oab: string;
-  uf: string;
+  oab?: string;
+  uf?: string;
+  nomeParte?: string;
   de: string;
   ate: string;
   esperar?: (ms: number) => Promise<void>;
@@ -21,6 +22,7 @@ const pausa = (ms: number) => new Promise<void>((resolver) => setTimeout(resolve
 export async function buscarComunicacoes({
   oab,
   uf,
+  nomeParte,
   de,
   ate,
   esperar = pausa,
@@ -30,13 +32,16 @@ export async function buscarComunicacoes({
   const todas: Comunicacao[] = [];
   for (let pagina = 1; pagina <= MAX_PAGINAS; pagina += 1) {
     const parametros = new URLSearchParams({
-      numeroOab: oab,
-      ufOab: uf.toUpperCase(),
       dataDisponibilizacaoInicio: de,
       dataDisponibilizacaoFim: ate,
       itensPorPagina: String(POR_PAGINA),
       pagina: String(pagina),
     });
+    if (oab && uf) {
+      parametros.set("numeroOab", oab);
+      parametros.set("ufOab", uf.toUpperCase());
+    }
+    if (nomeParte) parametros.set("nomeParte", nomeParte);
     let resposta = await buscar(`${BASE}?${parametros}`, {
       headers: { Accept: "application/json" },
     });

@@ -21,18 +21,3 @@ export async function salvarAlertas(
   revalidatePath("/app/configuracoes");
   return { ok: true };
 }
-
-export async function salvarDjen(ativo: boolean): Promise<{ ok: true } | { erro: string }> {
-  const usuario = await usuarioAtual();
-  if (!usuario) return { erro: "Sua sessão expirou. Entre de novo." };
-  if (ativo && (!usuario.oab_numero || !usuario.oab_uf))
-    return { erro: "Cadastre sua OAB no perfil antes de ligar a busca." };
-  const supabase = await criarClienteServidor();
-  const { error } = await supabase
-    .from("usuarios")
-    .update({ djen_ativo: ativo })
-    .eq("id", usuario.id);
-  if (error) return { erro: "Não foi possível salvar." };
-  revalidatePath("/app/configuracoes");
-  return { ok: true };
-}

@@ -1,3 +1,4 @@
+import { htmlParaTexto } from "@tesia/shared";
 import { z } from "zod";
 
 export const comunicacaoSchema = z.object({
@@ -11,6 +12,7 @@ export const comunicacaoSchema = z.object({
   nomeOrgao: z.string().nullable().optional(),
   numero_processo: z.string().nullable().optional(),
   tipoComunicacao: z.string().nullable().optional(),
+  tipoDocumento: z.string().nullable().optional(),
   destinatarioadvogados: z
     .array(
       z.object({
@@ -45,7 +47,7 @@ export function eDoAdvogado(comunicacao: Comunicacao, oab: string, uf: string) {
 export function paraIntimacao(comunicacao: Comunicacao) {
   return {
     djen_id: comunicacao.id,
-    texto: comunicacao.texto ?? "",
+    texto: htmlParaTexto(comunicacao.texto ?? ""),
     data_disponibilizacao: comunicacao.data_disponibilizacao,
   };
 }
