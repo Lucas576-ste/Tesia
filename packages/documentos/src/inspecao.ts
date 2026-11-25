@@ -12,6 +12,15 @@ const TIPOS_IMAGEM: Record<string, string> = {
   gif: "image/gif",
 };
 
+export type PosicaoImagem = {
+  origemH: "pagina" | "margem";
+  origemV: "pagina" | "margem" | "paragrafo";
+  xMm: number;
+  yMm: number;
+  alinhamentoH: "left" | "center" | "right" | null;
+  atrasDoTexto: boolean;
+};
+
 export type BlocoTimbrado =
   | {
       tipo: "texto";
@@ -19,8 +28,15 @@ export type BlocoTimbrado =
       alinhamento: "left" | "center" | "right" | "justify";
       negrito: boolean;
       tamanhoPt: number | null;
+      cor: string | null;
     }
-  | { tipo: "imagem"; dataUri: string; larguraMm: number | null; alturaMm: number | null };
+  | {
+      tipo: "imagem";
+      dataUri: string;
+      larguraMm: number | null;
+      alturaMm: number | null;
+      posicao: PosicaoImagem | null;
+    };
 
 export type InspecaoModelo = {
   pagina: {
@@ -83,6 +99,40 @@ function imagemDoRelacionamento(zip: PizZip, alvo: string | undefined) {
   return `data:${tipo};base64,${Buffer.from(bytes).toString("base64")}`;
 }
 
+function emMm(emu: number) {
+  return Math.round((emu / EMU_POR_MM) * 10) / 10;
+}
+
+function origemHorizontal(valor: string | undefined) {
+  return valor === "page" ? "pagina" : "margem";
+}
+
+function origemVertical(valor: string | undefined) {
+  if (valor === "page") return "pagina";
+  if (valor === "margin" || valor === "topMargin" || valor === "insideMargin") return "margem";
+  return "paragrafo";
+}
+
+function posicaoDoDesenho(desenho: string): PosicaoImagem | null {
+  if (!/<wp:anchor\b/.test(desenho)) return null;
+  const horizontal = desenho.match(/<wp:positionH\b([^>]*)>([\s\S]*?)<\/wp:positionH>/);
+  const vertical = desenho.match(/<wp:positionV\b([^>]*)>([\s\S]*?)<\/wp:positionV>/);
+  if (!horizontal || !vertical) return null;
+  const deslocamento = (miolo: string | undefined) => {
+    const emu = Number(miolo?.match(/<wp:posOffset>\s*(-?\d+)\s*</)?.[1]);
+    return Number.isFinite(emu) ? emMm(emu) : 0;
+  };
+  const alinhamento = horizontal[2]?.match(/<wp:align>\s*(left|center|right)\s*</)?.[1];
+  return {
+    origemH: origemHorizontal(horizontal[1]?.match(/relativeFrom="([^"]*)"/)?.[1]),
+    origemV: origemVertical(vertical[1]?.match(/relativeFrom="([^"]*)"/)?.[1]),
+    xMm: deslocamento(horizontal[2]),
+    yMm: deslocamento(vertical[2]),
+    alinhamentoH: (alinhamento as "left" | "center" | "right" | undefined) ?? null,
+    atrasDoTexto: /<wp:anchor\b[^>]*\bbehindDoc="(1|true)"/.test(desenho),
+  };
+}
+
 function blocosDaParte(zip: PizZip, caminho: string): BlocoTimbrado[] {
   const xml = zip.file(caminho)?.asText();
   if (!xml) return [];
@@ -111,22 +161,26 @@ function blocosDaParte(zip: PizZip, caminho: string): BlocoTimbrado[] {
       blocos.push({
         tipo: "imagem",
         dataUri,
-        larguraMm: largura > 0 ? Math.round((largura / EMU_POR_MM) * 10) / 10 : null,
-        alturaMm: altura > 0 ? Math.round((altura / EMU_POR_MM) * 10) / 10 : null,
+        larguraMm: largura > 0 ? emMm(largura) : null,
+        alturaMm: altura > 0 ? emMm(altura) : null,
+        posicao: posicaoDoDesenho(desenho),
       });
     }
     for (const [, id] of paragrafo.matchAll(/<v:imagedata\b[^>]*?\br:id="([^"]*)"/g)) {
       const dataUri = imagemDoRelacionamento(zip, rels.get(id ?? ""));
-      if (dataUri) blocos.push({ tipo: "imagem", dataUri, larguraMm: null, alturaMm: null });
+      if (dataUri)
+        blocos.push({ tipo: "imagem", dataUri, larguraMm: null, alturaMm: null, posicao: null });
     }
     if (texto) {
       const tamanho = Number(atributo(paragrafo, "w:sz", "w:val"));
+      const cor = atributo(paragrafo, "w:color", "w:val");
       blocos.push({
         tipo: "texto",
         texto,
         alinhamento,
         negrito: /<w:b\s*\/>|<w:b\s+w:val="(1|true)"/.test(paragrafo),
         tamanhoPt: tamanho > 0 ? tamanho / 2 : null,
+        cor: cor && /^[0-9a-f]{6}$/i.test(cor) ? `#${cor}` : null,
       });
     }
   }

@@ -123,6 +123,7 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-20 | Chat da Lia no app com ajuda de uso e explicação da tela, sem dúvidas jurídicas abertas; Haiku com streaming por `POST /api/lia`, histórico em `conversas_lia` e `mensagens_lia` (nomes em português), limite diário por plano e retenção de 90 dias | Substitui o "?" de ajuda; o escopo sem direito aberto evita resposta jurídica sem revisão |
 | 2026-11-20 | O chat chama `@anthropic-ai/sdk` direto no web, com prompt e base de conhecimento em `apps/web/src/lib/lia/`, e o web ganhou vitest | O Turbopack não resolve os imports `.js` do `@tesia/ia`; o web não tinha testes |
 | 2026-11-20 | Contexto da Lia: mínimo sempre (rota, plano, contagens, próximos prazos sem nomes) e detalhe só do item aberto | Reduz o que sai para o provedor de IA e mantém explicações com datas reais |
+| 2026-11-25 | A prévia do timbrado lê a posição das imagens ancoradas (página ou margem, atrás ou na frente do texto) e a cor do texto, e desenha as imagens de página fora das margens | A prévia prendia o timbrado de ponta a ponta dentro das margens e perdia o texto branco, embora o .docx baixado já saísse correto |
 
 ## Pendências
 

@@ -10,6 +10,7 @@ export const PREVIA_ILUSTRATIVA: InspecaoModelo = {
       alinhamento: "center",
       negrito: true,
       tamanhoPt: 16,
+      cor: null,
     },
     {
       tipo: "texto",
@@ -17,6 +18,7 @@ export const PREVIA_ILUSTRATIVA: InspecaoModelo = {
       alinhamento: "center",
       negrito: false,
       tamanhoPt: 10,
+      cor: null,
     },
   ],
   rodape: [
@@ -26,6 +28,7 @@ export const PREVIA_ILUSTRATIVA: InspecaoModelo = {
       alinhamento: "center",
       negrito: false,
       tamanhoPt: 9,
+      cor: null,
     },
   ],
 };

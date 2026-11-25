@@ -8,6 +8,55 @@ import { cn } from "@/lib/utils";
 const PX_POR_MM = 3.7795;
 const DISTANCIA_BORDA_MM = 12.5;
 
+type BlocoImagem = Extract<BlocoTimbrado, { tipo: "imagem" }>;
+
+function ehImagemDePagina(bloco: BlocoTimbrado): bloco is BlocoImagem {
+  return bloco.tipo === "imagem" && bloco.posicao !== null && !!bloco.larguraMm && !!bloco.alturaMm;
+}
+
+function ImagemDePagina({
+  bloco,
+  pagina,
+}: {
+  bloco: BlocoImagem;
+  pagina: InspecaoModelo["pagina"];
+}) {
+  const { posicao, larguraMm = 0, alturaMm = 0 } = bloco;
+  if (!posicao || !larguraMm || !alturaMm) return null;
+  const baseX = posicao.origemH === "pagina" ? 0 : pagina.esquerdaMm;
+  const larguraBase =
+    posicao.origemH === "pagina"
+      ? pagina.larguraMm
+      : pagina.larguraMm - pagina.esquerdaMm - pagina.direitaMm;
+  const deslocamentoX =
+    posicao.alinhamentoH === "center"
+      ? (larguraBase - larguraMm) / 2
+      : posicao.alinhamentoH === "right"
+        ? larguraBase - larguraMm
+        : posicao.xMm;
+  const baseY =
+    posicao.origemV === "pagina"
+      ? 0
+      : posicao.origemV === "margem"
+        ? pagina.topoMm
+        : DISTANCIA_BORDA_MM;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={bloco.dataUri}
+      alt=""
+      className="absolute max-w-none"
+      style={{
+        left: `${(baseX + deslocamentoX) * PX_POR_MM}px`,
+        top: `${(baseY + posicao.yMm) * PX_POR_MM}px`,
+        width: `${larguraMm * PX_POR_MM}px`,
+        height: `${alturaMm * PX_POR_MM}px`,
+        zIndex: posicao.atrasDoTexto ? 0 : 3,
+      }}
+    />
+  );
+}
+
 function Bloco({ bloco }: { bloco: BlocoTimbrado }) {
   if (bloco.tipo === "imagem") {
     return (
@@ -31,6 +80,7 @@ function Bloco({ bloco }: { bloco: BlocoTimbrado }) {
         textAlign: bloco.alinhamento,
         fontWeight: bloco.negrito ? 700 : 400,
         fontSize: bloco.tamanhoPt ? `${bloco.tamanhoPt * 1.333}px` : undefined,
+        color: bloco.cor ?? undefined,
       }}
     >
       {bloco.texto}
@@ -67,6 +117,8 @@ function CorpoExemplo({ fontePt }: { fontePt: number }) {
 function Folha({ previa }: { previa: InspecaoModelo }) {
   const { pagina, fonte } = previa;
   const mm = (valor: number) => `${valor * PX_POR_MM}px`;
+  const imagensDePagina = [...previa.cabecalho, ...previa.rodape].filter(ehImagemDePagina);
+  const emLinha = (blocos: BlocoTimbrado[]) => blocos.filter((bloco) => !ehImagemDePagina(bloco));
   return (
     <div
       className="tema-claro relative overflow-hidden bg-white text-black"
@@ -76,21 +128,26 @@ function Folha({ previa }: { previa: InspecaoModelo }) {
         fontFamily: `"${fonte.nome}", "Times New Roman", Times, serif`,
       }}
     >
+      {imagensDePagina.map((bloco, indice) => (
+        <ImagemDePagina key={indice} bloco={bloco} pagina={pagina} />
+      ))}
       <div
         className="absolute flex flex-col gap-1"
         style={{
+          zIndex: 1,
           top: mm(DISTANCIA_BORDA_MM),
           left: mm(pagina.esquerdaMm),
           right: mm(pagina.direitaMm),
         }}
       >
-        {previa.cabecalho.map((bloco, indice) => (
+        {emLinha(previa.cabecalho).map((bloco, indice) => (
           <Bloco key={indice} bloco={bloco} />
         ))}
       </div>
       <div
         className="absolute"
         style={{
+          zIndex: 2,
           top: mm(pagina.topoMm + 20),
           left: mm(pagina.esquerdaMm),
           right: mm(pagina.direitaMm),
@@ -102,13 +159,14 @@ function Folha({ previa }: { previa: InspecaoModelo }) {
       <div
         className="absolute flex flex-col gap-1"
         style={{
+          zIndex: 1,
           bottom: mm(DISTANCIA_BORDA_MM),
           left: mm(pagina.esquerdaMm),
           right: mm(pagina.direitaMm),
           fontSize: `${Math.min(fonte.tamanhoPt, 10) * 1.333}px`,
         }}
       >
-        {previa.rodape.map((bloco, indice) => (
+        {emLinha(previa.rodape).map((bloco, indice) => (
           <Bloco key={indice} bloco={bloco} />
         ))}
       </div>
