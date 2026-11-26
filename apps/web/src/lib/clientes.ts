@@ -20,7 +20,9 @@ const processoSchema = z.object({
   encerrado_em: z.string().nullable(),
   atualizado_em: z.string(),
   cliente_id: z.uuid().nullable(),
-  prazos: z.array(z.object({ status: z.string(), data_vencimento: z.string() })).nullable(),
+  prazos: z
+    .array(z.object({ status: z.string(), data_vencimento: z.string(), automatica: z.boolean() }))
+    .nullable(),
 });
 
 const clienteSchema = z.object({
@@ -79,7 +81,8 @@ function paraAcompanhado(
   linha: z.infer<typeof processoSchema>,
   nomes: Map<string, string>,
 ): ProcessoAcompanhado {
-  const proximo = (linha.prazos ?? [])
+  const prazos = (linha.prazos ?? []).filter(({ automatica }) => !automatica);
+  const proximo = prazos
     .filter(({ status }) => status === "confirmado")
     .map(({ data_vencimento }) => data_vencimento)
     .sort()[0];
@@ -113,7 +116,7 @@ function paraAcompanhado(
           ),
         }
       : null,
-    protocolado: !proximo && (linha.prazos ?? []).some(({ status }) => status === "cumprido"),
+    protocolado: !proximo && prazos.some(({ status }) => status === "cumprido"),
     area: linha.area ? rotuloArea(linha.area) : null,
     diasDesdeMovimentacao: dias,
     diasParado: !encerrado && !proximo && dias >= DIAS_PARADO ? dias : null,
@@ -125,7 +128,7 @@ function paraAcompanhado(
 const COLUNAS_CLIENTE =
   "id, nome, documento, contato, tipo_pessoa, qualificacao, pix, observacoes, ultimo_contato_em, papel, excluido_em";
 const COLUNAS_PROCESSO =
-  "id, numero_cnj, partes, parte_contraria, rito, area, fase, fase_origem, fase_atualizada_em, encerrado_em, atualizado_em, cliente_id, prazos(status, data_vencimento)";
+  "id, numero_cnj, partes, parte_contraria, rito, area, fase, fase_origem, fase_atualizada_em, encerrado_em, atualizado_em, cliente_id, prazos(status, data_vencimento, automatica)";
 
 export async function listarAcompanhamento() {
   const supabase = await criarClienteServidor();

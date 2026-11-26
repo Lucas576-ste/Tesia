@@ -219,6 +219,7 @@ Só `dono` e `advogado` escrevem (RLS por `papel_atual()`). A interface só cria
 | data_vencimento | date | prazo fatal |
 | data_vencimento_sugerida | date | data calculada pelo motor, guardada quando o advogado edita o fatal |
 | data_prazo_interno | date | opcional; vazio em audiências e compromissos |
+| automatica | boolean | tarefa criada pela busca para uma intimação nova; fica fora do painel, alertas e agenda (migration 0032) |
 | memoria_calculo | jsonb | passo a passo exibido ao advogado |
 | confirmado_por | uuid | usuário que confirmou |
 | confirmado_em | timestamptz | |

@@ -153,28 +153,30 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
   const processo = processoSchema.safeParse(data);
   if (!processo.success) return null;
 
-  const [prazos, { data: intimacoes }, { data: pecas }, { data: andamentos }] = await Promise.all([
-    listarPrazosConfirmados(id),
-    supabase
-      .from("intimacoes")
-      .select(
-        "id, criado_em, resumo, status, tratamento, concluida_em, tratador:usuarios!intimacoes_tratada_por_fkey(nome)",
-      )
-      .eq("processo_id", id)
-      .is("excluido_em", null),
-    supabase
-      .from("pecas")
-      .select("id, titulo, status, criado_em")
-      .eq("processo_id", id)
-      .is("excluido_em", null),
-    supabase
-      .from("andamentos_processo")
-      .select("id, texto, publicada_em, criado_em")
-      .eq("processo_id", id)
-      .order("publicada_em", { ascending: false })
-      .limit(100),
-  ]);
+  const [todosOsPrazos, { data: intimacoes }, { data: pecas }, { data: andamentos }] =
+    await Promise.all([
+      listarPrazosConfirmados(id, { comAutomaticas: true }),
+      supabase
+        .from("intimacoes")
+        .select(
+          "id, criado_em, resumo, status, tratamento, concluida_em, tratador:usuarios!intimacoes_tratada_por_fkey(nome)",
+        )
+        .eq("processo_id", id)
+        .is("excluido_em", null),
+      supabase
+        .from("pecas")
+        .select("id, titulo, status, criado_em")
+        .eq("processo_id", id)
+        .is("excluido_em", null),
+      supabase
+        .from("andamentos_processo")
+        .select("id, texto, publicada_em, criado_em")
+        .eq("processo_id", id)
+        .order("publicada_em", { ascending: false })
+        .limit(100),
+    ]);
 
+  const prazos = todosOsPrazos.filter(({ automatica }) => !automatica);
   const eventos: EventoProcesso[] = [
     ...(z.array(intimacaoSchema).safeParse(intimacoes).data ?? []).map((intimacao) => ({
       data: dataBrasilia(intimacao.criado_em),
@@ -203,7 +205,7 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
       descricao:
         andamento.texto.length > 240 ? `${andamento.texto.slice(0, 240)}…` : andamento.texto,
     })),
-    ...prazos.map((prazo) => ({
+    ...todosOsPrazos.map((prazo) => ({
       data: prazo.vencimento,
       tipo: "prazo" as const,
       titulo: `${prazo.tipo && prazo.tipo !== "prazo" ? "Compromisso" : "Prazo"}: ${prazo.peca}`,

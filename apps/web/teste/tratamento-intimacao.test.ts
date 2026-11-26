@@ -15,6 +15,13 @@ describe("podeTratarIntimacao", () => {
 });
 
 describe("resumoDoLote", () => {
+  it("diz quantos prazos confirmados continuam no painel", () => {
+    expect(resumoDoLote(2, 0, "concluídas", 1)).toBe(
+      "2 intimações concluídas. 1 prazo confirmado continua no painel.",
+    );
+    expect(resumoDoLote(3, 0, "concluídas", 2)).toContain("2 prazos confirmados continuam");
+  });
+
   it("conta o que foi feito e o que ficou de fora", () => {
     expect(resumoDoLote(1, 0, "concluída")).toBe("1 intimação concluída.");
     expect(resumoDoLote(3, 0, "concluídas")).toBe("3 intimações concluídas.");

@@ -118,6 +118,17 @@ export async function buscarTratamento(id: string): Promise<DadosTratamento | nu
     inicioProvavel = { inicioIso: resultado.inicio, memoria: resultado.memoria };
   }
 
+  const { data: confirmado } = await supabase
+    .from("prazos")
+    .select("data_vencimento")
+    .eq("intimacao_id", id)
+    .eq("status", "confirmado")
+    .order("data_vencimento")
+    .limit(1);
+  const prazoConfirmado =
+    z.array(z.object({ data_vencimento: z.string() })).safeParse(confirmado).data?.[0]
+      ?.data_vencimento ?? null;
+
   const digitos = normalizarCnj(l.numero_processo ?? dados?.numero_processo);
   const termo = l.termos_monitorados;
   return {
@@ -129,6 +140,7 @@ export async function buscarTratamento(id: string): Promise<DadosTratamento | nu
     responsavelId: l.responsavel_id,
     responsavelNome: l.responsavel?.nome ?? null,
     tarefaId: l.tarefa_id,
+    prazoConfirmado,
     texto: htmlParaTexto(l.texto ?? ""),
     fonte: l.fonte,
     tribunal: l.tribunal ?? dados?.tribunal ?? null,

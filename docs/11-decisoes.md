@@ -150,6 +150,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-26 | Os pontos atacáveis aparecem só na tela da análise, não em "Entenda a decisão" | Evitar repetição; na tela o advogado confere o trecho com o documento ao lado |
 | 2026-11-26 | Na publicação do diário, a data de disponibilização gravada pela busca prevalece sobre a leitura da IA, e a forma é diário (exceto citação) | A análise apagava a data e o prazo ficava sem cálculo |
 | 2026-11-26 | Prazo citado no texto diferente do sugerido gera aviso, sem mudar o cálculo; data fatal em dia não útil também avisa, sem bloquear | O código não sabe se o prazo citado é da parte ou do ato; o advogado decide |
+| 2026-11-26 | A tarefa automática "Intimação Judicial" (`prazos.automatica`, migration 0032) fica fora do painel, de Prazos, dos alertas, da agenda e da Lia; continua no histórico do processo | Aparecia como prazo que vence hoje e virava vencido no dia seguinte |
+| 2026-11-26 | Ao concluir uma intimação com prazo confirmado, a Tesia pergunta se o prazo foi cumprido; no lote, os prazos são mantidos e o aviso diz quantos | Nenhum prazo é dado como cumprido sem o advogado dizer |
 
 ## Pendências
 

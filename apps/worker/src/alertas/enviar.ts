@@ -70,7 +70,7 @@ export async function enviarAlertas(db: pg.Pool, config: Configuracao, hoje = ho
      join usuarios u on u.escritorio_id = p.escritorio_id and u.alerta_email
      join auth.users a on a.id = u.auth_user_id
      left join processos pr on pr.id = p.processo_id
-     where p.status = 'confirmado' and p.data_vencimento between $1::date and $1::date + 10
+     where p.status = 'confirmado' and not p.automatica and p.data_vencimento between $1::date and $1::date + 10
        and (p.responsavel_id is null or p.responsavel_id = u.id)`,
     [hoje],
   );

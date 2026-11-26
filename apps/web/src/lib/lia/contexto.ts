@@ -75,6 +75,7 @@ async function prazosDe(coluna: "processo_id" | "intimacao_id" | "id", valor: st
     .from("prazos")
     .select(CAMPOS_PRAZO)
     .eq(coluna, valor)
+    .eq("automatica", false)
     .order("data_vencimento")
     .limit(5);
   return z.array(prazoSchema).safeParse(data).data ?? [];
@@ -189,6 +190,7 @@ async function resumoGeral() {
     supabase
       .from("prazos")
       .select(`${CAMPOS_PRAZO}, processos(numero_cnj)`)
+      .eq("automatica", false)
       .in("status", ["sugerido", "confirmado"])
       .order("data_vencimento")
       .limit(60),
@@ -237,6 +239,7 @@ export async function contarVencendo() {
   const { count } = await supabase
     .from("prazos")
     .select("id", { count: "exact", head: true })
+    .eq("automatica", false)
     .in("status", ["sugerido", "confirmado"])
     .gte("data_vencimento", hoje)
     .lte("data_vencimento", somarDias(hoje, DIAS_VENCENDO));

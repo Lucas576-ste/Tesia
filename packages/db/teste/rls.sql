@@ -1134,4 +1134,25 @@ end;
 $$;
 reset role;
 
+do $$
+declare
+  esc uuid := current_setting('teste.esc_a')::uuid;
+  token_a text;
+  antes int;
+  tarefa uuid;
+begin
+  select calendario_token into token_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+  select count(*) into antes from agenda_por_token(token_a);
+  insert into prazos (escritorio_id, origem, tipo, descricao, data_vencimento, status)
+  values (esc, 'manual', 'compromisso', 'Tarefa antiga da intimação', '2026-12-15', 'confirmado')
+  returning id into tarefa;
+  assert (select not automatica from prazos where id = tarefa), 'Prazo novo não deveria ser automático';
+  assert (select count(*) from agenda_por_token(token_a)) = antes + 1, 'A agenda deveria trazer o compromisso comum';
+  insert into intimacoes (escritorio_id, origem, texto, tarefa_id) values (esc, 'djen', 'Publicação de teste', tarefa);
+  update prazos p set automatica = true where exists (select 1 from intimacoes i where i.tarefa_id = p.id);
+  assert (select automatica from prazos where id = tarefa), 'O backfill deveria marcar a tarefa da intimação';
+  assert (select count(*) from agenda_por_token(token_a)) = antes, 'A tarefa automática não deveria ir para a agenda';
+end;
+$$;
+
 select 'RLS: todos os testes passaram' as resultado;

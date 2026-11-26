@@ -10,6 +10,7 @@ export type DadosTratamento = {
   responsavelId: string | null;
   responsavelNome: string | null;
   tarefaId: string | null;
+  prazoConfirmado: string | null;
   texto: string;
   fonte: "diario" | "eletronico" | null;
   tribunal: string | null;

@@ -24,6 +24,7 @@ const processoSchema = z.object({
 
 const linhaPrazoSchema = z.object({
   id: z.uuid(),
+  automatica: z.boolean(),
   intimacao_id: z.uuid().nullable(),
   processo_id: z.uuid().nullable(),
   origem: z.enum(["intimacao", "manual"]),
@@ -77,7 +78,10 @@ function partesDaIntimacao(extracao: unknown, processo: z.infer<typeof processoS
   return processo?.partes ?? processo?.parte_contraria ?? "Sem processo";
 }
 
-export async function listarPrazosConfirmados(processoId?: string): Promise<LinhaPrazo[]> {
+export async function listarPrazosConfirmados(
+  processoId?: string,
+  { comAutomaticas = false }: { comAutomaticas?: boolean } = {},
+): Promise<LinhaPrazo[]> {
   const supabase = await criarClienteServidor();
   let consulta = supabase
     .from("prazos")
@@ -85,6 +89,7 @@ export async function listarPrazosConfirmados(processoId?: string): Promise<Linh
     .in("status", ["confirmado", "cumprido"])
     .order("data_vencimento");
   if (processoId) consulta = consulta.eq("processo_id", processoId);
+  if (!comAutomaticas) consulta = consulta.eq("automatica", false);
   const { data, error } = await consulta;
   if (error) throw new Error(`Falha ao ler os prazos: ${error.message}`);
   const linhas = z.array(linhaPrazoSchema).safeParse(data);
@@ -94,6 +99,7 @@ export async function listarPrazosConfirmados(processoId?: string): Promise<Linh
   return linhas.data.map((linha) => ({
     id: linha.intimacao_id ?? linha.id,
     prazoId: linha.id,
+    ...(linha.automatica && { automatica: true }),
     ...(linha.origem === "manual" && { tipo: linha.tipo, hora: linha.hora?.slice(0, 5) }),
     partes: partesDaIntimacao(linha.intimacoes?.extracao, linha.processos),
     cnj: linha.processos?.numero_cnj ?? "Sem número",

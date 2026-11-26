@@ -156,6 +156,7 @@ describe("gravarPublicacao", () => {
     expect(insercao.valores).toContain("hash-a");
     const tarefa = com(chamadas, "insert into prazos")[0]!;
     expect(tarefa.valores[3]).toBe("Intimação Judicial · 0723456-78.2026.8.07.0001");
+    expect(tarefa.sql).toContain("'confirmado', true");
     expect(com(chamadas, "insert into notificacoes")[0]!.valores[1]).toBe(termo.responsavel_id);
   });
 

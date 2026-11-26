@@ -47,8 +47,8 @@ async function criarTarefaENotificacao(
   const tarefa = await achar<{ id: string }>(
     db,
     `insert into prazos (escritorio_id, processo_id, origem, tipo, responsavel_id, descricao,
-       data_vencimento, status)
-     values ($1, $2, 'manual', 'compromisso', $3, $4, $5::date, 'confirmado')
+       data_vencimento, status, automatica)
+     values ($1, $2, 'manual', 'compromisso', $3, $4, $5::date, 'confirmado', true)
      returning id`,
     [
       termo.escritorio_id,

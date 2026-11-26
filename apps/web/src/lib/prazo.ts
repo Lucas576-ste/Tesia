@@ -21,6 +21,7 @@ export type LinhaPrazo = {
   etapa?: EtapaPrazo;
   pecaId?: string;
   prazoId?: string;
+  automatica?: boolean;
   diasAtraso?: number;
 };
 

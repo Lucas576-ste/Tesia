@@ -6,11 +6,17 @@ export function podeTratarIntimacao(responsavelId: string | null, usuarioId: str
   return responsavelId === null || responsavelId === usuarioId;
 }
 
-export function resumoDoLote(feitas: number, puladas: number, verbo: string) {
+export function resumoDoLote(feitas: number, puladas: number, verbo: string, prazosMantidos = 0) {
   const alvo = (n: number) => (n === 1 ? "1 intimação" : `${n} intimações`);
   if (feitas === 0) return `Nenhuma intimação ${verbo}: só o responsável trata cada uma.`;
-  if (puladas === 0) return `${alvo(feitas)} ${verbo}.`;
-  return `${alvo(feitas)} ${verbo}. ${alvo(puladas)} ${puladas === 1 ? "ficou" : "ficaram"} de fora porque o responsável é outra pessoa.`;
+  const prazos =
+    prazosMantidos === 0
+      ? ""
+      : prazosMantidos === 1
+        ? " 1 prazo confirmado continua no painel."
+        : ` ${prazosMantidos} prazos confirmados continuam no painel.`;
+  if (puladas === 0) return `${alvo(feitas)} ${verbo}.${prazos}`;
+  return `${alvo(feitas)} ${verbo}. ${alvo(puladas)} ${puladas === 1 ? "ficou" : "ficaram"} de fora porque o responsável é outra pessoa.${prazos}`;
 }
 
 export function mailtoDaIntimacao(dados: {

@@ -28,6 +28,7 @@ import type { PrazoManual, ProcessoResumo } from "@/lib/prazo-manual";
 import type { Responsavel } from "@/lib/termos";
 import type { DadosTratamento } from "@/lib/tratamento-dados";
 import { mailtoDaIntimacao, podeTratarIntimacao } from "@/lib/tratamento-intimacao";
+import { DialogoConcluir } from "./dialogo-concluir";
 import { DialogoNovoProcesso, DialogoVincularProcesso } from "./dialogos-processo-intimacao";
 
 type PainelTratamentoProps = {
@@ -37,7 +38,7 @@ type PainelTratamentoProps = {
   usuario: { id: string; papel: PapelUsuario };
 };
 
-type Janela = "tarefa" | "vincular" | "novo" | "encaminhar" | "desvincular" | null;
+type Janela = "tarefa" | "vincular" | "novo" | "encaminhar" | "desvincular" | "concluir" | null;
 
 function formatoData(iso: string) {
   return isoParaData(
@@ -64,9 +65,9 @@ export function PainelTratamento({
     router.refresh();
   };
 
-  function tratar(acao: "concluir" | "ignorar" | "reabrir") {
+  function tratar(acao: "concluir" | "ignorar" | "reabrir", cumprirPrazo = false) {
     iniciar(async () => {
-      const resultado = await tratarIntimacoes([dados.id], acao);
+      const resultado = await tratarIntimacoes([dados.id], acao, { cumprirPrazo });
       if ("erro" in resultado) return void toast.error(resultado.erro);
       if (resultado.feitas === 0) {
         return void toast.error(
@@ -227,7 +228,7 @@ export function PainelTratamento({
             <Button
               variant="outline"
               disabled={ocupado || !podeTratar}
-              onClick={() => tratar("concluir")}
+              onClick={() => (dados.prazoConfirmado ? setJanela("concluir") : tratar("concluir"))}
             >
               <CheckCheck aria-hidden />
               Concluir
@@ -258,6 +259,15 @@ export function PainelTratamento({
         </p>
       )}
 
+      {dados.prazoConfirmado && (
+        <DialogoConcluir
+          aberto={janela === "concluir"}
+          prazo={dados.prazoConfirmado}
+          ocupado={ocupado}
+          aoFechar={fechar}
+          aoConcluir={(cumprirPrazo) => tratar("concluir", cumprirPrazo)}
+        />
+      )}
       <ModalPrazoManual
         aberto={janela === "tarefa"}
         titulo="Atribuir nova tarefa"

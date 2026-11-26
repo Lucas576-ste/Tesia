@@ -69,6 +69,8 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
 ## Prazos
+- [ ] Intimação nova do diário não cria cartão no painel nem alerta de vencimento
+- [ ] Concluir intimação com prazo confirmado pergunta se ele foi cumprido; em lote, o aviso diz quantos prazos ficaram
 - [ ] Painel e Prazos mostram os prazos confirmados; o processo mostra o histórico deles
 - [ ] Intimação do diário chega com a data de disponibilização e o prazo sugerido
 - [ ] Texto com prazo diferente do sugerido mostra o aviso; data em sábado também

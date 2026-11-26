@@ -30,6 +30,7 @@ export function BarraLote({ ids, responsaveis, aoLimpar }: BarraLoteProps) {
         resultado.feitas,
         resultado.puladas,
         resultado.feitas === 1 ? verbo : `${verbo}s`,
+        resultado.prazosMantidos,
       );
       if (resultado.feitas === 0) toast.error(texto);
       else toast.success(texto);

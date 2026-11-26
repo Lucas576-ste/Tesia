@@ -3,6 +3,7 @@
 import { normalizarCnj, podeDesvincularProcesso } from "@tesia/shared";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { concluirPrazo } from "@/app/app/acoes-prazos";
 import { registrarAuditoria } from "@/lib/auditoria";
 import { criarNotificacao } from "@/lib/notificar";
 import { usuarioAtual } from "@/lib/sessao";
@@ -13,7 +14,10 @@ const LIMITE_LOTE = 100;
 const idsSchema = z.array(z.uuid()).min(1).max(LIMITE_LOTE);
 const SESSAO_EXPIRADA = "Sua sessão expirou. Entre de novo.";
 
-type ResultadoLote = { ok: true; feitas: number; puladas: number } | { erro: string };
+type ResultadoLote =
+  { ok: true; feitas: number; puladas: number; prazosMantidos?: number } | { erro: string };
+
+const opcoesSchema = z.object({ cumprirPrazo: z.boolean().default(false) });
 
 const linhaSchema = z.object({
   id: z.uuid(),
@@ -43,6 +47,7 @@ async function permitidas(ids: string[], usuarioId: string) {
 export async function tratarIntimacoes(
   entrada: string[],
   acao: "concluir" | "ignorar" | "reabrir",
+  opcoes: z.input<typeof opcoesSchema> = {},
 ): Promise<ResultadoLote> {
   const usuario = await usuarioAtual();
   if (!usuario) return { erro: SESSAO_EXPIRADA };
@@ -76,6 +81,25 @@ export async function tratarIntimacoes(
       .in("intimacao_id", idsOk)
       .eq("status", "sugerido");
   }
+  let prazosMantidos = 0;
+  if (acao === "concluir") {
+    const { data: confirmados } = await supabase
+      .from("prazos")
+      .select("id")
+      .in("intimacao_id", idsOk)
+      .eq("status", "confirmado");
+    const prazos = z.array(z.object({ id: z.uuid() })).safeParse(confirmados).data ?? [];
+    prazosMantidos = prazos.length;
+    const cumprir = opcoesSchema.safeParse(opcoes).data?.cumprirPrazo && idsOk.length === 1;
+    for (const prazo of cumprir ? prazos : []) {
+      const resultado = await concluirPrazo(prazo.id, true);
+      if ("erro" in resultado) {
+        return { erro: "A intimação foi concluída, mas o prazo não foi marcado como cumprido." };
+      }
+      await registrarAuditoria(usuario, "prazo_cumprido", "prazos", prazo.id);
+      prazosMantidos -= 1;
+    }
+  }
   await registrarAuditoria(
     usuario,
     `intimacao_${acao}`,
@@ -83,7 +107,7 @@ export async function tratarIntimacoes(
     idsOk.length === 1 ? idsOk[0] : undefined,
   );
   atualizarTelas();
-  return { ok: true, feitas: idsOk.length, puladas };
+  return { ok: true, feitas: idsOk.length, puladas, prazosMantidos };
 }
 
 export async function encaminharIntimacoes(
