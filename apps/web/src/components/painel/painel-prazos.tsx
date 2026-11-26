@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { CardIndicador } from "@/components/card-indicador";
 import { EstadoVazio } from "@/components/estado-vazio";
@@ -52,6 +52,7 @@ type PainelPrazosProps = {
   urlSemNovo: string;
   intimacoes: { total: number; pendentes: number };
   modo?: "painel" | "prazos";
+  aviso?: ReactNode;
 };
 
 const FILTROS_EQUIPE = {
@@ -74,6 +75,7 @@ export function PainelPrazos({
   urlSemNovo,
   intimacoes,
   modo = "painel",
+  aviso,
 }: PainelPrazosProps) {
   const base = modo === "painel" ? "/app" : "/app/prazos";
   const router = useRouter();
@@ -215,6 +217,7 @@ export function PainelPrazos({
             </p>
           )}
         </header>
+        {aviso}
         {modo === "painel" && <AtencaoAgora itens={atencao} />}
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <CardIndicador

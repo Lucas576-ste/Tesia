@@ -60,6 +60,7 @@ feriados, suspensoes_tribunal, regras_prazo (tabelas de referência, sem escrito
 | estilo_aprender_revisoes | boolean | aprender com as revisões de rascunho (padrão: sim) |
 | djen_ativo | boolean | busca automática no DJEN ligada (contas novas: sim; contas anteriores a 19/11/2026 começam desligadas) |
 | djen_buscado_ate | date | até que data as publicações já foram buscadas (só o worker altera) |
+| busca_oab_aceita_em | timestamptz | quando aceitou a busca das intimações da própria OAB; nulo = não aceitou; o próprio usuário altera (migration 0031, com backfill de quem já tinha o termo da própria OAB) |
 | modelo_docx_path | text | `escritorio_id/usuario_id/modelo.docx` no bucket privado `modelos` (até 5 MB, só .docx); vazio = modelo padrão da Tesia |
 | termos_aceitos_em | timestamptz | quando aceitou os termos e a política no cadastro |
 | calendario_token | text | token secreto do link da agenda (48 caracteres hexadecimais); `gerar_novo_link_agenda()` troca, `agenda_valida(token)` e `agenda_por_token(token)` atendem a rota pública `/agenda/<token>.ics` |
@@ -169,6 +170,7 @@ A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome
 | hash | text | sha256 de tribunal, CNJ, data e texto; único por escritório |
 | responsavel_id | uuid | quem trata (responsável do termo) |
 | tarefa_id | uuid | tarefa "Intimação Judicial" criada no recebimento (`prazos`, compromisso manual) |
+| tratada_por | uuid | quem concluiu ou ignorou; aparece no histórico do processo |
 
 ### termos_monitorados
 | Campo | Tipo | Observação |
@@ -181,7 +183,7 @@ A função `listar_clientes(...)` (migration 0025, com RLS) faz a busca por nome
 | status | enum | `sincronizando`, `monitorando`, `falha_autenticacao`, `inativo` |
 | ultima_sincronizacao_em, ultimo_erro, buscado_ate | | controle do worker |
 
-Só `dono` e `advogado` escrevem (RLS por `papel_atual()`). Credenciais, certificado A1 e TOTP não existem ainda.
+Só `dono` e `advogado` escrevem (RLS por `papel_atual()`). A interface só cria e apaga o termo `advogado` da própria OAB do usuário, depois do consentimento; termos pf e pj ficam fora da tela. Credenciais, certificado A1 e TOTP não existem ainda.
 
 ### andamentos_processo
 | Campo | Tipo | Observação |
@@ -208,6 +210,7 @@ Só `dono` e `advogado` escrevem (RLS por `papel_atual()`). Credenciais, certifi
 | tipo | enum | `prazo`, `audiencia`, `compromisso` |
 | hora | time | opcional, para audiências e compromissos |
 | responsavel_id | uuid | quem pediu; o rascunho usa o estilo dessa pessoa |
+| observacoes | text | texto livre da tarefa (até 500 caracteres); só em prazos manuais |
 | regra_prazo_id | uuid | regra usada no cálculo; vazio quando manual |
 | descricao | text | ex.: "Recurso inominado" |
 | dias | int | |

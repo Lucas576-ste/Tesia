@@ -109,6 +109,7 @@ Um único botão na barra superior para criar: nova intimação, novo prazo manu
 ## Painel em Lista ou Quadro
 
 - O Quadro está disponível do plano Pro em diante. No Start, o painel é só em lista.
+- A busca automática das intimações da OAB vale no teste grátis e nos planos Pro, Sociedade e Fundador. No Start, o painel, as intimações e o Perfil mostram o convite para o Pro. A primeira busca começa em instantes e traz os últimos 7 dias; depois, a cada 3 horas, das 6h às 22h.
 - **Lista:** tabela ordenada pelo prazo fatal, com coluna de prazo interno.
 - **Quadro:** colunas Vence hoje, Próximos 3 dias, Depois (só quando tiver itens), Rascunho pronto e Protocolado (últimos 7 dias). Arrastar um card para "Protocolado" conclui o prazo. O card mostra as datas fatal e interna.
 - Na fase 1.5, a coluna "Sugeridos" (só quando tiver itens) mostra prazos `sugerido` vindos da busca automática. Arrastar ou abrir o card leva à análise, e arrastar sozinho nunca confirma. Não existe tabela de tarefas: o card continua sendo um prazo, e Processos lê o status direto dele. Intimação nova sem conferência tem aviso próprio no painel e por e-mail, sem apresentar a data como confirmada.

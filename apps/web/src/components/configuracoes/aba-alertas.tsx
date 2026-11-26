@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { salvarAlertas } from "@/app/app/configuracoes/alertas-acoes";
@@ -80,13 +81,7 @@ function EdicaoAlertas({ atual, aoSalvar, aoCancelar }: EdicaoAlertasProps) {
   );
 }
 
-export function AbaAlertas({
-  alertas,
-  aoAbrirTermos,
-}: {
-  alertas: PreferenciasAlerta;
-  aoAbrirTermos: () => void;
-}) {
+export function AbaAlertas({ alertas }: { alertas: PreferenciasAlerta }) {
   const [atual, setAtual] = useState(alertas);
   const { plano } = usePlano();
   const semAlerta = !atual.email || atual.dias.length === 0;
@@ -141,12 +136,11 @@ export function AbaAlertas({
         <div className="flex max-w-xl flex-col gap-1">
           <h3 className="text-base font-semibold">Busca de intimações nos diários</h3>
           <p className="text-sm text-texto-secundario">
-            A busca da sua OAB e de outros nomes fica em Termos monitorados. Lá você liga, pausa e
-            escolhe quem recebe cada intimação.
+            A busca das intimações da sua OAB fica no Perfil. Lá você ativa e para quando quiser.
           </p>
         </div>
-        <Button variant="outline" onClick={aoAbrirTermos}>
-          Abrir termos monitorados
+        <Button variant="outline" asChild>
+          <Link href="/app/configuracoes?aba=perfil">Abrir o Perfil</Link>
         </Button>
       </Card>
     </div>

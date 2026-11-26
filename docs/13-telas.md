@@ -136,7 +136,7 @@ Barra de progresso com 3 passos. O advogado pode pular os passos 2 e 3 e voltar 
 A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na lista, o passo 1 avisa que os calendários locais cobrem só o DF.
 
 ### 8. Dados profissionais (`/onboarding/perfil`) — MVP
-- Número da OAB e UF
+- Número da OAB (placeholder "Ex.: 12345", até 6 dígitos, erro em toast e no campo) e UF, com a linha de conferência "Confira: OAB 12345/DF". A autorização da busca nos diários não é pedida aqui, só em Configurações
 - Áreas de atuação (seleção múltipla, áreas "em breve" desabilitadas). No plano Start, só uma.
 - Tribunais em que mais atua (para priorizar calendários)
 - WhatsApp para alertas (opcional)
@@ -177,12 +177,18 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 - Após o envio, mostra o progresso: lendo documento, identificando o ato, calculando prazo
 - Redireciona para a análise
 
+### 12b. Lista de intimações (`/app/intimacoes`)
+- Banner da busca nos diários: convite com "Ativar busca da minha OAB" (dono e advogado, sem aceite), link para completar a OAB no Perfil, "Monitorando sua OAB · última busca às hh:mm" ou aviso de falha com link para o Perfil; "Buscar agora" só em desenvolvimento. Estagiário só vê o estado, nunca o convite
+- Busca por parte, número do processo ou conteúdo; filtros de estado, tipo, termo, situação (pendentes, concluídas, ignoradas) e período; atalho "Aguardando confirmação"
+- Lista paginada (25 por página) com seleção; em lote: concluir, ignorar e encaminhar (só vale para quem é o responsável)
+- "Baixar em Excel" exporta o resultado filtrado (até 5.000 linhas)
+
 ### 13. Análise da intimação (`/app/intimacoes/:id`) — MVP (protótipo)
 - Cabeçalho: número do processo, órgão, partes
 - **O que aconteceu:** resumo em até 4 frases
 - **Pontos que podem ser atacados:** tópicos com link para o trecho da decisão
 - **Prazo sugerido:** prazo fatal, início da contagem, prazo interno, dias, tipo de contagem, fundamento legal e memória de cálculo expansível; botão "Confirmo o prazo" e opção de editar as datas
-- **Tratar esta intimação:** botões "Criar tarefa" (abre o novo prazo como compromisso, já com o processo e a descrição, e conclui a intimação ao salvar) e "Concluir intimação" (sai da lista de pendentes e descarta o prazo sugerido); intimação concluída mostra aviso com "Reabrir"
+- **Tratar esta intimação (também abre sem análise pronta, só com o texto):** responsável e termo; processo vinculado (desvincular só o dono) ou "Cadastrar novo processo" e "Vincular a processo existente"; início provável da contagem só como informação; "Atribuir nova tarefa" (responsável e observações), "Encaminhar", "Enviar por e-mail" (abre o e-mail do advogado), "Concluir" e "Ignorar" (só o responsável) e "Reabrir". Antes: botões "Criar tarefa" (abre o novo prazo como compromisso, já com o processo e a descrição, e conclui a intimação ao salvar) e "Concluir intimação" (sai da lista de pendentes e descarta o prazo sugerido); intimação concluída mostra aviso com "Reabrir"
 - **Peça sugerida:** recomendada e alternativas (seleção única)
 - Visualizador do PDF original ao lado (ou em aba no celular)
 - Botão "Gerar rascunho no meu estilo" (mostra quantas peças restam no mês)
@@ -226,8 +232,7 @@ A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na list
 
 ### 19. Configurações (`/app/configuracoes`) — MVP
 Abas:
-- **Perfil:** nome, OAB, UF, áreas, tribunais
-- **Termos monitorados:** lista de termos (OAB, CPF ou CNPJ) com status, responsável, estados e última busca; novo termo, editar, pausar, buscar de novo e excluir (só dono e advogado; estagiário só vê)
+- **Perfil:** nome, OAB, UF, áreas, tribunais e o bloco "Busca de intimações" (só dono e advogado): sem aceite, a pergunta com "Sim, buscar" e "Agora não" (que só esconde a pergunta até recarregar); com número salvo inválido, o pedido para conferir a OAB; com aceite, "Buscando intimações da OAB 12345/DF desde dd/mm" e o link "Parar de buscar" com confirmação. Trocar a OAB ou a UF zera o aceite. A aba Termos monitorados deixou de existir (`?aba=termos` cai em Perfil). Este bloco é o único lugar que pede a autorização; enquanto ela não existe, o painel e a lista de intimações mostram o cartão "Receba suas intimações sem enviar PDF", com link para ele (só dono e advogado). No Start, o cartão e o bloco convidam para o plano Pro
 - **Alertas:** canais (e-mail, WhatsApp), dias de antecedência e aviso no dia do prazo interno
 - **Agenda** (do Pro em diante)**:** link para assinar no Google, Apple ou Outlook, com instruções passo a passo e botão para gerar um novo link
 - **Equipe** (plano Sociedade, logo após o MVP): convidar o sócio, ver os membros, remover acesso, divisão por área
@@ -319,3 +324,6 @@ No MVP, essas tarefas são feitas direto no Supabase Studio. As telas entram na 
 
 - Todas as telas funcionam no celular.
 - No celular, o foco é consultar o painel, ver a análise e confirmar prazos. Edição longa de peças é pensada para o computador, mas funciona no celular.
+
+## Documento original da intimação
+- Nas duas telas da intimação (com e sem análise), o texto aparece organizado em parágrafos e títulos, com o botão "Ver como chegou". Linhas quebradas no meio da frase (PDF) são emendadas, e "Ver trecho" grifa só a citação. Na análise, "Entenda a intimação" mostra três tópicos (o que aconteceu, o que foi decidido e o prazo) e "Ler mais" abre o modal "Entenda a decisão", só com dados já extraídos, sem nova chamada à IA. Os pontos que podem ser atacados ficam só na tela (um tópico por ponto, com "Ver trecho"), não no modal. A organização é só de exibição: o texto salvo, a leitura da IA e o Excel não mudam.

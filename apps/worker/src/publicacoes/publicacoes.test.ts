@@ -208,6 +208,17 @@ describe("sincronizarTermos", () => {
     expect(atualizacao.valores).toEqual([termo.id, "2026-11-24"]);
   });
 
+  it("na busca imediata, pega só os termos recém-ativados", async () => {
+    const { db, chamadas } = bancoFalso();
+    const { config } = configuracao({ buscar: async () => [] });
+    await sincronizarTermos(db, config, "2026-11-24", { somenteNovos: true });
+    await sincronizarTermos(db, config, "2026-11-24");
+    expect(com(chamadas, "from termos_monitorados t").map(({ valores }) => valores[1])).toEqual([
+      ["sincronizando"],
+      ["sincronizando", "monitorando"],
+    ]);
+  });
+
   it("conta intimações e andamentos novos", async () => {
     const { db } = bancoFalso({
       "from termos_monitorados t": [linhaTermo],
@@ -244,7 +255,7 @@ describe("sincronizarTermos", () => {
     expect(erros).toHaveLength(0);
   });
 
-  it("erro comum guarda a mensagem sem trocar o status", async () => {
+  it("erro comum guarda a mensagem e tira o termo da busca imediata", async () => {
     const { db, chamadas } = bancoFalso({ "from termos_monitorados t": [linhaTermo] });
     const { config, erros } = configuracao({
       buscar: async () => {
@@ -252,7 +263,10 @@ describe("sincronizarTermos", () => {
       },
     });
     await sincronizarTermos(db, config, "2026-11-24");
-    expect(com(chamadas, "set ultimo_erro")[0]!.valores).toEqual([termo.id, "DJEN respondeu 500"]);
+    expect(com(chamadas, "set status = 'monitorando', ultimo_erro")[0]!.valores).toEqual([
+      termo.id,
+      "DJEN respondeu 500",
+    ]);
     expect(com(chamadas, "'falha_autenticacao'")).toHaveLength(0);
     expect(erros).toHaveLength(1);
   });
@@ -261,6 +275,8 @@ describe("sincronizarTermos", () => {
     const { db, chamadas } = bancoFalso({ "from termos_monitorados t": [linhaTermo] });
     const { config } = configuracao(provedorPje);
     await sincronizarTermos(db, config, "2026-11-24");
-    expect(String(com(chamadas, "set ultimo_erro")[0]!.valores[1])).toContain("PJe");
+    expect(
+      String(com(chamadas, "set status = 'monitorando', ultimo_erro")[0]!.valores[1]),
+    ).toContain("PJe");
   });
 });

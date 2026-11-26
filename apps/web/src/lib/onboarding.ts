@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MENSAGEM_OAB_INVALIDA, numeroOabSchema } from "@/lib/busca-oab";
 import { REGEX_WHATSAPP, UFS } from "@/lib/lead";
 
 export const AREAS_ATUACAO = [
@@ -33,7 +34,11 @@ export const TRIBUNAIS = ["TJDFT", "TRF1 / SJDF", "TRT10", OUTRO_TRIBUNAL] as co
 
 export const perfilSchema = z.object({
   nome: z.string().trim().max(120).optional(),
-  oab: z.string().trim().min(1, "Informe o número da OAB.").max(12),
+  oab: z
+    .string()
+    .trim()
+    .min(1, "Informe o número da OAB.")
+    .refine((valor) => numeroOabSchema.safeParse(valor).success, MENSAGEM_OAB_INVALIDA),
   uf: z.enum(UFS, { error: "Escolha a UF." }),
   areas: z.array(z.enum(AREAS_ATUACAO)).min(1, "Escolha pelo menos uma área."),
   tribunais: z.array(z.enum(TRIBUNAIS)),

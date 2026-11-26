@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Quote, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
@@ -13,12 +13,19 @@ import { usePlano } from "@/components/plano/provedor-plano";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Analise } from "@/lib/analise";
+import type { Grifo } from "@/lib/formatar-publicacao";
 import type { UsoPecas } from "@/lib/uso-pecas";
 import type { ProcessoResumo } from "@/lib/prazo-manual";
 import { BlocoPrazo } from "./bloco-prazo";
 import { DocumentoOriginal } from "./documento-original";
 import { EscolhaPeca } from "./escolha-peca";
-import { TratarIntimacao } from "./tratar-intimacao";
+import { ModalEntendaDecisao } from "./modal-entenda-decisao";
+import { ResumoDaDecisao } from "./resumo-da-decisao";
+import type { PapelUsuario } from "@tesia/shared";
+import type { Responsavel } from "@/lib/termos";
+import type { DadosTratamento } from "@/lib/tratamento-dados";
+import { PainelTratamento } from "./painel-tratamento";
+import { PontosAtacaveis } from "./pontos-atacaveis";
 
 function textoPontos(quantidade: number) {
   const pontos = quantidade === 1 ? "1 ponto" : `${quantidade} pontos`;
@@ -27,11 +34,26 @@ function textoPontos(quantidade: number) {
 
 const conteudoAba = "data-[state=inactive]:hidden lg:data-[state=inactive]:block";
 
-type TelaAnaliseProps = { analise: Analise; uso: UsoPecas; processos: ProcessoResumo[] };
+type TelaAnaliseProps = {
+  analise: Analise;
+  uso: UsoPecas;
+  processos: ProcessoResumo[];
+  tratamento: DadosTratamento;
+  responsaveis: Responsavel[];
+  usuario: { id: string; papel: PapelUsuario };
+};
 
-export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
+export function TelaAnalise({
+  analise,
+  uso,
+  processos,
+  tratamento,
+  responsaveis,
+  usuario,
+}: TelaAnaliseProps) {
   const [aba, setAba] = useState("analise");
-  const [destaque, setDestaque] = useState<string | null>(null);
+  const [destaque, setDestaque] = useState<Grifo[]>([]);
+  const [lendoMais, setLendoMais] = useState(false);
   const [confirmado, setConfirmado] = useState(analise.confirmado);
   const router = useRouter();
   const { plano } = usePlano();
@@ -41,9 +63,9 @@ export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
   const restantes = uso.limite - uso.usadas;
 
   useEffect(() => {
-    if (!destaque) return;
+    if (!destaque[0]) return;
     document
-      .getElementById(`trecho-${destaque}`)
+      .getElementById(`trecho-${destaque[0].id}`)
       ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [destaque, aba]);
 
@@ -63,8 +85,8 @@ export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
     });
   }
 
-  function verTrecho(trechoId: string) {
-    setDestaque(trechoId);
+  function verTrecho(grifos: Grifo[]) {
+    setDestaque(grifos);
     setAba("documento");
   }
 
@@ -93,50 +115,23 @@ export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
         <div className="grid items-start gap-5 lg:grid-cols-2">
           <TabsContent value="analise" forceMount className={`flex-col gap-4 ${conteudoAba}`}>
             <div className="flex flex-col gap-4">
-              <section className="rounded-xl border bg-card p-4 shadow-xs">
-                <h2 className="text-lg font-semibold">O que aconteceu</h2>
-                <p className="mt-1 text-sm">{analise.resumo}</p>
-              </section>
+              <ResumoDaDecisao
+                analise={analise}
+                confirmado={confirmado}
+                aoLerMais={() => setLendoMais(true)}
+              />
+              <ModalEntendaDecisao
+                analise={analise}
+                confirmado={confirmado}
+                aberto={lendoMais}
+                aoFechar={() => setLendoMais(false)}
+              />
               {plano.recursosPro ? (
-                <section className="rounded-xl border bg-card p-4 shadow-xs">
-                  <h2 className="text-lg font-semibold">Pontos que podem ser atacados</h2>
-                  <ul className="mt-2 flex flex-col gap-2 text-sm">
-                    {analise.pontos.length === 0 && (
-                      <li className="text-texto-secundario">
-                        Não encontrei um ponto claro para atacar nesta decisão.
-                      </li>
-                    )}
-                    {analise.pontos.map(({ titulo, explicacao, trechoId }) => (
-                      <li
-                        key={titulo}
-                        className="flex flex-wrap items-center justify-between gap-2"
-                      >
-                        <span className="flex min-w-0 flex-1 basis-48 gap-2">
-                          <Sparkles aria-hidden className="mt-0.5 size-4 shrink-0 text-primaria" />
-                          <span>
-                            {titulo}
-                            {explicacao && (
-                              <span className="block text-xs text-texto-secundario">
-                                {explicacao}
-                              </span>
-                            )}
-                          </span>
-                        </span>
-                        {trechoId && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            aria-pressed={destaque === trechoId}
-                            onClick={() => verTrecho(trechoId)}
-                          >
-                            <Quote aria-hidden />
-                            Ver trecho
-                          </Button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
+                <PontosAtacaveis
+                  pontos={analise.pontos}
+                  destaque={destaque}
+                  aoVerTrecho={verTrecho}
+                />
               ) : (
                 <AvisoPro
                   titulo="Pontos que podem ser atacados"
@@ -154,12 +149,11 @@ export function TelaAnalise({ analise, uso, processos }: TelaAnaliseProps) {
                 confirmado={confirmado}
                 aoMudarConfirmacao={setConfirmado}
               />
-              <TratarIntimacao
-                intimacaoId={analise.id}
-                partes={analise.partes}
-                concluida={analise.concluida}
-                processoId={analise.processoId}
+              <PainelTratamento
+                dados={tratamento}
                 processos={processos}
+                responsaveis={responsaveis}
+                usuario={usuario}
               />
               <EscolhaPeca
                 pecas={plano.recursosPro ? analise.pecas : analise.pecas.slice(0, 1)}

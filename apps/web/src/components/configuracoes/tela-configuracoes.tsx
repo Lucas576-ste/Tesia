@@ -17,7 +17,6 @@ import type { DadosTimbrado } from "@/components/modelo/painel-timbrado";
 import type { PreferenciasAlerta } from "@/lib/alertas";
 import { AbaModelo } from "./aba-modelo";
 import { AbaPerfil } from "./aba-perfil";
-import { AbaTermos, type DadosTermos } from "./aba-termos";
 import type { PerfilConta, ResumoDados } from "@/lib/perfil-conta";
 import { AbaSeguranca } from "./aba-seguranca";
 
@@ -27,13 +26,10 @@ function conteudosDasAbas(
   modelo: DadosTimbrado,
   agenda: DadosAgenda,
   alertas: PreferenciasAlerta,
-  aoAbrirTermos: () => void,
   calendario: CalendarioProprio,
-  termos: DadosTermos,
 ): Record<Exclude<AbaConfiguracoes, "perfil">, React.ReactNode> {
   return {
-    alertas: <AbaAlertas alertas={alertas} aoAbrirTermos={aoAbrirTermos} />,
-    termos: <AbaTermos termos={termos} />,
+    alertas: <AbaAlertas alertas={alertas} />,
     agenda: <AbaAgenda agenda={agenda} />,
     equipe: <AbaEquipe />,
     modelo: <AbaModelo modelo={modelo} />,
@@ -60,7 +56,6 @@ export function TelaConfiguracoes({
   agenda,
   alertas,
   calendario,
-  termos,
 }: {
   abaInicial: AbaConfiguracoes;
   conta: PerfilConta;
@@ -69,7 +64,6 @@ export function TelaConfiguracoes({
   agenda: DadosAgenda;
   alertas: PreferenciasAlerta;
   calendario: CalendarioProprio;
-  termos: DadosTermos;
 }) {
   const { id, plano } = usePlano();
   const [abaEscolhida, setAba] = useState(abaInicial);
@@ -82,16 +76,7 @@ export function TelaConfiguracoes({
     window.history.replaceState(null, "", `/app/configuracoes?aba=${nova}`);
   }
 
-  const conteudos = conteudosDasAbas(
-    conta,
-    resumo,
-    modelo,
-    agenda,
-    alertas,
-    () => trocarAba("termos"),
-    calendario,
-    termos,
-  );
+  const conteudos = conteudosDasAbas(conta, resumo, modelo, agenda, alertas, calendario);
 
   return (
     <div className="flex flex-col gap-4">

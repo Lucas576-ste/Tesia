@@ -22,6 +22,7 @@ import type { MetricasClientes } from "@/lib/clientes-metricas";
 import { ListaClientes } from "./lista-clientes";
 import { useDrawerCliente } from "./provedor-cliente";
 import { useExibicaoClientes } from "./usar-exibicao-clientes";
+import { LINK_BUSCA_OAB } from "@/lib/busca-oab";
 
 type TelaClientesProps = {
   clientes: ClienteResumo[];
@@ -293,7 +294,7 @@ export function TelaClientes({
               <Link href="/app/intimacoes/nova">Enviar intimação</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/app/configuracoes?aba=alertas">Ligar a busca no DJEN</Link>
+              <Link href={LINK_BUSCA_OAB}>Ligar a busca no DJEN</Link>
             </Button>
           </div>
         }

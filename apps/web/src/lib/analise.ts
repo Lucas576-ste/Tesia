@@ -7,10 +7,14 @@ import {
 import { z } from "zod";
 import { hojeEmBrasilia } from "@/lib/datas-servidor";
 import { STATUS_INTIMACAO } from "@/lib/envio-intimacao";
+import {
+  acharTrecho,
+  dividirDocumento,
+  type Grifo,
+  type TrechoDocumento,
+} from "@/lib/formatar-publicacao";
 import type { CalendarioPrazo, FormaRecebimento, RegraPrazo } from "@/lib/recalculo-prazo";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
-
-export type TrechoDocumento = { id: string; texto: string };
 
 export type PrazoAnalise = {
   vencimentoIso: string;
@@ -30,7 +34,10 @@ export type Analise = {
   orgao: string;
   partes: string;
   resumo: string;
-  pontos: { titulo: string; explicacao?: string; trechoId: string | null }[];
+  pontos: { titulo: string; explicacao?: string; trecho: string; grifos: Grifo[] }[];
+  resultado: string | null;
+  tipoAto: string;
+  partesDetalhadas: { nome: string; polo: "ativo" | "passivo" | null; cliente: boolean }[];
   prazo: PrazoAnalise | null;
   motivoSemPrazo: string | null;
   confirmado: boolean;
@@ -38,6 +45,7 @@ export type Analise = {
   processoId: string | null;
   pecas: { codigo: string; nome: string; justificativa: string }[];
   documento: TrechoDocumento[];
+  textoOriginal: string;
   hoje: string;
   recebimento: { forma: FormaRecebimento; disponibilizacao: string; envio: string };
   regra: RegraPrazo | null;
@@ -133,27 +141,6 @@ const prazoSchema = z.object({
   memoria_calculo: z.unknown(),
 });
 
-function normalizar(texto: string) {
-  return texto.toLocaleLowerCase("pt-BR").replace(/\s+/g, " ").trim();
-}
-
-export function dividirDocumento(texto: string): TrechoDocumento[] {
-  return texto
-    .split(/\n+/)
-    .map((paragrafo) => paragrafo.trim())
-    .filter(Boolean)
-    .map((paragrafo, indice) => ({ id: `p${indice}`, texto: paragrafo }));
-}
-
-export function acharTrecho(documento: TrechoDocumento[], trecho: string) {
-  const alvo = normalizar(trecho);
-  const inicio = alvo.slice(0, 40);
-  const encontrado =
-    documento.find((paragrafo) => normalizar(paragrafo.texto).includes(alvo)) ??
-    documento.find((paragrafo) => normalizar(paragrafo.texto).includes(inicio));
-  return encontrado?.id ?? null;
-}
-
 function montarPrazo(
   linha: z.infer<typeof prazoSchema> | undefined,
   gravado: z.infer<typeof analiseGravadaSchema>["prazo"],
@@ -211,7 +198,8 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
     dados.forma_intimacao === "portal" || dados.forma_intimacao === "citacao"
       ? dados.forma_intimacao
       : "diario";
-  const documento = dividirDocumento(htmlParaTexto(linha.data.texto ?? ""));
+  const textoOriginal = htmlParaTexto(linha.data.texto ?? "");
+  const documento = dividirDocumento(textoOriginal);
   const pontos = resumo.pontos_ataque.length
     ? resumo.pontos_ataque
     : dados.pontos.map((ponto) => ({ ...ponto, explicacao: undefined }));
@@ -224,10 +212,18 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       orgao: [dados.orgao, dados.tribunal].filter(Boolean).join(" · ") || "Órgão não identificado",
       partes: nomePartes(dados.partes),
       resumo: resumo.o_que_aconteceu,
+      resultado: dados.resultado,
+      tipoAto: dados.tipo_ato,
+      partesDetalhadas: dados.partes.map(({ nome, polo }) => ({
+        nome,
+        polo,
+        cliente: polo !== null && polo === dados.polo_cliente,
+      })),
       pontos: pontos.map(({ titulo, explicacao, trecho }) => ({
         titulo,
         explicacao,
-        trechoId: acharTrecho(documento, trecho),
+        trecho,
+        grifos: acharTrecho(documento, trecho),
       })),
       prazo: montarPrazo(prazo, gravada.data.prazo),
       motivoSemPrazo: gravada.data.motivo_sem_prazo,
@@ -236,6 +232,7 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       processoId: linha.data.processo_id,
       pecas: pecas.map(({ codigo, nome, justificativa }) => ({ codigo, nome, justificativa })),
       documento,
+      textoOriginal,
       hoje: hojeEmBrasilia(),
       recebimento: {
         forma,

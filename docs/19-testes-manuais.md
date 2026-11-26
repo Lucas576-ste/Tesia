@@ -68,6 +68,24 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Depois de confirmar, o aviso some e o prazo aparece no painel com os dias úteis certos
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
+## Documento original
+- [ ] Uma publicação do diário aparece em parágrafos; "Ver como chegou" mostra o texto corrido e "Ver formatado" volta
+- [ ] "Ver trecho" grifa só a citação, e um PDF não aparece com frases picadas
+- [ ] "Ler mais" abre "Entenda a decisão", sem os pontos; "Ver trecho" nos pontos grifa a citação ao lado (conferir tema escuro e celular)
+
+## Busca de intimações da OAB
+- [ ] Ativar a busca: o worker registra `termos_sincronizados` em até 15s, mesmo fora das 6h às 22h
+- [ ] Conta no plano Start: painel, intimações e Perfil convidam para o Pro, sem "Sim, buscar"
+- [ ] OAB com 7 ou mais dígitos ou com letras no meio: não salva, mostra toast e erro no campo; OAB válida mostra "Confira: OAB 12345/DF"
+- [ ] Perfil, "Agora não": a pergunta some, nada é gravado e "Ativar a busca" traz a pergunta de volta
+- [ ] Onboarding não pergunta sobre a busca; ao cair no painel aparece "Receba suas intimações sem enviar PDF", que abre o bloco no Perfil
+- [ ] A lista de intimações mostra o mesmo cartão; ele some após "Sim, buscar" e volta após "Parar de buscar"
+- [ ] Configurações → Perfil: "Sim, buscar" ativa; "Parar de buscar" pede confirmação e desativa, e as intimações recebidas continuam na lista
+- [ ] Trocar a OAB no Perfil com a busca ativa volta a pedir o consentimento
+- [ ] Estagiário não vê a pergunta nem o convite
+- [ ] `?aba=termos` abre a aba Perfil
+- [ ] "Buscar agora" aparece só no ambiente local
+
 ## Produção
 - [ ] Site publicado abre a landing com as capturas e o login funciona
 - [ ] Worker no Railway mostra "worker_iniciado" nos logs e analisa uma intimação enviada pelo site publicado

@@ -15,6 +15,7 @@ import {
   type PresetPrazo,
 } from "@/lib/prazo-manual";
 import { recalcularPrazo } from "@/lib/recalculo-prazo";
+import { criarNotificacao } from "@/lib/notificar";
 import { usuarioAtual } from "@/lib/sessao";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
 
@@ -174,6 +175,7 @@ export async function criarPrazoManual(entrada: PrazoManual): Promise<Resultado>
       })
     : null;
   const inicio = sugestao && sugestao.inicio <= dados.data ? sugestao.inicio : dados.inicio || null;
+  const responsavel = dados.responsavelId || usuario.id;
   const { error } = await supabase.from("prazos").insert({
     escritorio_id: usuario.escritorio_id,
     processo_id: z.uuid().safeParse(dados.processoId).success ? dados.processoId : null,
@@ -195,10 +197,21 @@ export async function criarPrazoManual(entrada: PrazoManual): Promise<Resultado>
     status: "confirmado",
     confirmado_por: usuario.id,
     confirmado_em: new Date().toISOString(),
-    responsavel_id: usuario.id,
+    responsavel_id: responsavel,
+    observacoes: dados.observacoes || null,
   });
   if (error)
     return { erro: "Não foi possível salvar. Confira o processo escolhido e tente de novo." };
+  if (responsavel !== usuario.id) {
+    await criarNotificacao({
+      escritorioId: usuario.escritorio_id,
+      usuarioId: responsavel,
+      tipo: "tarefa",
+      titulo: "Nova tarefa para você",
+      texto: dados.descricao,
+      href: "/app",
+    });
+  }
   atualizarTelas();
   return { ok: true };
 }

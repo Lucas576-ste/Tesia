@@ -37,6 +37,12 @@ const intimacaoSchema = z.object({
   criado_em: z.string(),
   resumo: z.string().nullable(),
   status: z.string(),
+  tratamento: z.enum(["pendente", "concluida", "ignorada"]),
+  concluida_em: z.string().nullable(),
+  tratador: z
+    .union([z.object({ nome: z.string() }), z.array(z.object({ nome: z.string() }))])
+    .nullable()
+    .transform((valor) => (Array.isArray(valor) ? (valor[0] ?? null) : valor)),
 });
 
 const andamentoSchema = z.object({
@@ -151,7 +157,9 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
     listarPrazosConfirmados(id),
     supabase
       .from("intimacoes")
-      .select("id, criado_em, resumo, status")
+      .select(
+        "id, criado_em, resumo, status, tratamento, concluida_em, tratador:usuarios!intimacoes_tratada_por_fkey(nome)",
+      )
       .eq("processo_id", id)
       .is("excluido_em", null),
     supabase
@@ -175,6 +183,17 @@ export async function buscarProcesso(id: string): Promise<Processo | null> {
       descricao: intimacao.resumo?.split(/(?<=\.)\s/)[0] ?? "Análise em andamento.",
       link: { href: `/app/intimacoes/${intimacao.id}`, rotulo: "Ver análise" },
     })),
+    ...(z.array(intimacaoSchema).safeParse(intimacoes).data ?? [])
+      .filter((intimacao) => intimacao.tratamento === "concluida" && intimacao.concluida_em)
+      .map((intimacao) => ({
+        data: dataBrasilia(intimacao.concluida_em ?? intimacao.criado_em),
+        tipo: "intimacao" as const,
+        titulo: "Intimação concluída",
+        descricao: intimacao.tratador
+          ? `Por ${intimacao.tratador.nome}.`
+          : "Concluída pelo escritório.",
+        link: { href: `/app/intimacoes/${intimacao.id}`, rotulo: "Ver intimação" },
+      })),
     ...(z.array(andamentoSchema).safeParse(andamentos).data ?? []).map((andamento) => ({
       data: andamento.publicada_em
         ? isoParaData(andamento.publicada_em)

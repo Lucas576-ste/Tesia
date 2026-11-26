@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { ChamadaBuscaOab } from "@/components/chamada-busca-oab";
 import { PainelPrazos } from "@/components/painel/painel-prazos";
 import { urlSemNovo } from "@/lib/url-painel";
 import { filtroPrazosSchema } from "@/lib/filtros-prazos";
 import { resumoIntimacoes } from "@/lib/intimacoes";
+import { bannerSincronizacao } from "@/lib/intimacoes-lista-servidor";
 import { listarPrazosConfirmados, listarProcessosResumo } from "@/lib/painel";
 import { exigirUsuario } from "@/lib/sessao";
 
@@ -14,11 +16,12 @@ type PainelPageProps = {
 
 export default async function PainelPage({ searchParams }: PainelPageProps) {
   const parametros = await searchParams;
-  const [usuario, prazos, processos, intimacoes] = await Promise.all([
+  const [usuario, prazos, processos, intimacoes, banner] = await Promise.all([
     exigirUsuario(),
     listarPrazosConfirmados(),
     listarProcessosResumo(),
     resumoIntimacoes(),
+    bannerSincronizacao(),
   ]);
 
   return (
@@ -32,6 +35,7 @@ export default async function PainelPage({ searchParams }: PainelPageProps) {
       novoPrazo={parametros.novo === "prazo"}
       urlSemNovo={urlSemNovo(parametros)}
       intimacoes={intimacoes}
+      aviso={<ChamadaBuscaOab banner={banner} />}
     />
   );
 }

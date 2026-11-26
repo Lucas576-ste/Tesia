@@ -8,7 +8,7 @@ const secoes = [
     titulo: "O que o serviço faz",
     paragrafos: [
       "A Tesia lê intimações enviadas pelo advogado, resume o que aconteceu, calcula o prazo, sugere a peça cabível e gera um rascunho no estilo do advogado.",
-      "No momento, a intimação entra apenas quando o advogado envia o arquivo. A Tesia não monitora diários nem sistemas de tribunais.",
+      "A intimação entra quando o advogado envia o arquivo ou, se ele autorizar, pela busca nos diários de justiça das publicações em nome da OAB informada. A busca não substitui o acompanhamento dos diários e dos processos pelo advogado. [CONFIRMAR redação com revisão jurídica]",
     ],
   },
   {

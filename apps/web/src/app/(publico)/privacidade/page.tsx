@@ -20,6 +20,13 @@ const secoes = [
     ],
   },
   {
+    titulo: "Busca de intimações nos diários",
+    paragrafos: [
+      "Se o advogado autorizar, a Tesia busca nos diários de justiça as publicações em nome da OAB informada e as traz para a lista de intimações. A busca só começa depois dessa autorização.",
+      "O advogado pode parar a busca a qualquer momento em Configurações, no Perfil. As intimações já recebidas continuam na lista, e trocar a OAB exige uma nova autorização. [CONFIRMAR com o advogado revisor a base legal e a redação do consentimento].",
+    ],
+  },
+  {
     titulo: "Suboperadores",
     paragrafos: [
       "Supabase (banco de dados, autenticação e arquivos, em São Paulo), Vercel (hospedagem do site), Railway (processamento em segundo plano), Anthropic (IA que lê intimações e escreve rascunhos), Voyage AI (embeddings para encontrar trechos das peças antigas do advogado), Resend (e-mails de alerta) e Sentry (monitoramento de erros, sem o conteúdo dos documentos). O provedor de pagamentos será incluído quando a cobrança entrar em operação.",

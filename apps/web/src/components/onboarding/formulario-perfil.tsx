@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type FieldErrors } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,6 +23,7 @@ import {
   perfilSchema,
   type Perfil,
 } from "@/lib/onboarding";
+import { ConferenciaOab } from "./conferencia-oab";
 import { GrupoOpcoes } from "./grupo-opcoes";
 
 type FormularioPerfilProps = {
@@ -48,6 +50,7 @@ export function FormularioPerfil({
     resolver: zodResolver(perfilSchema),
     defaultValues: { oab: "", areas: [], tribunais: [], whatsapp: "", ...valoresIniciais },
   });
+  const oab = useWatch({ control: form.control, name: "oab" });
   const uf = useWatch({ control: form.control, name: "uf" });
   const tribunais = useWatch({ control: form.control, name: "tribunais" });
   const areas = useWatch({ control: form.control, name: "areas" });
@@ -71,9 +74,17 @@ export function FormularioPerfil({
     else router.push("/onboarding/estilo");
   }
 
+  function avisarErro(erros: FieldErrors<Perfil>) {
+    if (erros.oab?.message) toast.error(erros.oab.message);
+  }
+
   return (
     <Form {...form}>
-      <form noValidate onSubmit={form.handleSubmit(enviar)} className="flex flex-col gap-5">
+      <form
+        noValidate
+        onSubmit={form.handleSubmit(enviar, avisarErro)}
+        className="flex flex-col gap-5"
+      >
         {comNome && (
           <FormField
             control={form.control}
@@ -97,7 +108,12 @@ export function FormularioPerfil({
               <FormItem>
                 <FormLabel>Número da OAB</FormLabel>
                 <FormControl>
-                  <Input autoComplete="off" {...field} />
+                  <Input
+                    autoComplete="off"
+                    inputMode="numeric"
+                    placeholder="Ex.: 12345"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,6 +142,7 @@ export function FormularioPerfil({
             )}
           />
         </div>
+        <ConferenciaOab numero={oab} uf={uf} />
         <FormField
           control={form.control}
           name="areas"

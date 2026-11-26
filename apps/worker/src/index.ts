@@ -56,6 +56,14 @@ const contexto: Contexto = {
   registrar,
 };
 
+const INTERVALO_TERMOS_NOVOS_MS = 15_000;
+
+const configuracaoDaBusca = {
+  registrar,
+  avisarErro: (erro: unknown) => Sentry.captureException(erro),
+  provedorDoTermo,
+};
+
 let ativo = true;
 
 async function processar(job: Job) {
@@ -86,6 +94,7 @@ async function laco() {
   let ultimaConferenciaAlertas = 0;
   let diaAlertas = "";
   let ultimaBuscaDjen = 0;
+  let ultimaBuscaNovos = 0;
   let diaLimpezaLia = "";
   while (ativo) {
     try {
@@ -105,11 +114,13 @@ async function laco() {
       const hora = horaBrasilia();
       if (Date.now() - ultimaBuscaDjen > 3 * 3_600_000 && hora >= 6 && hora < 22) {
         ultimaBuscaDjen = Date.now();
-        await sincronizarTermos(
-          contexto.db,
-          { registrar, avisarErro: (erro) => Sentry.captureException(erro), provedorDoTermo },
-          hojeBrasilia(),
-        );
+        await sincronizarTermos(contexto.db, configuracaoDaBusca, hojeBrasilia());
+      }
+      if (Date.now() - ultimaBuscaNovos > INTERVALO_TERMOS_NOVOS_MS) {
+        ultimaBuscaNovos = Date.now();
+        await sincronizarTermos(contexto.db, configuracaoDaBusca, hojeBrasilia(), {
+          somenteNovos: true,
+        });
       }
       if (hojeBrasilia() !== diaLimpezaLia && horaBrasilia() >= 3) {
         diaLimpezaLia = hojeBrasilia();

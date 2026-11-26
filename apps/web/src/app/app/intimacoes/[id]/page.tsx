@@ -2,11 +2,14 @@ import { CircleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EstadoVazio } from "@/components/estado-vazio";
-import { AnaliseEmAndamento } from "@/components/intimacao/analise-em-andamento";
 import { TelaAnalise } from "@/components/intimacao/tela-analise";
+import { TelaTratamento } from "@/components/intimacao/tela-tratamento";
 import { Button } from "@/components/ui/button";
 import { buscarIntimacao } from "@/lib/analise";
 import { listarProcessosResumo } from "@/lib/painel";
+import { exigirUsuario } from "@/lib/sessao";
+import { listarResponsaveis } from "@/lib/termos-servidor";
+import { buscarTratamento } from "@/lib/tratamento-servidor";
 import { buscarUsoPecas } from "@/lib/uso-pecas";
 
 export const metadata: Metadata = { title: "Análise da intimação · Tesia" };
@@ -30,38 +33,57 @@ function DocumentoIlegivel() {
   );
 }
 
+function IntimacaoNaoEncontrada() {
+  return (
+    <EstadoVazio
+      titulo="Intimação não encontrada"
+      descricao="Ela pode ter sido excluída ou pertencer a outro escritório."
+      acao={
+        <Button asChild variant="outline">
+          <Link href="/app/intimacoes/nova">Enviar uma intimação</Link>
+        </Button>
+      }
+    />
+  );
+}
+
 type AnalisePageProps = {
   params: Promise<{ id: string }>;
 };
 
 export default async function AnalisePage({ params }: AnalisePageProps) {
   const { id } = await params;
-  const intimacao = await buscarIntimacao(id);
+  const [intimacao, tratamento, processos, responsaveis, usuario] = await Promise.all([
+    buscarIntimacao(id),
+    buscarTratamento(id),
+    listarProcessosResumo(),
+    listarResponsaveis(),
+    exigirUsuario(),
+  ]);
+  if (!intimacao || !tratamento) return <IntimacaoNaoEncontrada />;
+  const quem = { id: usuario.id, papel: usuario.papel };
 
-  if (!intimacao) {
+  if (intimacao.status !== "analisada") {
+    if (intimacao.status === "erro" && !tratamento.texto) return <DocumentoIlegivel />;
     return (
-      <EstadoVazio
-        titulo="Intimação não encontrada"
-        descricao="Ela pode ter sido excluída ou pertencer a outro escritório."
-        acao={
-          <Button asChild variant="outline">
-            <Link href="/app/intimacoes/nova">Enviar uma intimação</Link>
-          </Button>
-        }
+      <TelaTratamento
+        dados={tratamento}
+        processos={processos}
+        responsaveis={responsaveis}
+        usuario={quem}
       />
     );
   }
-  if (intimacao.status === "erro") return <DocumentoIlegivel />;
-  if (intimacao.status !== "analisada") {
-    return <AnaliseEmAndamento lendo={intimacao.status === "processando"} />;
-  }
-  const [uso, processos] = await Promise.all([buscarUsoPecas(), listarProcessosResumo()]);
+  const uso = await buscarUsoPecas();
   return (
     <TelaAnalise
       key={intimacao.analise.id}
       analise={intimacao.analise}
       uso={uso}
       processos={processos}
+      tratamento={tratamento}
+      responsaveis={responsaveis}
+      usuario={quem}
     />
   );
 }

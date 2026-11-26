@@ -78,6 +78,8 @@ export function esquemaPrazoManual(hoje: string) {
       prazoInterno: dataOpcional,
       inicio: dataOpcional,
       calculo: calculoPrazoSchema.optional(),
+      responsavelId: z.union([z.uuid(), z.literal("")]).optional(),
+      observacoes: z.string().trim().max(500, "Use até 500 caracteres nas observações.").optional(),
     })
     .superRefine(({ tipo, data, prazoInterno, inicio }, contexto) => {
       if (tipo !== "prazo" || !data) return;

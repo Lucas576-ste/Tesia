@@ -34,23 +34,28 @@ async function avisarFalhaDeAutenticacao(db: Banco, termo: Termo, mensagem: stri
   if (!usuario) return;
   await db.query(
     `insert into notificacoes (escritorio_id, usuario_id, tipo, titulo, texto, href)
-     values ($1, $2, 'termo', 'Falha na busca de intimações', $3, '/app/configuracoes?aba=termos')`,
-    [termo.escritorio_id, usuario, `${mensagem}. Confira o termo monitorado.`],
+     values ($1, $2, 'termo', 'Falha na busca de intimações', $3, '/app/configuracoes?aba=perfil')`,
+    [termo.escritorio_id, usuario, `${mensagem}. Confira a busca da sua OAB em Configurações.`],
   );
 }
 
-export async function sincronizarTermos(db: Banco, config: Configuracao, hoje: string) {
+export async function sincronizarTermos(
+  db: Banco,
+  config: Configuracao,
+  hoje: string,
+  { somenteNovos = false }: { somenteNovos?: boolean } = {},
+) {
   const { rows } = await db.query(
     `select t.id, t.escritorio_id, t.responsavel_id, t.tipo, t.oab_numero, t.oab_uf, t.documento,
        t.nome, t.ufs,
        to_char(greatest(coalesce(t.buscado_ate - 1, $1::date - 7), $1::date - 30), 'YYYY-MM-DD') as inicio
      from termos_monitorados t
      join assinaturas a on a.escritorio_id = t.escritorio_id
-     where t.status in ('sincronizando', 'monitorando')
+     where t.status = any($2::status_termo[])
        and a.status in ('trial', 'ativa')
        and (a.status = 'trial' or a.plano_codigo in ('pro', 'sociedade', 'fundador'))
      order by t.criado_em`,
-    [hoje],
+    [hoje, somenteNovos ? ["sincronizando"] : ["sincronizando", "monitorando"]],
   );
   const termos = z.array(termoSchema).parse(rows);
   let intimacoes = 0;
@@ -80,16 +85,18 @@ export async function sincronizarTermos(db: Banco, config: Configuracao, hoje: s
         );
         await avisarFalhaDeAutenticacao(db, termo, mensagem);
       } else {
-        await db.query("update termos_monitorados set ultimo_erro = $2 where id = $1", [
-          termo.id,
-          mensagem,
-        ]);
+        await db.query(
+          "update termos_monitorados set status = 'monitorando', ultimo_erro = $2 where id = $1",
+          [termo.id, mensagem],
+        );
         config.avisarErro(erro);
       }
       config.registrar("termo_falhou", { termo_id: termo.id, erro: mensagem });
       if (erro instanceof FormatoDjenMudou) break;
     }
   }
-  config.registrar("termos_sincronizados", { termos: termos.length, intimacoes, andamentos });
+  if (!somenteNovos || termos.length > 0) {
+    config.registrar("termos_sincronizados", { termos: termos.length, intimacoes, andamentos });
+  }
   return { intimacoes, andamentos };
 }

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SelectNativo } from "@/components/ui/select-nativo";
+import { Textarea } from "@/components/ui/textarea";
 import {
   esquemaPrazoManual,
   hojeBrasilia,
@@ -42,6 +43,8 @@ const valoresIniciais: PrazoManual = {
   processoId: "",
   prazoInterno: "",
   inicio: "",
+  responsavelId: "",
+  observacoes: "",
 };
 
 type ModalPrazoManualProps = {
@@ -50,6 +53,9 @@ type ModalPrazoManualProps = {
   descricaoInicial?: string;
   tipoInicial?: PrazoManual["tipo"];
   titulo?: string;
+  responsaveis?: { id: string; nome: string }[];
+  responsavelInicial?: string;
+  comObservacoes?: boolean;
   processos: ProcessoResumo[];
   aoFechar: () => void;
   aoSalvar: (dados: PrazoManual) => void | Promise<void>;
@@ -65,10 +71,20 @@ function FormularioPrazoManual({
   processoInicial,
   descricaoInicial,
   tipoInicial,
+  responsaveis,
+  responsavelInicial,
+  comObservacoes,
   aoSalvar,
 }: Pick<
   ModalPrazoManualProps,
-  "processos" | "processoInicial" | "descricaoInicial" | "tipoInicial" | "aoSalvar"
+  | "processos"
+  | "processoInicial"
+  | "descricaoInicial"
+  | "tipoInicial"
+  | "responsaveis"
+  | "responsavelInicial"
+  | "comObservacoes"
+  | "aoSalvar"
 >) {
   const hoje = hojeBrasilia();
   const form = useForm<PrazoManual>({
@@ -78,6 +94,7 @@ function FormularioPrazoManual({
       tipo: tipoInicial ?? valoresIniciais.tipo,
       descricao: descricaoInicial ?? "",
       processoId: processoInicial ?? "",
+      responsavelId: responsavelInicial ?? "",
     },
   });
   const [modo, setModo] = useState<"calcular" | "informar">("calcular");
@@ -145,6 +162,42 @@ function FormularioPrazoManual({
             </FormItem>
           )}
         />
+        {responsaveis && responsaveis.length > 1 && (
+          <FormField
+            control={form.control}
+            name="responsavelId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Responsável</FormLabel>
+                <FormControl>
+                  <SelectNativo {...field}>
+                    {responsaveis.map(({ id, nome }) => (
+                      <option key={id} value={id}>
+                        {nome}
+                      </option>
+                    ))}
+                  </SelectNativo>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        {comObservacoes && (
+          <FormField
+            control={form.control}
+            name="observacoes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Observações (opcional)</FormLabel>
+                <FormControl>
+                  <Textarea rows={3} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         {ehPrazo && (
           <div
             role="radiogroup"
@@ -253,6 +306,9 @@ export function ModalPrazoManual({
   descricaoInicial,
   tipoInicial,
   titulo = "Novo prazo",
+  responsaveis,
+  responsavelInicial,
+  comObservacoes,
   processos,
   aoFechar,
   aoSalvar,
@@ -277,6 +333,9 @@ export function ModalPrazoManual({
           processoInicial={processoInicial}
           descricaoInicial={descricaoInicial}
           tipoInicial={tipoInicial}
+          responsaveis={responsaveis}
+          responsavelInicial={responsavelInicial}
+          comObservacoes={comObservacoes}
           aoSalvar={aoSalvar}
         />
       </DialogContent>

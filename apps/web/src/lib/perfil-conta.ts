@@ -1,4 +1,6 @@
+import { podeGerenciarTermos } from "@tesia/shared";
 import { z } from "zod";
+import { contaTemBusca } from "@/lib/busca-oab-servidor";
 import { areasPorCodigo } from "@/lib/onboarding";
 import type { UsuarioSessao } from "@/lib/sessao";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
@@ -11,6 +13,9 @@ export type PerfilConta = {
   areas: string[];
   tribunais: string[];
   whatsapp: string | null;
+  buscaOabAceitaEm: string | null;
+  podeGerenciarBusca: boolean;
+  temPlanoComBusca: boolean;
 };
 
 export type ResumoDados = {
@@ -36,6 +41,9 @@ export async function buscarPerfilConta(usuario: UsuarioSessao): Promise<PerfilC
     areas: [...areasPorCodigo(usuario.areas)],
     tribunais: tribunais ?? [],
     whatsapp: usuario.whatsapp,
+    buscaOabAceitaEm: usuario.busca_oab_aceita_em,
+    podeGerenciarBusca: podeGerenciarTermos(usuario.papel),
+    temPlanoComBusca: await contaTemBusca(),
   };
 }
 

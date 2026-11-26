@@ -1006,4 +1006,132 @@ end;
 $$;
 reset role;
 
+do $$
+declare
+  a uuid := current_setting('teste.esc_a')::uuid;
+  b uuid := current_setting('teste.esc_b')::uuid;
+  termo uuid;
+  dono_a uuid;
+begin
+  update intimacoes set excluido_em = coalesce(excluido_em, now());
+  select id into termo from termos_monitorados where oab_numero = '12345';
+  select id into dono_a from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000a1';
+
+  insert into intimacoes (escritorio_id, origem, texto, termo_id, fonte, tribunal, uf, tipo_publicacao,
+    numero_processo, publicada_em, hash, status, responsavel_id, extracao)
+  values
+    (a, 'djen', 'Fica a parte ré intimada para pagar o débito.', termo, 'diario', 'TJDFT', 'DF', 'Sentença',
+     '00000011120268070001', '2026-11-10', 'lista-1', 'recebida', dono_a,
+     '{"dados": {"partes": [{"nome": "Banco Alfa"}], "numero_processo": "0000001-11.2026.8.07.0001"}}'),
+    (a, 'djen', 'Despacho sem relevância.', termo, 'diario', 'TJSP', 'SP', 'Decisão',
+     '00000022220268260001', '2026-11-20', 'lista-2', 'recebida', null, null),
+    (b, 'djen', 'Fica a parte ré intimada para pagar o débito.', null, 'diario', 'TJDFT', 'DF', 'Sentença',
+     '00000033320268070001', '2026-11-10', 'lista-3', 'recebida', null, null);
+  update intimacoes set tratamento = 'concluida' where hash = 'lista-2';
+end;
+$$;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', false);
+do $$
+declare
+  achados int;
+  primeiro text;
+begin
+  select count(*) into achados from listar_intimacoes() where numero_processo like '0000%' ;
+  assert achados = 2, 'A lista deveria trazer só as intimações do escritório A';
+  select tribunal into primeiro from listar_intimacoes(p_tamanho => 1);
+  assert primeiro = 'TJSP', 'A mais recente deveria vir primeiro';
+  select count(*) into achados from listar_intimacoes(p_uf => 'DF');
+  assert achados = 1, 'O filtro de UF deveria trazer só a de DF';
+  select count(*) into achados from listar_intimacoes(p_de => '2026-11-15', p_ate => '2026-11-30');
+  assert achados = 1, 'O filtro de período deveria trazer só a de 20/11';
+  select count(*) into achados from listar_intimacoes(p_tipo => 'Sentença');
+  assert achados = 1, 'O filtro de tipo deveria trazer só a sentença';
+  select count(*) into achados from listar_intimacoes(p_tratamento => 'concluida');
+  assert achados = 1, 'O filtro de status deveria trazer só a concluída';
+  select count(*) into achados from listar_intimacoes(p_tratamento => 'pendente');
+  assert achados = 1, 'Só uma deveria estar pendente';
+  select count(*) into achados from listar_intimacoes(p_busca => 'pagar o débito');
+  assert achados = 1, 'A busca deveria olhar o conteúdo e não trazer a do escritório B';
+  select count(*) into achados from listar_intimacoes(p_busca => 'banco alfa');
+  assert achados = 1, 'A busca deveria olhar as partes';
+  select count(*) into achados from listar_intimacoes(p_busca => '0000001-11.2026.8.07.0001', p_digitos => '00000011120268070001');
+  assert achados = 1, 'A busca deveria achar pelo número do processo, com ou sem pontuação';
+  select count(*) into achados from listar_intimacoes(p_termo => (select id from termos_monitorados where oab_numero = '12345'));
+  assert achados = 2, 'O filtro de termo deveria trazer as duas do termo';
+  select count(*) into achados from listar_intimacoes(p_aguardando => true);
+  assert achados = 0, 'Nenhuma estava analisada, então nenhuma aguarda confirmação';
+  select total::int into achados from listar_intimacoes(p_tamanho => 1);
+  assert achados = 2, 'O total deveria contar além da página';
+end;
+$$;
+reset role;
+
+insert into auth.users (id, email, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-0000000000d1', 'd1@exemplo.com', '{"nome": "Advogado D1"}'),
+  ('00000000-0000-0000-0000-0000000000d2', 'd2@exemplo.com', '{"nome": "Advogado D2"}');
+
+update usuarios set oab_numero = '000555', oab_uf = 'DF'
+where auth_user_id in ('00000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-0000000000d2');
+
+insert into termos_monitorados (escritorio_id, responsavel_id, tipo, oab_numero, oab_uf)
+select escritorio_id, id, 'advogado', '555', 'DF' from usuarios
+where auth_user_id = '00000000-0000-0000-0000-0000000000d1';
+
+insert into intimacoes (escritorio_id, origem, texto, termo_id, fonte, hash, status)
+select u.escritorio_id, 'djen', 'Consentimento', t.id, 'diario', 'consentimento-1', 'recebida'
+from usuarios u join termos_monitorados t on t.responsavel_id = u.id
+where u.auth_user_id = '00000000-0000-0000-0000-0000000000d1';
+
+update usuarios u set busca_oab_aceita_em = now()
+where exists (
+  select 1 from termos_monitorados t
+  where t.tipo = 'advogado'
+    and t.responsavel_id = u.id
+    and t.oab_numero = ltrim(regexp_replace(u.oab_numero, '[^0-9]', '', 'g'), '0')
+    and t.oab_uf = u.oab_uf
+);
+
+do $$
+begin
+  assert (select busca_oab_aceita_em from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000d1') is not null,
+    'O backfill deveria marcar quem já tinha o termo da própria OAB';
+  assert (select busca_oab_aceita_em from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000d2') is null,
+    'O backfill não deveria marcar quem não tinha termo';
+end;
+$$;
+
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000d2', false);
+do $$
+declare
+  linhas int;
+begin
+  update usuarios set busca_oab_aceita_em = now() where auth_user_id = '00000000-0000-0000-0000-0000000000d2';
+  get diagnostics linhas = row_count;
+  assert linhas = 1, 'O próprio usuário deveria gravar o aceite da busca';
+  update usuarios set busca_oab_aceita_em = null where auth_user_id = '00000000-0000-0000-0000-0000000000d1';
+  get diagnostics linhas = row_count;
+  assert linhas = 0, 'Outro usuário não deveria alterar o aceite alheio';
+end;
+$$;
+
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000d1', false);
+do $$
+declare
+  linhas int;
+begin
+  delete from termos_monitorados where tipo = 'advogado' and oab_numero = '555';
+  get diagnostics linhas = row_count;
+  assert linhas = 1, 'O dono deveria apagar o termo da própria OAB';
+  update usuarios set busca_oab_aceita_em = null where auth_user_id = '00000000-0000-0000-0000-0000000000d1';
+  assert (select busca_oab_aceita_em from usuarios where auth_user_id = '00000000-0000-0000-0000-0000000000d1') is null,
+    'Parar a busca deveria zerar o aceite';
+  assert (select count(*) from intimacoes where hash = 'consentimento-1' and termo_id is null) = 1,
+    'Apagar o termo não deveria apagar a intimação, só soltar o termo_id';
+end;
+$$;
+reset role;
+
 select 'RLS: todos os testes passaram' as resultado;
