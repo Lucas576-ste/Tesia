@@ -1,3 +1,4 @@
+import { SELECAO_DOS_PRAZOS } from "@/lib/consulta-prazos";
 import { analiseGravadaSchema, nomePartes } from "@tesia/shared";
 import { z } from "zod";
 import { diasUteisAte, hojeEmBrasilia } from "@/lib/datas-servidor";
@@ -80,15 +81,14 @@ export async function listarPrazosConfirmados(processoId?: string): Promise<Linh
   const supabase = await criarClienteServidor();
   let consulta = supabase
     .from("prazos")
-    .select(
-      "id, intimacao_id, processo_id, origem, tipo, hora, descricao, status, data_inicio, data_vencimento, data_prazo_interno, processos(id, numero_cnj, area, parte_contraria, partes), intimacoes(extracao), pecas(id, status, criado_em, excluido_em)",
-    )
+    .select(SELECAO_DOS_PRAZOS)
     .in("status", ["confirmado", "cumprido"])
     .order("data_vencimento");
   if (processoId) consulta = consulta.eq("processo_id", processoId);
-  const { data } = await consulta;
+  const { data, error } = await consulta;
+  if (error) throw new Error(`Falha ao ler os prazos: ${error.message}`);
   const linhas = z.array(linhaPrazoSchema).safeParse(data);
-  if (!linhas.success) return [];
+  if (!linhas.success) throw new Error("Os prazos vieram em um formato inesperado.");
   const hoje = hojeEmBrasilia();
 
   return linhas.data.map((linha) => ({
