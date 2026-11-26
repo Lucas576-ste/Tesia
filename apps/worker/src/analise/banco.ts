@@ -228,7 +228,7 @@ export async function gravarAnalise(
     }
     await cliente.query(
       `update intimacoes set processo_id = $3, extracao = $4, resumo = $5, tipo_ato = $6, resultado = $7,
-         data_disponibilizacao = $8, status = 'analisada'
+         data_disponibilizacao = coalesce($8::date, data_disponibilizacao), status = 'analisada'
        where id = $1 and escritorio_id = $2`,
       [
         intimacaoId,

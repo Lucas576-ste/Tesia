@@ -1,4 +1,4 @@
-import { calcularPrazo, calcularPrazoInterno, criarCalendario } from "@tesia/prazos";
+import { calcularPrazo, calcularPrazoInterno, criarCalendario, ehDiaUtil } from "@tesia/prazos";
 
 export type FormaRecebimento = "diario" | "portal" | "citacao";
 
@@ -70,4 +70,9 @@ export function recalcularPrazo(
     interno: calcularPrazoInterno({ fatal: resultado.vencimento, hoje, calendario }),
     memoria: resultado.memoria,
   };
+}
+
+export function avisoDeDiaNaoUtil(data: string, calendarioPrazo: CalendarioPrazo) {
+  if (!DATA_ISO.test(data) || ehDiaUtil(data, criarCalendario(calendarioPrazo))) return null;
+  return "Esta data não é dia útil no calendário desta intimação. Confira antes de confirmar.";
 }

@@ -129,6 +129,24 @@ export type DadosRecebimento = {
   data_envio_portal: string | null;
 };
 
+export type OrigemDaIntimacao = {
+  origem: string;
+  dataDisponibilizacao: string | null;
+};
+
+export function aplicarDataDoDiario<
+  T extends Pick<DadosRecebimento, "data_disponibilizacao"> & {
+    forma_intimacao: "diario" | "portal" | "citacao" | "nao_identificada";
+  },
+>(dados: T, { origem, dataDisponibilizacao }: OrigemDaIntimacao): T {
+  if (origem !== "djen" || !dataDisponibilizacao) return dados;
+  return {
+    ...dados,
+    data_disponibilizacao: dataDisponibilizacao,
+    forma_intimacao: dados.forma_intimacao === "citacao" ? "citacao" : "diario",
+  };
+}
+
 export function marcoDoPrazo({
   forma_intimacao,
   data_disponibilizacao,

@@ -13,6 +13,7 @@ import {
   textoBuscaEstilo,
   siglaTribunal,
   type OpcaoBanco,
+  aplicarDataDoDiario,
 } from "./montar.js";
 
 const regra = (id: string, dias: number, prioridade: number, ativa = false) => ({
@@ -177,5 +178,30 @@ describe("limitarTamanhoReferencia", () => {
     expect(limitarTamanhoReferencia(undefined)).toBeNull();
     expect(limitarTamanhoReferencia(0)).toBeNull();
     expect(limitarTamanhoReferencia(Number.NaN)).toBeNull();
+  });
+});
+
+describe("aplicarDataDoDiario", () => {
+  const dados = { forma_intimacao: "nao_identificada" as const, data_disponibilizacao: null };
+
+  it("usa a data que a busca no diário gravou", () => {
+    expect(
+      aplicarDataDoDiario(dados, { origem: "djen", dataDisponibilizacao: "2026-11-25" }),
+    ).toEqual({ forma_intimacao: "diario", data_disponibilizacao: "2026-11-25" });
+  });
+
+  it("mantém a citação", () => {
+    const citacao = { ...dados, forma_intimacao: "citacao" as const };
+    expect(
+      aplicarDataDoDiario(citacao, { origem: "djen", dataDisponibilizacao: "2026-11-25" })
+        .forma_intimacao,
+    ).toBe("citacao");
+  });
+
+  it("não mexe no arquivo enviado pelo advogado nem sem data", () => {
+    expect(
+      aplicarDataDoDiario(dados, { origem: "upload", dataDisponibilizacao: "2026-11-25" }),
+    ).toBe(dados);
+    expect(aplicarDataDoDiario(dados, { origem: "djen", dataDisponibilizacao: null })).toBe(dados);
   });
 });

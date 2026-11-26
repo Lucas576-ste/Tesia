@@ -68,6 +68,11 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Depois de confirmar, o aviso some e o prazo aparece no painel com os dias úteis certos
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
+## Prazos
+- [ ] Painel e Prazos mostram os prazos confirmados; o processo mostra o histórico deles
+- [ ] Intimação do diário chega com a data de disponibilização e o prazo sugerido
+- [ ] Texto com prazo diferente do sugerido mostra o aviso; data em sábado também
+
 ## Documento original
 - [ ] Uma publicação do diário aparece em parágrafos; "Ver como chegou" mostra o texto corrido e "Ver formatado" volta
 - [ ] "Ver trecho" grifa só a citação, e um PDF não aparece com frases picadas

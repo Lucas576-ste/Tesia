@@ -102,7 +102,7 @@ export function PainelFiltrosIntimacoes({
             ))}
           </SelectNativo>
         </Campo>
-        <Campo rotulo="Termo">
+        <Campo rotulo="OAB buscada">
           <SelectNativo
             value={filtros.termo ?? ""}
             onChange={(e) => aplicar({ termo: e.target.value || undefined })}

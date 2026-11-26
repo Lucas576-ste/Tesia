@@ -7,6 +7,7 @@ import {
 import { z } from "zod";
 import { hojeEmBrasilia } from "@/lib/datas-servidor";
 import { STATUS_INTIMACAO } from "@/lib/envio-intimacao";
+import { avisoDoPrazoCitado } from "@/lib/prazo-no-texto";
 import {
   acharTrecho,
   dividirDocumento,
@@ -46,6 +47,7 @@ export type Analise = {
   pecas: { codigo: string; nome: string; justificativa: string }[];
   documento: TrechoDocumento[];
   textoOriginal: string;
+  avisoPrazo: string | null;
   hoje: string;
   recebimento: { forma: FormaRecebimento; disponibilizacao: string; envio: string };
   regra: RegraPrazo | null;
@@ -233,6 +235,7 @@ export async function buscarIntimacao(id: string): Promise<EstadoIntimacao | nul
       pecas: pecas.map(({ codigo, nome, justificativa }) => ({ codigo, nome, justificativa })),
       documento,
       textoOriginal,
+      avisoPrazo: avisoDoPrazoCitado(textoOriginal, regraGravada?.dias ?? null),
       hoje: hojeEmBrasilia(),
       recebimento: {
         forma,

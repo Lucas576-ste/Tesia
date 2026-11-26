@@ -11,6 +11,7 @@ import { htmlParaTexto, type AnaliseGravada } from "@tesia/shared";
 import { z } from "zod";
 import { buscarCalendario, buscarOpcoes, gravarAnalise, registrarUso } from "../analise/banco.js";
 import {
+  aplicarDataDoDiario,
   calcularPrazoSugerido,
   corrigirRito,
   hojeEmBrasilia,
@@ -25,7 +26,12 @@ import { ErroDefinitivo, type Job } from "../fila.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ intimacao_id: z.uuid() });
-const linhaSchema = z.object({ arquivo_path: z.string().nullable(), texto: z.string().nullable() });
+const linhaSchema = z.object({
+  arquivo_path: z.string().nullable(),
+  texto: z.string().nullable(),
+  origem: z.string(),
+  disponibilizacao: z.string().nullable(),
+});
 
 function intimacaoDoJob(job: Job) {
   const resultado = dadosSchema.safeParse(job.dados);
@@ -49,12 +55,17 @@ async function obterTexto(job: Job, intimacaoId: string, contexto: Contexto) {
   const { rows } = await db.query(
     `update intimacoes set status = 'processando'
      where id = $1 and escritorio_id = $2 and excluido_em is null
-     returning arquivo_path, texto`,
+     returning arquivo_path, texto, origem,
+       to_char(data_disponibilizacao, 'YYYY-MM-DD') as disponibilizacao`,
     [intimacaoId, job.escritorio_id],
   );
   const linha = linhaSchema.safeParse(rows[0]);
   if (!linha.success) throw new ErroDefinitivo("Intimação ou arquivo não encontrado");
-  if (linha.data.texto) return htmlParaTexto(linha.data.texto);
+  const origem = {
+    origem: linha.data.origem,
+    dataDisponibilizacao: linha.data.disponibilizacao,
+  };
+  if (linha.data.texto) return { texto: htmlParaTexto(linha.data.texto), ...origem };
   if (!linha.data.arquivo_path) throw new ErroDefinitivo("Intimação sem texto e sem arquivo");
 
   const { data, error } = await supabase.storage
@@ -82,23 +93,26 @@ async function obterTexto(job: Job, intimacaoId: string, contexto: Contexto) {
     paginas: leitura.paginas,
     caracteres: leitura.texto.length,
   });
-  return leitura.texto;
+  return { texto: leitura.texto, ...origem };
 }
 
 async function executar(job: Job, contexto: Contexto) {
   const { db, ia, registrar } = contexto;
   const intimacaoId = intimacaoDoJob(job);
-  const texto = await obterTexto(job, intimacaoId, contexto);
+  const { texto, ...origem } = await obterTexto(job, intimacaoId, contexto);
 
   const extracao = await comIa(() => extrairDados(ia, texto));
   await registrarUso(db, job, { etapa: "extracao", ...extracao });
-  const dados = {
-    ...extracao.resultado,
-    rito: corrigirRito(
-      extracao.resultado.numero_processo,
-      extracao.resultado.rito,
-    ) as typeof extracao.resultado.rito,
-  };
+  const dados = aplicarDataDoDiario(
+    {
+      ...extracao.resultado,
+      rito: corrigirRito(
+        extracao.resultado.numero_processo,
+        extracao.resultado.rito,
+      ) as typeof extracao.resultado.rito,
+    },
+    origem,
+  );
 
   const opcoes = await buscarOpcoes(db, dados.area, dados.rito, dados.tipo_ato);
   const escolha = await comIa(() => escolherPeca(ia, dados, opcoesParaIa(opcoes)));

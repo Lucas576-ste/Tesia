@@ -9,6 +9,7 @@ import {
 import type { Analise } from "@/lib/analise";
 import { dividirFrases } from "@/lib/formatar-publicacao";
 import { rotuloDoAto, textoDoPrazo } from "@/lib/resumo-decisao";
+import { AvisoDePrazo } from "./aviso-de-prazo";
 import { TopicoDaDecisao } from "./topico-da-decisao";
 
 const POLOS = { ativo: "polo ativo", passivo: "polo passivo" };
@@ -64,6 +65,7 @@ export function ModalEntendaDecisao({
           <TopicoDaDecisao tom="prazo" icone={CalendarClock} titulo="Seu prazo">
             <p>{textoDoPrazo(analise, confirmado)}</p>
             {analise.prazo?.fundamento && <p>Fundamento: {analise.prazo.fundamento}</p>}
+            <AvisoDePrazo texto={analise.avisoPrazo} />
           </TopicoDaDecisao>
         </div>
         <p className="border-t pt-3 text-xs text-texto-secundario">

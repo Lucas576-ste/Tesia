@@ -2,6 +2,7 @@ import { CalendarClock, Gavel, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Analise } from "@/lib/analise";
 import { textoDoPrazo } from "@/lib/resumo-decisao";
+import { AvisoDePrazo } from "./aviso-de-prazo";
 import { TopicoDaDecisao } from "./topico-da-decisao";
 
 type ResumoDaDecisaoProps = {
@@ -24,6 +25,7 @@ export function ResumoDaDecisao({ analise, confirmado, aoLerMais }: ResumoDaDeci
       )}
       <TopicoDaDecisao tom="prazo" icone={CalendarClock} titulo="Seu prazo">
         <p>{textoDoPrazo(analise, confirmado)}</p>
+        <AvisoDePrazo texto={analise.avisoPrazo} />
       </TopicoDaDecisao>
       <Button variant="outline" size="sm" className="w-fit" onClick={aoLerMais}>
         Ler mais

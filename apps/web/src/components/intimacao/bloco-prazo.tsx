@@ -17,7 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Analise, PrazoAnalise } from "@/lib/analise";
-import { recalcularPrazo, type Recebimento } from "@/lib/recalculo-prazo";
+import { avisoDeDiaNaoUtil, recalcularPrazo, type Recebimento } from "@/lib/recalculo-prazo";
+import { AvisoDePrazo } from "./aviso-de-prazo";
 import { RecebimentoIntimacao } from "./recebimento-intimacao";
 import {
   calcularPrazoInterno,
@@ -28,7 +29,7 @@ import {
 
 type BlocoPrazoProps = Pick<
   Analise,
-  "prazo" | "motivoSemPrazo" | "hoje" | "regra" | "calendario" | "recebimento"
+  "prazo" | "motivoSemPrazo" | "avisoPrazo" | "hoje" | "regra" | "calendario" | "recebimento"
 > & {
   intimacaoId: string;
   confirmado: boolean;
@@ -78,6 +79,7 @@ export function BlocoPrazo({
   intimacaoId,
   prazo,
   motivoSemPrazo,
+  avisoPrazo,
   hoje,
   regra,
   calendario,
@@ -165,7 +167,9 @@ export function BlocoPrazo({
 
   return (
     <section className="flex flex-col gap-3 rounded-xl border-l-4 border-destaque bg-card p-4 shadow-xs">
-      <h2 className="text-lg font-semibold">{base ? "Prazo sugerido" : "Prazo"}</h2>
+      <h2 className="text-lg font-semibold">
+        {confirmado ? "Prazo confirmado" : base ? "Prazo sugerido" : "Prazo"}
+      </h2>
       <div>
         <p className="text-xs text-texto-secundario">Prazo fatal</p>
         <p className="font-serif text-3xl font-semibold tabular-nums">
@@ -183,6 +187,8 @@ export function BlocoPrazo({
           </p>
         )}
       </div>
+      <AvisoDePrazo texto={avisoPrazo} />
+      <AvisoDePrazo texto={avisoDeDiaNaoUtil(data, calendario)} />
       <RecebimentoIntimacao
         recebimento={recebimento}
         bloqueado={confirmado || enviando}

@@ -148,6 +148,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-26 | O texto da publicação é organizado em parágrafos só na exibição, por padrões (`lib/formatar-publicacao.ts`), cortando apenas em espaços, com a opção "Ver como chegou" | O DJEN entrega o texto quase sem quebras; o documento salvo não pode mudar |
 | 2026-11-26 | O detalhe da análise (tópicos e "Entenda a decisão") usa só o que a IA já extraiu; sem mudar prompt nem reanalisar, e sem texto "pronto para o juiz" | Não aumentar o gasto com IA; o que vai ao juiz é a peça, revisada pelo advogado |
 | 2026-11-26 | Os pontos atacáveis aparecem só na tela da análise, não em "Entenda a decisão" | Evitar repetição; na tela o advogado confere o trecho com o documento ao lado |
+| 2026-11-26 | Na publicação do diário, a data de disponibilização gravada pela busca prevalece sobre a leitura da IA, e a forma é diário (exceto citação) | A análise apagava a data e o prazo ficava sem cálculo |
+| 2026-11-26 | Prazo citado no texto diferente do sugerido gera aviso, sem mudar o cálculo; data fatal em dia não útil também avisa, sem bloquear | O código não sabe se o prazo citado é da parte ou do ato; o advogado decide |
 
 ## Pendências
 

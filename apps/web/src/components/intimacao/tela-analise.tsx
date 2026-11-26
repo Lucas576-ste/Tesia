@@ -93,9 +93,9 @@ export function TelaAnalise({
   return (
     <div className="flex w-full flex-col gap-4">
       <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link href="/app">
+        <Link href="/app/intimacoes">
           <ArrowLeft aria-hidden />
-          Voltar ao painel
+          Voltar às intimações
         </Link>
       </Button>
       <header className="flex flex-col gap-1">
@@ -142,6 +142,7 @@ export function TelaAnalise({
                 intimacaoId={analise.id}
                 prazo={analise.prazo}
                 motivoSemPrazo={analise.motivoSemPrazo}
+                avisoPrazo={analise.avisoPrazo}
                 hoje={analise.hoje}
                 regra={analise.regra}
                 calendario={analise.calendario}
