@@ -11,7 +11,7 @@ Protótipo visual das telas principais: canvas "Protótipo Agente Jurídico" (Me
 - **Painel (`/app`):** bloco "Atenção agora" (até 3 itens, com ação direta); cards clicáveis Vencidos, Vencem em até 3 dias, Rascunhos para revisar e Intimações novas; quadro com Vencidos, Vence hoje, Próximos 3 dias, Mais de 3 dias e Protocolado ("Rascunho pronto" virou selo no card); filtros em chips; conteúdo alinhado ao menu, até 1280px.
 - **Prazos (`/app/prazos`):** a lista completa, com os mesmos cards, chips e quadro, sem o "Atenção agora".
 - **Topo:** botão "Nova intimação" (com ⌄ para prazo manual, processo e cliente); o uso de peças foi para o rodapé do menu.
-- **Lia (chat):** botão flutuante com o avatar da Lia em todo o app (Ctrl+J); abre o painel de chat com sugestões por tela, histórico e feedback. Detalhes em `21-lia-chat.md`.
+- **Lia (chat):** botão com o avatar da Lia em todo o app, flutuante no computador e no topo à direita no celular (Ctrl+J); abre o painel de chat com sugestões por tela, histórico e feedback. Detalhes em `21-lia-chat.md`.
 - **Menu:** Painel, Intimações (badge), Prazos, Peças (badge), Clientes, Meu estilo; embaixo, Configurações e Indicar a Tesia; card "Peças: X de Y" com o plano; perfil com menu (Configurações, Plano e uso, Sair); botão para recolher, salvo no navegador.
 
 ## Menu do app (reorganizado em 2026-11-19)
@@ -329,3 +329,4 @@ No MVP, essas tarefas são feitas direto no Supabase Studio. As telas entram na 
 - Nas duas telas da intimação (com e sem análise), o texto aparece organizado em parágrafos e títulos, com o botão "Ver como chegou". Linhas quebradas no meio da frase (PDF) são emendadas, e "Ver trecho" grifa só a citação. Na análise, "Entenda a intimação" mostra três tópicos (o que aconteceu, o que foi decidido e o prazo) e "Ler mais" abre o modal "Entenda a decisão", só com dados já extraídos, sem nova chamada à IA. Os pontos que podem ser atacados ficam só na tela (um tópico por ponto, com "Ver trecho"), não no modal. A organização é só de exibição: o texto salvo, a leitura da IA e o Excel não mudam.
 - Prazo na análise: aviso quando o texto cita um prazo diferente do sugerido (sem mudar o cálculo) e quando a data fatal não é dia útil; o cartão mostra "Prazo confirmado" depois da confirmação.
 - A tarefa automática da intimação não aparece no painel nem em Prazos. "Concluir" com prazo confirmado abre a pergunta "Você também cumpriu o prazo?".
+- Celular: a Lia fica no topo à direita; Configurações mostra "Meu estilo", plano, indicação e "Sair da conta"; as fases do processo rolam para o lado.

@@ -1,5 +1,6 @@
 "use client";
 
+import { BotaoSair } from "@/components/autenticacao/botao-sair";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AvisoPro } from "@/components/plano/aviso-pro";
@@ -42,6 +43,7 @@ function conteudosDasAbas(
 export type CalendarioProprio = { itens: ItemCalendario[]; tribunais: string[] };
 
 const atalhos = [
+  { rotulo: "Meu estilo", href: "/app/estilo" },
   { rotulo: "Plano e uso", href: "/app/plano" },
   { rotulo: "Indicar a Tesia", href: "/app/indicar" },
 ];
@@ -92,6 +94,7 @@ export function TelaConfiguracoes({
           </Link>
         ))}
       </nav>
+      <BotaoSair className="md:hidden" />
       <Tabs value={aba} onValueChange={trocarAba} className="min-w-0">
         <TabsList className="w-full flex-wrap justify-start md:w-fit">
           {abas.map((chave) => (

@@ -48,11 +48,11 @@ export function TimbradoAtivo({ nome, enviadoEm, aoTrocar, aoRemover }: Timbrado
   const estado = usePrevia(enviadoEm);
   const data = dataEnvio(enviadoEm);
   return (
-    <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+    <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <section
         id="previa-timbrado"
         aria-label="Prévia da peça com o seu timbrado"
-        className="scroll-mt-20"
+        className="min-w-0 scroll-mt-20"
       >
         <Previa estado={estado} />
       </section>

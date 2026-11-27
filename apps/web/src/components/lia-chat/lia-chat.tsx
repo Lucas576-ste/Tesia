@@ -14,7 +14,6 @@ export function LiaChat({ vencendo }: { vencendo: number }) {
   const [jaAbriu, setJaAbriu] = useState(false);
   const botao = useRef<HTMLButtonElement>(null);
   const painel = useRef<HTMLDivElement>(null);
-  const noEditor = /^\/app\/pecas\/[^/]+$/.test(caminho);
   const retencao = Number(process.env.NEXT_PUBLIC_LIA_RETENCAO_DIAS) || RETENCAO_PADRAO;
 
   const alternar = useCallback(() => {
@@ -50,9 +49,8 @@ export function LiaChat({ vencendo }: { vencendo: number }) {
     <>
       <div
         className={cn(
-          "group fixed right-4 z-40 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] md:bottom-6",
+          "group fixed right-4 z-40 max-md:top-1.5 md:bottom-6",
           aberto && "max-md:hidden",
-          noEditor && "max-md:hidden",
         )}
       >
         <button
@@ -62,9 +60,9 @@ export function LiaChat({ vencendo }: { vencendo: number }) {
           aria-label="Pergunte à Lia"
           aria-expanded={aberto}
           aria-keyshortcuts="Control+J"
-          className="relative flex size-14 items-center justify-center rounded-full border-2 border-destaque bg-card shadow-md outline-none motion-safe:transition-transform hover:scale-105 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          className="relative flex size-9 items-center justify-center rounded-full border-2 border-destaque bg-card outline-none motion-safe:transition-transform hover:scale-105 focus-visible:ring-[3px] focus-visible:ring-ring/50 md:size-14 md:shadow-md"
         >
-          <AvatarLia className="size-11 text-xl" />
+          <AvatarLia className="size-7 text-sm md:size-11 md:text-xl" />
           {vencendo > 0 && (
             <span
               aria-label={`${vencendo} ${vencendo === 1 ? "prazo vence" : "prazos vencem"} em até 2 dias`}

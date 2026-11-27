@@ -7,7 +7,7 @@
 - Não faz: parecer jurídico, jurisprudência, escolha de tese. Perguntas assim recebem a resposta padrão "Nesta versão eu ajudo com o uso da Tesia e com o que está na sua tela. Para dúvidas jurídicas, confira nas fontes oficiais." com links do que ela pode fazer. Um filtro simples (`porteiro.ts`) responde sem chamar o modelo; o prompt cobre os demais casos.
 
 ## Como funciona
-- Botão flutuante com o avatar da Lia (Ctrl+J abre e fecha) e painel de chat acima dele; no celular o painel ocupa a tela inteira.
+- Botão com o avatar da Lia (Ctrl+J abre e fecha), flutuante no computador, com o painel acima dele, e no topo à direita no celular; no celular o painel ocupa a tela inteira.
 - Cada pergunta vai para `POST /api/lia`, que valida (até 2.000 caracteres), confere o limite diário do plano, grava a pergunta, monta o contexto, chama o Claude Haiku com streaming (NDJSON) e grava a resposta.
 - O web chama o SDK da Anthropic direto porque o Next não compila o pacote `@tesia/ia` (imports `.js`). Prompt e base de conhecimento ficam em `apps/web/src/lib/lia/`.
 - A base de conhecimento (`base-conhecimento.ts`) é um texto curado do produto, sem custos nem estratégia interna. Quando uma tela ou regra mudar, atualizar esse arquivo junto com `13-telas.md`.

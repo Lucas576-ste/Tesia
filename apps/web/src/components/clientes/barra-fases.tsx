@@ -19,7 +19,13 @@ export function BarraFases({ rito, fase, encerrado, compacta = false }: BarraFas
         const feita = indice < atual || (encerrado && indice === atual);
         const corrente = indice === atual && !encerrado;
         return (
-          <li key={item.codigo} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+          <li
+            key={item.codigo}
+            className={cn(
+              "flex flex-1 flex-col items-center gap-1.5",
+              compacta ? "min-w-0" : "min-w-20 shrink-0",
+            )}
+          >
             <div className="flex w-full items-center">
               <span
                 className={cn(
