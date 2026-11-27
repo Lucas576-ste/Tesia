@@ -12,7 +12,7 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
   {
     pergunta: "Para quem é?",
     resposta:
-      "Para advogados que trabalham sozinhos ou em dupla e querem gastar menos tempo com prazo e rascunho. Hoje, o calendário de feriados cobre o Distrito Federal.",
+      "Para advogados que trabalham sozinhos ou em dupla e querem gastar menos tempo com prazo e rascunho. Hoje, há calendários do TRF1 e do TRT10 no DF; para o TJDFT e outros tribunais, a Tesia avisa para você conferir feriados e suspensões.",
   },
   {
     pergunta: "Como funciona o teste grátis?",
@@ -74,7 +74,7 @@ const perguntas: { pergunta: string; resposta: ReactNode; aConfirmar?: boolean }
   {
     pergunta: "Atende fora do DF?",
     resposta:
-      "Por enquanto, as vagas de fundador são para advogados do DF, onde os calendários locais de prazo já estão prontos. Se você atua em outro estado, entre na lista de espera e avisamos quando chegarmos até você.",
+      "Por enquanto, as vagas de fundador são para advogados do DF. Há calendários do TRF1 e do TRT10 no DF; para o TJDFT e outros tribunais, a Tesia avisa para você conferir feriados e suspensões. Se você atua em outro estado, entre na lista de espera e avisamos quando chegarmos até você.",
   },
   {
     pergunta: "Onde ficam os meus dados?",

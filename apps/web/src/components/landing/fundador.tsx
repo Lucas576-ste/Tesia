@@ -19,10 +19,11 @@ export function Fundador() {
             Seja um dos 6 primeiros.
           </h2>
           <p className="text-lg">
-            Estamos abrindo a Tesia para um grupo pequeno de advogados do DF, onde os calendários
-            locais de prazo já estão prontos. Quem entrar agora tem 11 dias grátis para testar a Lia
-            no dia a dia, paga R$ 79 por mês enquanto a assinatura estiver ativa e ajuda a decidir o
-            que a Tesia vai fazer a seguir.
+            Estamos abrindo a Tesia para um grupo pequeno de advogados do DF. Há calendários do TRF1
+            e do TRT10 no DF; para o TJDFT e outros tribunais, a Tesia avisa para você conferir
+            feriados e suspensões. Quem entrar agora tem 11 dias grátis para testar a Lia no dia a
+            dia, paga R$ 79 por mês enquanto a assinatura estiver ativa e ajuda a decidir o que a
+            Tesia vai fazer a seguir.
           </p>
           <ul className="flex flex-col gap-2">
             {incluido.map((item) => (

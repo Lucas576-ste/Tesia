@@ -7,13 +7,18 @@ export const TIPOS_MANUAIS: Record<TipoManual, string> = {
   compromisso: "Compromisso",
 };
 
+export const ROTULOS_MARCO = {
+  diario: "Disponibilizada no diário em",
+  portal: "Data do envio",
+};
+
 const dataOpcional = z.union([z.iso.date("Informe uma data válida."), z.literal("")]);
 
 export { hojeBrasilia } from "@/lib/hoje";
 
 export const calculoPrazoSchema = z.object({
   forma: z.enum(["diario", "portal"]),
-  marco: z.iso.date("Informe a data da publicação."),
+  marco: z.iso.date("Informe a data de disponibilização ou de envio."),
   abertura: dataOpcional,
   dias: z.number().int().min(1, "Informe os dias.").max(365, "Informe até 365 dias."),
   contagem: z.enum(["uteis", "corridos"]),

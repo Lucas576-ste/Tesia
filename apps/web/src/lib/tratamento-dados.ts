@@ -19,6 +19,10 @@ export type DadosTratamento = {
   numeroProcesso: string | null;
   publicadaEm: string | null;
   processo: { id: string; cnj: string; partes: string } | null;
-  inicioProvavel: { inicioIso: string; memoria: string[] } | null;
+  inicioProvavel: {
+    inicioIso: string;
+    memoria: string[];
+    avisoCalendario: string | null;
+  } | null;
   sugestaoProcesso: DadosProcesso;
 };

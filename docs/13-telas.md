@@ -133,7 +133,7 @@ Aplicativo (menu lateral)
 
 Barra de progresso com 3 passos. O advogado pode pular os passos 2 e 3 e voltar depois.
 
-A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na lista, o passo 1 avisa que os calendários locais cobrem só o DF.
+A Lia conduz o fluxo. Se a UF não for DF, ou se o tribunal não estiver na lista, o passo 1 avisa que há calendários do TRF1 e do TRT10 no DF e que, para o TJDFT e outros tribunais, a Tesia avisa para conferir feriados e suspensões.
 
 ### 8. Dados profissionais (`/onboarding/perfil`) — MVP
 - Número da OAB (placeholder "Ex.: 12345", até 6 dígitos, erro em toast e no campo) e UF, com a linha de conferência "Confira: OAB 12345/DF". A autorização da busca nos diários não é pedida aqui, só em Configurações
@@ -257,7 +257,7 @@ Abas:
 - **M1. Limite atingido:** aviso aos 80% e bloqueio aos 100%, com opções de pacote extra ou upgrade
 - **M2. Fim do teste grátis:** escolha do plano e pagamento
 - **M3. Confirmação de prazo editado:** registra a data sugerida e a data escolhida
-- **M4. Novo prazo:** com o tipo prazo, o padrão é "Calcular pela publicação": como foi intimado (Diário ou Portal), data da publicação e atalho de prazo (peça, dias e contagem, ou "Outro prazo"); a tela mostra "Sugestão de vencimento", a conta e a data fatal editável (a sugerida fica registrada). "Informar a data" mantém o formulário manual. Campos do formulário: tipo (prazo, audiência, compromisso), descrição, data (prazo fatal, quando o tipo é prazo), hora, processo (opcional), responsável; com o tipo prazo, prazo interno e início da contagem (opcionais); opção "calcular a partir da disponibilização"
+- **M4. Novo prazo:** com o tipo prazo, o padrão é "Calcular pela publicação": como foi intimado (Diário ou Portal), data de disponibilização ou do envio e atalho de prazo (peça, dias e contagem, ou "Outro prazo"); a tela mostra "Sugestão de vencimento", a conta e a data fatal editável (a sugerida fica registrada). "Informar a data" mantém o formulário manual. Campos do formulário: tipo (prazo, audiência, compromisso), descrição, data (prazo fatal, quando o tipo é prazo), hora, processo (opcional), responsável; com o tipo prazo, prazo interno e início da contagem (opcionais); opção "calcular a partir da disponibilização"
 
 ---
 

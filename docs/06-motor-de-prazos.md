@@ -59,7 +59,8 @@ O motor considera como dia não útil:
 - feriados e suspensões cadastrados pelo próprio advogado (um dia vai para `feriados`, um período para `suspensoes_tribunal`; sem tribunal valem para todos os processos do escritório, com tribunal só para os processos dele). Entram nos próximos cálculos; prazos já calculados não são refeitos sozinhos, e a tela avisa quantos prazos abertos vencem depois da data cadastrada
 
 Manutenção:
-- **MVP:** feriados nacionais por algoritmo + tribunais do DF (TJDFT, TRF1/SJDF, TRT10) cadastrados manualmente.
+- **MVP:** feriados nacionais por algoritmo + TRF1/SJDF e TRT10 cadastrados manualmente (2026 e 2027). O TJDFT ainda não tem calendário cadastrado.
+- **Aviso de cobertura:** o tribunal do processo só tem calendário num ano quando há registro oficial dele (feriado de abrangência tribunal ou suspensão, sem escritório). Nacionais, recesso, estaduais, municipais e itens do escritório entram na conta, mas não contam como cobertura. Se algum ano entre as datas do cálculo não tiver registro, ou o tribunal não for identificado, a análise, o novo prazo (com processo escolhido) e o início provável da contagem pedem para conferir, sem bloquear.
 - **Depois:** um responsável atualiza os calendários dos tribunais mais usados todo ano, com a fonte (portaria) registrada.
 - O advogado pode cadastrar exceções, que valem só para o escritório dele.
 

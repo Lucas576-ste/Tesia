@@ -10,6 +10,7 @@ import { dividirDocumento } from "@/lib/formatar-publicacao";
 import type { ProcessoResumo } from "@/lib/prazo-manual";
 import type { Responsavel } from "@/lib/termos";
 import type { DadosTratamento } from "@/lib/tratamento-dados";
+import { rotuloDaData } from "@/lib/tratamento-intimacao";
 import { PainelTratamento } from "./painel-tratamento";
 import { TextoDaPublicacao } from "./texto-da-publicacao";
 
@@ -62,7 +63,12 @@ export function TelaTratamento({ dados, processos, responsaveis, usuario }: Tela
           {(dados.processo?.partes ?? dados.sugestaoProcesso.partes) || "Intimação recebida"}
         </h1>
         <p className="text-sm text-texto-secundario">
-          {[dados.sugestaoProcesso.cnj, dados.tribunal, dados.tipoPublicacao, dados.publicadaEm]
+          {[
+            dados.sugestaoProcesso.cnj,
+            dados.tribunal,
+            dados.tipoPublicacao,
+            dados.publicadaEm && `${rotuloDaData(dados.fonte)} ${dados.publicadaEm}`,
+          ]
             .filter(Boolean)
             .join(" · ")}
         </p>

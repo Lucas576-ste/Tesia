@@ -19,10 +19,15 @@ export function resumoDoLote(feitas: number, puladas: number, verbo: string, pra
   return `${alvo(feitas)} ${verbo}. ${alvo(puladas)} ${puladas === 1 ? "ficou" : "ficaram"} de fora porque o responsável é outra pessoa.${prazos}`;
 }
 
+export function rotuloDaData(fonte: "diario" | "eletronico" | null) {
+  return fonte === "eletronico" ? "Enviada em" : "Disponibilizada em";
+}
+
 export function mailtoDaIntimacao(dados: {
   numeroProcesso: string | null;
   tribunal: string | null;
   publicadaEm: string | null;
+  fonte: "diario" | "eletronico" | null;
   texto: string;
 }) {
   const cnj = normalizarCnj(dados.numeroProcesso);
@@ -31,7 +36,7 @@ export function mailtoDaIntimacao(dados: {
   const corpo = [
     `Processo: ${processo}`,
     dados.tribunal ? `Tribunal: ${dados.tribunal}` : null,
-    dados.publicadaEm ? `Publicada em: ${dados.publicadaEm}` : null,
+    dados.publicadaEm ? `${rotuloDaData(dados.fonte)}: ${dados.publicadaEm}` : null,
     "",
     dados.texto.slice(0, 1500),
   ]

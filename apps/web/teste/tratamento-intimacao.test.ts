@@ -3,6 +3,7 @@ import {
   mailtoDaIntimacao,
   podeTratarIntimacao,
   resumoDoLote,
+  rotuloDaData,
   termoDeBuscaDeProcesso,
 } from "@/lib/tratamento-intimacao";
 
@@ -37,11 +38,13 @@ describe("mailtoDaIntimacao", () => {
       numeroProcesso: "07234567820268070001",
       tribunal: "TJDFT",
       publicadaEm: "13/11/2026",
+      fonte: "diario",
       texto: "Fica intimado & notificado.",
     });
     expect(link.startsWith("mailto:?subject=")).toBe(true);
     expect(decodeURIComponent(link)).toContain("Intimação · 0723456-78.2026.8.07.0001");
     expect(decodeURIComponent(link)).toContain("Fica intimado & notificado.");
+    expect(decodeURIComponent(link)).toContain("Disponibilizada em: 13/11/2026");
     expect(link).not.toContain(" ");
   });
   it("limita o tamanho do texto e aceita processo sem número", () => {
@@ -49,10 +52,19 @@ describe("mailtoDaIntimacao", () => {
       numeroProcesso: null,
       tribunal: null,
       publicadaEm: null,
+      fonte: null,
       texto: "x".repeat(5000),
     });
     expect(decodeURIComponent(link)).toContain("processo sem número");
     expect(link.length).toBeLessThan(2600);
+  });
+});
+
+describe("rotuloDaData", () => {
+  it("diz envio na fonte eletrônica e disponibilização nas demais", () => {
+    expect(rotuloDaData("eletronico")).toBe("Enviada em");
+    expect(rotuloDaData("diario")).toBe("Disponibilizada em");
+    expect(rotuloDaData(null)).toBe("Disponibilizada em");
   });
 });
 

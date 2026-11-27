@@ -3,14 +3,25 @@
 import { useEffect, useState } from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
 import { presetsDePrazo, sugerirPrazo } from "@/app/app/acoes-prazos";
+import { AvisoDePrazo } from "@/components/intimacao/aviso-de-prazo";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectNativo } from "@/components/ui/select-nativo";
 import { isoParaData } from "@/lib/prazo-interno";
-import { rotuloPreset, type PrazoManual, type PresetPrazo } from "@/lib/prazo-manual";
+import {
+  ROTULOS_MARCO,
+  rotuloPreset,
+  type PrazoManual,
+  type PresetPrazo,
+} from "@/lib/prazo-manual";
 
 type Forma = "diario" | "portal";
-type Sugestao = { inicio: string; vencimento: string; memoria: string[] };
+type Sugestao = {
+  inicio: string;
+  vencimento: string;
+  memoria: string[];
+  avisoCalendario: string | null;
+};
 type Resposta = { chave: string; sugestao: Sugestao | null; erro: string };
 
 const OUTRO = "outro";
@@ -125,15 +136,19 @@ export function CalculoPrazo({
           </SelectNativo>
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="calculo-marco">
-            {forma === "diario" ? "Data da publicação" : "Data do envio"}
-          </Label>
+          <Label htmlFor="calculo-marco">{ROTULOS_MARCO[forma]}</Label>
           <Input
             id="calculo-marco"
             type="date"
             value={marco}
+            aria-describedby={forma === "diario" ? "ajuda-calculo-marco" : undefined}
             onChange={(evento) => setMarco(evento.target.value)}
           />
+          {forma === "diario" && (
+            <p id="ajuda-calculo-marco" className="text-xs text-texto-secundario">
+              Use a data de disponibilização, não a de publicação.
+            </p>
+          )}
         </div>
         {forma === "portal" && (
           <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -214,6 +229,7 @@ export function CalculoPrazo({
                 Esse prazo já venceu em {isoParaData(sugestao.vencimento)}.
               </p>
             )}
+            {processoId && <AvisoDePrazo texto={sugestao.avisoCalendario} />}
             <details className="text-xs text-texto-secundario">
               <summary className="cursor-pointer font-medium text-primaria">Ver a conta</summary>
               <ul className="mt-1 list-disc pl-4">

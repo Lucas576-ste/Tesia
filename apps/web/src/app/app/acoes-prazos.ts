@@ -4,6 +4,7 @@ import { calcularPrazoInterno, criarCalendario } from "@tesia/prazos";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { buscarCalendario } from "@/lib/analise";
+import { avisoDeCalendario } from "@/lib/cobertura-calendario";
 import {
   agruparPresets,
   calculoPrazoSchema,
@@ -41,7 +42,12 @@ const processoLocalSchema = z.object({
   rito: z.string().nullable(),
 });
 
-type Sugestao = { inicio: string; vencimento: string; memoria: string[] };
+type Sugestao = {
+  inicio: string;
+  vencimento: string;
+  memoria: string[];
+  avisoCalendario: string | null;
+};
 
 async function calcularSugestao(calculo: CalculoPrazo, processoId: string) {
   const supabase = await criarClienteServidor();
@@ -72,7 +78,16 @@ async function calcularSugestao(calculo: CalculoPrazo, processoId: string) {
     hojeBrasilia(),
   );
   const sugestao: Sugestao | null = resultado
-    ? { inicio: resultado.inicio, vencimento: resultado.vencimento, memoria: resultado.memoria }
+    ? {
+        inicio: resultado.inicio,
+        vencimento: resultado.vencimento,
+        memoria: resultado.memoria,
+        avisoCalendario: avisoDeCalendario(calendarioPrazo.cobertura, [
+          calculo.marco,
+          resultado.inicio,
+          resultado.vencimento,
+        ]),
+      }
     : null;
   return { sugestao, calendarioPrazo };
 }

@@ -84,6 +84,11 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Intimação do diário chega com a data de disponibilização e o prazo sugerido
 - [ ] Texto com prazo diferente do sugerido mostra o aviso; data em sábado também
 
+## Calendário e datas
+- [ ] Novo prazo pelo diário: o campo é "Disponibilizada no diário em"; 25/11/2026 com 5 dias úteis, sem processo, dá início em 27/11 e vencimento em 03/12
+- [ ] Processo do TJDFT mostra o aviso de calendário na análise (também com o prazo confirmado), no novo prazo e no início provável; no TRF1, com datas de 2026, não mostra
+- [ ] Gerar e ajustar uma peça com um perfil de estilo antigo (sem aprendizados) não traz o aviso de rascunho genérico quando há peças enviadas
+
 ## Documento original
 - [ ] Uma publicação do diário aparece em parágrafos; "Ver como chegou" mostra o texto corrido e "Ver formatado" volta
 - [ ] "Ver trecho" grifa só a citação, e um PDF não aparece com frases picadas

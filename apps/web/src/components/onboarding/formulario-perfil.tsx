@@ -179,8 +179,8 @@ export function FormularioPerfil({
         )}
         {foraDoDf && (
           <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
-            Por enquanto, os calendários locais cobrem só o DF. Fora dele, confira feriados e
-            suspensões do seu tribunal.
+            Há calendários do TRF1 e do TRT10 no DF; para o TJDFT e outros tribunais, a Tesia avisa
+            para você conferir feriados e suspensões.
           </p>
         )}
         <FormField

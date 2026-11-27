@@ -158,6 +158,10 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-27 | Intimação, tarefa e notificação são gravadas na mesma transação | Uma falha no meio deixava a intimação sem aviso para sempre |
 | 2026-11-27 | Quem ficou com aceite da busca pelo preenchimento da migration 0031, sem clicar em "Sim, buscar", tem o aceite zerado e a busca desligada; parar a busca apaga os termos do responsável | O consentimento precisa ser um ato do advogado |
 | 2026-11-27 | Prazo protocolado ou cumprido tem "Desfazer protocolo" (ou "Marcar como não cumprido") no menu do cartão | Um clique errado ao concluir a intimação não podia ser desfeito |
+| 2026-11-27 | Um tribunal só tem calendário num ano quando há registro oficial dele (sem escritório): feriado de abrangência tribunal ou suspensão. Nacionais, recesso, estaduais, municipais e itens do escritório entram na conta, mas não contam como cobertura. Sem cobertura, a tela avisa, sem bloquear | Sem o aviso, a conta parecia completa para tribunais sem calendário, como o TJDFT |
+| 2026-11-27 | A geração e o ajuste de peças leem o perfil de estilo com o formato gravado (`perfilGravadoSchema`), que aceita perfil sem aprendizados | Perfis antigos eram descartados e a peça saía genérica; o formato de saída da IA não muda |
+| 2026-11-27 | O cálculo manual pede a "data de disponibilização" no diário; o e-mail e a tela de tratamento dizem "Disponibilizada em" ou "Enviada em" | O rótulo "publicação" levava a informar o dia errado e a adiar o prazo |
+| 2026-11-27 | Os textos públicos dizem que há calendários do TRF1 e do TRT10 no DF e que, no TJDFT e em outros tribunais, a Tesia avisa para conferir | A afirmação de que os calendários locais cobriam o DF não era verdadeira |
 
 ## Pendências
 
@@ -190,7 +194,8 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | Revisão de advogado dos termos e da política de privacidade (rascunho de 18/11) | Lucas | Antes de divulgar |
 | Conferir os termos da Anthropic e da Voyage sobre treino com dados e tirar o [CONFIRMAR] da privacidade | Lucas | Antes de divulgar |
 | Assinar o Railway Hobby (US$ 5/mês) e subir o worker; até lá, o worker roda na máquina do Lucas | Lucas | Dia 34, antes do 1º cliente |
-| Confirmar com o advogado parceiro se o TJDFT suspende prazos em 08/12 (Dia da Justiça); o banco só tem para TRF1 e TRT10 | Lucas | Antes do Dia 34 |
+| Confirmar com o advogado parceiro se o TJDFT suspende prazos em 08/12 (Dia da Justiça); o banco só tem para TRF1 e TRT10. Levantar também o calendário completo de feriados e suspensões do TJDFT, com a fonte (portaria) | Lucas | Antes do Dia 34 |
+| Os alertas do worker (`alertas/escolher.ts`) contam os dias úteis sem o calendário do tribunal | Lucas | |
 | Trocar os números e depoimentos de exemplo (`content/proof.ts`) pelos reais, com autorização dos advogados | Lucas | Depois dos primeiros fundadores |
 | Validar com o advogado parceiro as fases de cada rito e os nomes usados no dia a dia (`packages/shared/src/fases.ts`) | Lucas | Antes de divulgar |
 | Validar com advogados as regras de prazo das áreas novas (criminal, tributário, empresarial, administrativo) | Lucas | Antes de divulgar essas áreas |

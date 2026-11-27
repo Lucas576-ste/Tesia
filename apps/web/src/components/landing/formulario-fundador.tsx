@@ -188,8 +188,8 @@ export function FormularioFundador() {
         />
         {foraDoDf && (
           <p role="status" className="rounded-md bg-atencao-fundo px-3 py-2 text-sm text-atencao">
-            As vagas de fundador são para advogados do DF, por causa dos calendários locais de
-            prazo. Entre na lista de espera e avisamos quando chegarmos ao seu estado.
+            Por enquanto, as vagas de fundador são para advogados do DF. Entre na lista de espera e
+            avisamos quando chegarmos ao seu estado.
           </p>
         )}
         <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">

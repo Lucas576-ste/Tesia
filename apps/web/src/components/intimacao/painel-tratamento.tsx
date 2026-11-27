@@ -28,6 +28,7 @@ import type { PrazoManual, ProcessoResumo } from "@/lib/prazo-manual";
 import type { Responsavel } from "@/lib/termos";
 import type { DadosTratamento } from "@/lib/tratamento-dados";
 import { mailtoDaIntimacao, podeTratarIntimacao } from "@/lib/tratamento-intimacao";
+import { AvisoDePrazo } from "./aviso-de-prazo";
 import { DialogoConcluir } from "./dialogo-concluir";
 import { DialogoNovoProcesso, DialogoVincularProcesso } from "./dialogos-processo-intimacao";
 
@@ -130,6 +131,7 @@ export function PainelTratamento({
     numeroProcesso: dados.numeroProcesso,
     tribunal: dados.tribunal,
     publicadaEm: dados.publicadaEm,
+    fonte: dados.fonte,
     texto: dados.texto,
   });
 
@@ -203,6 +205,9 @@ export function PainelTratamento({
           <p className="mt-1 text-xs text-texto-secundario">
             Só uma referência. O prazo final só vale depois que você confirmar.
           </p>
+          <div className="mt-2 empty:hidden">
+            <AvisoDePrazo texto={dados.inicioProvavel.avisoCalendario} />
+          </div>
         </div>
       )}
 

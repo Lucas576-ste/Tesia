@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { Analise, PrazoAnalise } from "@/lib/analise";
+import { avisoDeCalendario } from "@/lib/cobertura-calendario";
 import { avisoDeDiaNaoUtil, recalcularPrazo, type Recebimento } from "@/lib/recalculo-prazo";
 import { AvisoDePrazo } from "./aviso-de-prazo";
 import { RecebimentoIntimacao } from "./recebimento-intimacao";
@@ -121,6 +122,13 @@ export function BlocoPrazo({
     : undefined;
   const editada = Boolean(sugerida) && data !== sugerida;
   const depoisDaSugerida = Boolean(sugerida) && data > sugerida;
+  const marco = recebimento.forma === "portal" ? recebimento.envio : recebimento.disponibilizacao;
+  const avisoCalendario = avisoDeCalendario(calendario.cobertura, [
+    marco,
+    base?.inicio,
+    sugerida,
+    data,
+  ]);
 
   function mudarFatal(novaData: string) {
     setFatalManual(novaData);
@@ -189,6 +197,7 @@ export function BlocoPrazo({
       </div>
       <AvisoDePrazo texto={avisoPrazo} />
       <AvisoDePrazo texto={avisoDeDiaNaoUtil(data, calendario)} />
+      <AvisoDePrazo texto={avisoCalendario} />
       <RecebimentoIntimacao
         recebimento={recebimento}
         bloqueado={confirmado || enviando}

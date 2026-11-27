@@ -8,6 +8,7 @@ import {
 import { criarCalendario, inicioProvavelContagem } from "@tesia/prazos";
 import { z } from "zod";
 import { buscarCalendario } from "@/lib/analise";
+import { avisoDeCalendario } from "@/lib/cobertura-calendario";
 import { isoParaData } from "@/lib/prazo-interno";
 import { AREAS_ATUACAO, CODIGO_AREA } from "@/lib/onboarding";
 import type { DadosTratamento } from "@/lib/tratamento-dados";
@@ -115,7 +116,11 @@ export async function buscarTratamento(id: string): Promise<DadosTratamento | nu
       { fonte, disponibilizadaEm: disponibilizada },
       criarCalendario(calendario),
     );
-    inicioProvavel = { inicioIso: resultado.inicio, memoria: resultado.memoria };
+    inicioProvavel = {
+      inicioIso: resultado.inicio,
+      memoria: resultado.memoria,
+      avisoCalendario: avisoDeCalendario(calendario.cobertura, [disponibilizada, resultado.inicio]),
+    };
   }
 
   const { data: confirmado } = await supabase
@@ -155,9 +160,7 @@ export async function buscarTratamento(id: string): Promise<DadosTratamento | nu
           partes: l.processos.partes ?? l.processos.parte_contraria ?? l.processos.numero_cnj,
         }
       : null,
-    inicioProvavel: inicioProvavel
-      ? { inicioIso: inicioProvavel.inicioIso, memoria: inicioProvavel.memoria }
-      : null,
+    inicioProvavel,
     sugestaoProcesso: {
       cnj: digitos ? formatarCnj(digitos) : "",
       partes: dados ? nomePartes(dados.partes) : "",

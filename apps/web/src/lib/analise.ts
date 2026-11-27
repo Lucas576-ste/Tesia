@@ -6,7 +6,9 @@ import {
 } from "@tesia/shared";
 import { z } from "zod";
 import { hojeEmBrasilia } from "@/lib/datas-servidor";
+import { montarCobertura, type Cobertura } from "@/lib/cobertura-calendario";
 import { STATUS_INTIMACAO } from "@/lib/envio-intimacao";
+import { valorDeFiltro } from "@/lib/filtro-postgrest";
 import { avisoDoPrazoCitado } from "@/lib/prazo-no-texto";
 import {
   acharTrecho,
@@ -51,8 +53,10 @@ export type Analise = {
   hoje: string;
   recebimento: { forma: FormaRecebimento; disponibilizacao: string; envio: string };
   regra: RegraPrazo | null;
-  calendario: CalendarioPrazo;
+  calendario: CalendarioComCobertura;
 };
+
+export type CalendarioComCobertura = CalendarioPrazo & { cobertura: Cobertura };
 
 export type EstadoIntimacao =
   { status: "recebida" | "processando" | "erro" } | { status: "analisada"; analise: Analise };
@@ -89,10 +93,18 @@ const feriadosSchema = z.array(
     nome: z.string(),
     abrangencia: z.string(),
     municipio: z.string().nullable(),
+    tribunal: z.string().nullable(),
+    escritorio_id: z.uuid().nullable(),
   }),
 );
 const suspensoesSchema = z.array(
-  z.object({ inicio: z.string(), fim: z.string(), motivo: z.string() }),
+  z.object({
+    inicio: z.string(),
+    fim: z.string(),
+    motivo: z.string(),
+    tribunal: z.string().nullable(),
+    escritorio_id: z.uuid().nullable(),
+  }),
 );
 
 type SupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
@@ -101,16 +113,15 @@ export async function buscarCalendario(
   supabase: SupabaseServidor,
   local: { tribunal: string | null; uf: string | null; municipio: string | null } | null,
   rito: string,
-): Promise<CalendarioPrazo> {
+): Promise<CalendarioComCobertura> {
   const recessoCivil = rito !== "criminal";
+  const tribunal = local?.tribunal ? valorDeFiltro(local.tribunal) : null;
   const filtros = ["and(escritorio_id.not.is.null,tribunal.is.null)"];
-  if (local?.tribunal) {
-    filtros.push(`and(abrangencia.eq.tribunal,tribunal.eq.${local.tribunal})`);
-  }
+  if (tribunal) filtros.push(`and(abrangencia.eq.tribunal,tribunal.eq.${tribunal})`);
   if (local?.uf) filtros.push(`and(abrangencia.in.(estadual,municipal),uf.eq.${local.uf})`);
   const { data: feriados } = await supabase
     .from("feriados")
-    .select("data, nome, abrangencia, municipio")
+    .select("data, nome, abrangencia, municipio, tribunal, escritorio_id")
     .or(filtros.join(","));
   const municipio = local?.municipio?.toLocaleLowerCase("pt-BR");
   const lista = (feriadosSchema.safeParse(feriados).data ?? []).filter(
@@ -120,15 +131,17 @@ export async function buscarCalendario(
   );
 
   const filtrosSuspensao = ["and(escritorio_id.not.is.null,tribunal.is.null)"];
-  if (local?.tribunal) filtrosSuspensao.push(`tribunal.eq.${local.tribunal}`);
+  if (tribunal) filtrosSuspensao.push(`tribunal.eq.${tribunal}`);
   const { data: suspensoes } = await supabase
     .from("suspensoes_tribunal")
-    .select("inicio:data_inicio, fim:data_fim, motivo")
+    .select("inicio:data_inicio, fim:data_fim, motivo, tribunal, escritorio_id")
     .or(filtrosSuspensao.join(","));
+  const periodos = suspensoesSchema.safeParse(suspensoes).data ?? [];
   return {
     feriados: lista.map(({ data, nome }) => ({ data, nome })),
-    suspensoes: suspensoesSchema.safeParse(suspensoes).data ?? [],
+    suspensoes: periodos.map(({ inicio, fim, motivo }) => ({ inicio, fim, motivo })),
     recessoCivil,
+    cobertura: montarCobertura(local?.tribunal ?? null, lista, periodos),
   };
 }
 

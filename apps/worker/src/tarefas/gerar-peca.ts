@@ -11,12 +11,7 @@ import {
   RespostaInvalidaDaIa,
   vetorParaPgvector,
 } from "@tesia/ia";
-import {
-  analiseGravadaSchema,
-  htmlParaTexto,
-  perfilEstiloSchema,
-  textoQualificacao,
-} from "@tesia/shared";
+import { analiseGravadaSchema, htmlParaTexto, textoQualificacao } from "@tesia/shared";
 import { z } from "zod";
 import { registrarUso } from "../analise/banco.js";
 import {
@@ -25,6 +20,7 @@ import {
   textoBuscaEstilo,
 } from "../analise/montar.js";
 import { ErroDefinitivo, type Job } from "../fila.js";
+import { lerPerfil } from "./perfil.js";
 import type { Contexto, Tarefa } from "./tipos.js";
 
 const dadosSchema = z.object({ peca_id: z.uuid() });
@@ -180,7 +176,7 @@ async function executar(job: Job, contexto: Contexto) {
     "select guia from perfis_estilo where usuario_id = $1 and escritorio_id = $2",
     [peca.data.responsavel_id, job.escritorio_id],
   );
-  const perfil = perfilEstiloSchema.safeParse(perfis[0]?.guia).data ?? null;
+  const perfil = lerPerfil(perfis[0]?.guia);
 
   const temQualificacao = peca.data.estrutura.includes("qualificacao");
   const { rows: clientes } = temQualificacao
