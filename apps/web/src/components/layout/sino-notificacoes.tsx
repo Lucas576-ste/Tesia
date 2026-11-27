@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -83,9 +84,9 @@ export function SinoNotificacoes({ notificacoes }: { notificacoes: Notificacao[]
               return (
                 <li key={id}>
                   {href ? (
-                    <Link href={href} className={classe}>
-                      {conteudo}
-                    </Link>
+                    <DropdownMenuItem asChild className={classe}>
+                      <Link href={href}>{conteudo}</Link>
+                    </DropdownMenuItem>
                   ) : (
                     <div className={classe}>{conteudo}</div>
                   )}

@@ -3,11 +3,13 @@ import { z } from "zod";
 import {
   linhaDaIntimacao,
   linhaRpcSchema,
+  LIMITE_EXPORTACAO,
   TAMANHO_PAGINA_INTIMACOES,
   type FiltrosIntimacoes,
   type PaginaIntimacoes,
 } from "@/lib/intimacoes-lista";
 import { lerOabDaBusca } from "@/lib/busca-oab";
+import { lerEmBlocos } from "@/lib/ler-em-blocos";
 import { contaTemBusca } from "@/lib/busca-oab-servidor";
 import { usuarioAtual } from "@/lib/sessao";
 import { criarClienteServidor } from "@/lib/supabase/servidor";
@@ -49,11 +51,13 @@ export async function listarIntimacoesPagina(
 
 export async function listarIntimacoesParaExportar(filtros: FiltrosIntimacoes, limite: number) {
   const supabase = await criarClienteServidor();
-  const { data } = await supabase.rpc("listar_intimacoes", {
-    ...parametrosDaConsulta(filtros, limite, 1),
-    p_aguardando: filtros.aguardando,
-  });
-  const lidas = z.array(linhaRpcSchema).safeParse(data).data ?? [];
+  const lidas = await lerEmBlocos(async (indice, tamanho) => {
+    const { data } = await supabase.rpc(
+      "listar_intimacoes",
+      parametrosDaConsulta(filtros, tamanho, indice + 1),
+    );
+    return z.array(linhaRpcSchema).safeParse(data).data ?? [];
+  }, limite);
   return { linhas: lidas.map(linhaDaIntimacao), total: lidas[0]?.total ?? 0 };
 }
 
@@ -71,11 +75,18 @@ const termoSchema = z.array(
 
 export async function opcoesDeFiltro() {
   const supabase = await criarClienteServidor();
-  const [{ data: publicacoes }, { data: termos }] = await Promise.all([
-    supabase.from("intimacoes").select("uf, tipo_publicacao").is("excluido_em", null).limit(2000),
+  const [linhas, { data: termos }] = await Promise.all([
+    lerEmBlocos(async (indice, tamanho) => {
+      const { data } = await supabase
+        .from("intimacoes")
+        .select("uf, tipo_publicacao")
+        .is("excluido_em", null)
+        .order("id")
+        .range(indice * tamanho, (indice + 1) * tamanho - 1);
+      return opcoesSchema.safeParse(data).data ?? [];
+    }, LIMITE_EXPORTACAO),
     supabase.from("termos_monitorados").select("id, nome, oab_numero, oab_uf").order("criado_em"),
   ]);
-  const linhas = opcoesSchema.safeParse(publicacoes).data ?? [];
   const ordenar = (valores: (string | null)[]) =>
     [...new Set(valores.filter((valor): valor is string => Boolean(valor)))].sort((a, b) =>
       a.localeCompare(b, "pt-BR"),

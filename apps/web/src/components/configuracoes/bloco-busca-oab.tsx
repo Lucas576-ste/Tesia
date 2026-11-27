@@ -75,11 +75,11 @@ export function BlocoBuscaOab({
     <Card id="busca-intimacoes" className="scroll-mt-24 gap-3 p-5">
       <h2 className="text-base font-semibold text-titulo">Busca de intimações</h2>
       {!temPlano && <AvisoPlanoBusca pausada={aceitaEm !== null} />}
-      {aceitaEm && oab ? (
+      {aceitaEm ? (
         <>
           {temPlano && (
             <p className="text-sm">
-              Buscando intimações da OAB {formatarOabDaBusca(oab)} desde{" "}
+              Buscando intimações da OAB{oab ? ` ${formatarOabDaBusca(oab)}` : ""} desde{" "}
               {formatoDia.format(new Date(aceitaEm))}. Depois da primeira busca, procuramos a cada 3
               horas, das 6h às 22h.
             </p>

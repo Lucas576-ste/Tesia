@@ -26,7 +26,7 @@ import {
   filtroParaUrl,
   type FiltroPrazos,
 } from "@/lib/filtros-prazos";
-import { ordenarPrazos, type LinhaPrazo } from "@/lib/prazo";
+import { ordenarPrazos, statusSemConclusao, type LinhaPrazo } from "@/lib/prazo";
 import { contagemDosPrazos } from "@/lib/urgencia";
 import { alterarPrazoInterno, concluirPrazo, criarPrazoManual } from "@/app/app/acoes-prazos";
 import type { PrazoManual, ProcessoResumo } from "@/lib/prazo-manual";
@@ -164,11 +164,19 @@ export function PainelPrazos({
     router.refresh();
   }
 
+  async function desfazerConclusao(prazo: LinhaPrazo) {
+    if (!(await mudarConclusao(prazo, false))) return;
+    trocarStatus(prazo.id, statusSemConclusao(prazo));
+    toast.success("Voltou para os pendentes.");
+    router.refresh();
+  }
+
   const acoes = (prazo: LinhaPrazo) => (
     <MenuAcoesPrazo
       prazo={prazo}
       temAnalise={idsComAnalise.includes(prazo.id)}
       aoMarcar={setAConfirmar}
+      aoDesfazer={desfazerConclusao}
       aoEditarInterno={setAEditarInterno}
       aoConcluirEtapa={concluirEtapa}
       aoAssumir={assumirPrazo}

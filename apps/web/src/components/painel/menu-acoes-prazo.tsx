@@ -7,6 +7,7 @@ import {
   FileSearch,
   FileText,
   MoreHorizontal,
+  Undo2,
   UserCheck,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +26,7 @@ type MenuAcoesPrazoProps = {
   prazo: LinhaPrazo;
   temAnalise: boolean;
   aoMarcar: (prazo: LinhaPrazo) => void;
+  aoDesfazer: (prazo: LinhaPrazo) => void;
   aoEditarInterno: (prazo: LinhaPrazo) => void;
   aoConcluirEtapa: (prazo: LinhaPrazo) => void;
   aoAssumir: (prazo: LinhaPrazo) => void;
@@ -34,14 +36,13 @@ export function MenuAcoesPrazo({
   prazo,
   temAnalise,
   aoMarcar,
+  aoDesfazer,
   aoEditarInterno,
   aoConcluirEtapa,
   aoAssumir,
 }: MenuAcoesPrazoProps) {
   const temPeca = !prazo.tipo && prazo.status !== "nao_iniciado";
   const temLinks = temAnalise || temPeca;
-
-  if (!temLinks && prazo.status === "protocolado") return null;
 
   return (
     <DropdownMenu modal={false}>
@@ -66,6 +67,15 @@ export function MenuAcoesPrazo({
               Abrir peça
             </Link>
           </DropdownMenuItem>
+        )}
+        {prazo.status === "protocolado" && (
+          <>
+            {temLinks && <DropdownMenuSeparator />}
+            <DropdownMenuItem onSelect={() => aoDesfazer(prazo)}>
+              <Undo2 aria-hidden />
+              {prazo.tipo ? "Marcar como não cumprido" : "Desfazer protocolo"}
+            </DropdownMenuItem>
+          </>
         )}
         {prazo.status !== "protocolado" && (
           <>

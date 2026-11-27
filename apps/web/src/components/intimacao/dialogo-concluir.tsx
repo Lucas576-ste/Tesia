@@ -31,7 +31,7 @@ export function DialogoConcluir({
           <DialogTitle>Você também cumpriu o prazo?</DialogTitle>
           <DialogDescription>
             Esta intimação tem um prazo confirmado para {isoParaData(prazo)}. Se marcar como
-            cumprido, ele sai dos pendentes; dá para desfazer pelo painel.
+            cumprido, ele sai dos pendentes; dá para desfazer no menu do prazo, no painel.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

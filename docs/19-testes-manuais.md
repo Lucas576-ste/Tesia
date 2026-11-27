@@ -75,6 +75,9 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] Lia no topo sem cobrir conteúdo; "Meu estilo" e "Sair da conta" em Configurações
 
 ## Prazos
+- [ ] Concluir com "Sim, cumpri o prazo" e desfazer pelo menu do cartão no painel
+- [ ] Vincular e desvincular processo levam o prazo e a peça; reabrir uma intimação ignorada traz o prazo sugerido de volta
+- [ ] Digitar uma data nos filtros não apaga o campo; clicar numa notificação fecha o menu
 - [ ] Intimação nova do diário não cria cartão no painel nem alerta de vencimento
 - [ ] Concluir intimação com prazo confirmado pergunta se ele foi cumprido; em lote, o aviso diz quantos prazos ficaram
 - [ ] Painel e Prazos mostram os prazos confirmados; o processo mostra o histórico deles

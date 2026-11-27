@@ -48,6 +48,7 @@ function bancoFalso(respostas: { [trecho: string]: unknown[] } = {}) {
       const rows = trecho ? respostas[trecho]! : [];
       return { rows, rowCount: rows.length };
     },
+    connect: async () => ({ query: db.query, release: () => {} }),
   };
   return { db: db as never, chamadas };
 }
@@ -158,6 +159,38 @@ describe("gravarPublicacao", () => {
     expect(tarefa.valores[3]).toBe("Intimação Judicial · 0723456-78.2026.8.07.0001");
     expect(tarefa.sql).toContain("'confirmado', true");
     expect(com(chamadas, "insert into notificacoes")[0]!.valores[1]).toBe(termo.responsavel_id);
+  });
+
+  it("grava intimação, tarefa e notificação na mesma transação", async () => {
+    const { db, chamadas } = bancoFalso({
+      "insert into intimacoes": [{ id: "int-1" }],
+      "insert into prazos": [{ id: "tarefa-1" }],
+    });
+    await gravarPublicacao(db, termo, publicacao, "2026-11-24");
+    const ordem = chamadas.map(({ sql }) => sql.trim().split(/\s+/)[0]);
+    expect(ordem.indexOf("begin")).toBeLessThan(ordem.lastIndexOf("insert"));
+    expect(ordem.at(-1)).toBe("commit");
+  });
+
+  it("desfaz tudo quando a tarefa falha, para a próxima busca gravar de novo", async () => {
+    const { db, chamadas } = bancoFalso({ "insert into intimacoes": [{ id: "int-1" }] });
+    const falha = db as unknown as {
+      query: (sql: string, valores?: unknown[]) => Promise<unknown>;
+      connect: () => Promise<unknown>;
+    };
+    const original = falha.query;
+    falha.connect = async () => ({
+      query: async (sql: string, valores?: unknown[]) => {
+        if (sql.includes("insert into prazos")) throw new Error("conexão caiu");
+        return original(sql, valores);
+      },
+      release: () => {},
+    });
+    await expect(gravarPublicacao(db, termo, publicacao, "2026-11-24")).rejects.toThrow(
+      "conexão caiu",
+    );
+    expect(com(chamadas, "rollback")).toHaveLength(1);
+    expect(com(chamadas, "commit")).toHaveLength(0);
   });
 
   it("não cria tarefa nem notificação quando a publicação já existe", async () => {

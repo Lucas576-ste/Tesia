@@ -4,7 +4,7 @@ import { FormatoDjenMudou } from "../djen/cliente.js";
 import { gravarPublicacao } from "./gravar.js";
 import { FalhaAutenticacao, type ProvedorPublicacoes, type Termo } from "./tipos.js";
 
-type Banco = Pick<pg.Pool, "query">;
+type Banco = Pick<pg.Pool, "query" | "connect">;
 
 type Configuracao = {
   registrar: (evento: string, dados: Record<string, unknown>) => void;

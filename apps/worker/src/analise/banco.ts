@@ -193,6 +193,33 @@ async function salvarProcesso(
   return z.object({ id: z.uuid() }).parse(rows[0]).id;
 }
 
+const vinculoSchema = z.object({
+  processo_id: z.uuid().nullable(),
+  numero_cnj: z.string().nullable(),
+});
+
+type Vinculo = z.infer<typeof vinculoSchema>;
+
+async function vinculoAtual(
+  cliente: PoolClient,
+  escritorioId: string,
+  intimacaoId: string,
+): Promise<Vinculo> {
+  const { rows } = await cliente.query(
+    `select i.processo_id, p.numero_cnj
+     from intimacoes i
+     left join processos p on p.id = i.processo_id
+     where i.id = $1 and i.escritorio_id = $2
+     for update of i`,
+    [intimacaoId, escritorioId],
+  );
+  return vinculoSchema.parse(rows[0]);
+}
+
+export function deveSalvarProcesso(vinculo: Vinculo, numeroDaAnalise: string | null) {
+  return !vinculo.processo_id || vinculo.numero_cnj === numeroDaAnalise;
+}
+
 export async function gravarAnalise(
   db: Pool,
   { job, intimacaoId, analise, tribunal, prazo }: GravacaoAnalise,
@@ -200,7 +227,11 @@ export async function gravarAnalise(
   const cliente = await db.connect();
   try {
     await cliente.query("begin");
-    const processoId = await salvarProcesso(cliente, job.escritorio_id, analise, tribunal);
+    const vinculo = await vinculoAtual(cliente, job.escritorio_id, intimacaoId);
+    const salvo = deveSalvarProcesso(vinculo, analise.dados.numero_processo)
+      ? await salvarProcesso(cliente, job.escritorio_id, analise, tribunal)
+      : null;
+    const processoId = salvo ?? vinculo.processo_id;
     await cliente.query(
       "delete from prazos where intimacao_id = $1 and escritorio_id = $2 and status = 'sugerido'",
       [intimacaoId, job.escritorio_id],
@@ -242,6 +273,12 @@ export async function gravarAnalise(
       ],
     );
     if (processoId) {
+      await cliente.query(
+        `update prazos set processo_id = $3
+         where escritorio_id = $2 and processo_id is null
+           and id = (select tarefa_id from intimacoes where id = $1 and escritorio_id = $2)`,
+        [intimacaoId, job.escritorio_id, processoId],
+      );
       await ligarCliente(cliente, job.escritorio_id, processoId, analise);
       await atualizarFase(
         cliente,

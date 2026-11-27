@@ -7,6 +7,10 @@ import type { SituacaoIntimacao } from "@/lib/situacao-intimacao";
 export const TAMANHO_PAGINA_INTIMACOES = 25;
 export const LIMITE_EXPORTACAO = 5000;
 
+export function dataDeFiltroCompleta(valor: string) {
+  return valor === "" || /^(19|20)\d{2}-\d{2}-\d{2}$/.test(valor);
+}
+
 export const filtrosIntimacoesSchema = z.object({
   busca: z.string().trim().max(100).catch(""),
   uf: z.enum(UFS).optional().catch(undefined),

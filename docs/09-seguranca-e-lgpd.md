@@ -46,6 +46,7 @@
 - Base legal: consentimento do advogado, registrado em `usuarios.busca_oab_aceita_em` e na auditoria (`busca_oab_aceita`, `busca_oab_encerrada`).
 - Sem aceite, nenhum termo da OAB é criado. O aceite é pedido só em Configurações → Perfil. O advogado revoga a qualquer momento em Configurações → Perfil ("Parar de buscar"), o que apaga o termo e zera a data; as intimações já recebidas ficam na lista.
 - Quem já tinha o termo da própria OAB antes da migration 0031 recebeu `busca_oab_aceita_em` no backfill (estava ligado por `djen_ativo`).
+- Em 27/11, o aceite criado por esse preenchimento, sem clique do advogado, foi zerado e o termo apagado (1 conta). As intimações já recebidas ficaram. Daqui em diante, só há busca com clique registrado na auditoria.
 - Trocar a OAB ou a UF zera o aceite: o novo número exige novo consentimento.
 - Termos de pessoa (pf e pj) já existentes continuam sendo buscados pelo worker, mas não aparecem mais na interface.
 

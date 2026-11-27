@@ -67,7 +67,7 @@ export default async function AnalisePage({ params }: AnalisePageProps) {
     if (intimacao.status === "erro" && !tratamento.texto) return <DocumentoIlegivel />;
     return (
       <TelaTratamento
-        dados={tratamento}
+        dados={{ ...tratamento, status: intimacao.status }}
         processos={processos}
         responsaveis={responsaveis}
         usuario={quem}

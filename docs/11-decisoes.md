@@ -154,6 +154,10 @@ Formato: data, decisão, motivo. Quando uma decisão mudar, adicione uma nova li
 | 2026-11-26 | Ao concluir uma intimação com prazo confirmado, a Tesia pergunta se o prazo foi cumprido; no lote, os prazos são mantidos e o aviso diz quantos | Nenhum prazo é dado como cumprido sem o advogado dizer |
 | 2026-11-27 | No celular, a Lia fica na barra de cima; "Sair da conta" e "Meu estilo" ficam em Configurações | O botão flutuante cobria conteúdo, sair acontecia com um toque ao lado do perfil e Meu estilo não tinha acesso |
 | 2026-11-27 | No celular, os filtros das intimações ficam recolhidos, as abas da análise ficam fixas e os alvos de toque têm pelo menos 36 px | A lista ficava fora da primeira tela e voltar aos pontos exigia rolar tudo |
+| 2026-11-27 | A análise não troca o vínculo já existente da intimação com o processo; vincular e desvincular levam prazo e peça junto; reabrir devolve o prazo sugerido | A revisão de código achou perda de vínculo e de prazo |
+| 2026-11-27 | Intimação, tarefa e notificação são gravadas na mesma transação | Uma falha no meio deixava a intimação sem aviso para sempre |
+| 2026-11-27 | Quem ficou com aceite da busca pelo preenchimento da migration 0031, sem clicar em "Sim, buscar", tem o aceite zerado e a busca desligada; parar a busca apaga os termos do responsável | O consentimento precisa ser um ato do advogado |
+| 2026-11-27 | Prazo protocolado ou cumprido tem "Desfazer protocolo" (ou "Marcar como não cumprido") no menu do cartão | Um clique errado ao concluir a intimação não podia ser desfeito |
 
 ## Pendências
 

@@ -69,6 +69,12 @@ export async function encerrarBuscaDaOab(
   oab: OabDaBusca | null,
 ): Promise<ResultadoBusca> {
   const supabase = await criarClienteServidor();
+  const { error: erroDoResponsavel } = await supabase
+    .from("termos_monitorados")
+    .delete()
+    .eq("tipo", "advogado")
+    .eq("responsavel_id", usuario.id);
+  if (erroDoResponsavel) return { erro: "Não foi possível parar a busca agora." };
   if (oab) {
     const { error } = await supabase
       .from("termos_monitorados")

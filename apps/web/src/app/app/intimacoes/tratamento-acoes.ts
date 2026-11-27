@@ -30,6 +30,20 @@ function atualizarTelas() {
   revalidatePath("/app/intimacoes");
 }
 
+async function levarAoProcesso(
+  supabase: Awaited<ReturnType<typeof criarClienteServidor>>,
+  intimacaoId: string,
+  tarefaId: string | null,
+  processoId: string | null,
+) {
+  const alteracao = { processo_id: processoId };
+  await Promise.all([
+    supabase.from("prazos").update(alteracao).eq("intimacao_id", intimacaoId),
+    supabase.from("pecas").update(alteracao).eq("intimacao_id", intimacaoId),
+    ...(tarefaId ? [supabase.from("prazos").update(alteracao).eq("id", tarefaId)] : []),
+  ]);
+}
+
 async function permitidas(ids: string[], usuarioId: string) {
   const supabase = await criarClienteServidor();
   const { data } = await supabase
@@ -74,7 +88,14 @@ export async function tratarIntimacoes(
       .update({ status: acao === "reabrir" ? "confirmado" : "cumprido" })
       .in("id", tarefas);
   }
-  if (acao !== "reabrir") {
+  if (acao === "reabrir") {
+    await supabase
+      .from("prazos")
+      .update({ status: "sugerido" })
+      .in("intimacao_id", idsOk)
+      .eq("status", "descartado")
+      .is("confirmado_em", null);
+  } else {
     await supabase
       .from("prazos")
       .update({ status: "descartado" })
@@ -221,9 +242,7 @@ export async function vincularProcesso(
     .select("id, tarefa_id");
   const linha = z.array(linhaSchema.pick({ id: true, tarefa_id: true })).safeParse(data).data?.[0];
   if (error || !linha) return { erro: "Não foi possível vincular o processo." };
-  if (linha.tarefa_id) {
-    await supabase.from("prazos").update({ processo_id: alvo.data.id }).eq("id", linha.tarefa_id);
-  }
+  await levarAoProcesso(supabase, intimacaoId, linha.tarefa_id, alvo.data.id);
   await registrarAuditoria(usuario, "intimacao_vinculada", "intimacoes", intimacaoId);
   atualizarTelas();
   revalidatePath(`/app/intimacoes/${intimacaoId}`);
@@ -247,9 +266,7 @@ export async function desvincularProcesso(
     .select("id, tarefa_id");
   const linha = z.array(linhaSchema.pick({ id: true, tarefa_id: true })).safeParse(data).data?.[0];
   if (error || !linha) return { erro: "Não foi possível desvincular." };
-  if (linha.tarefa_id) {
-    await supabase.from("prazos").update({ processo_id: null }).eq("id", linha.tarefa_id);
-  }
+  await levarAoProcesso(supabase, intimacaoId, linha.tarefa_id, null);
   await registrarAuditoria(usuario, "intimacao_desvinculada", "intimacoes", intimacaoId);
   atualizarTelas();
   revalidatePath(`/app/intimacoes/${intimacaoId}`);

@@ -3,6 +3,7 @@ import type pg from "pg";
 import type { PublicacaoExterna, Termo } from "./tipos.js";
 
 type Banco = Pick<pg.Pool, "query">;
+type BancoComTransacao = Pick<pg.Pool, "query" | "connect">;
 
 export type ResultadoGravacao = "intimacao" | "andamento" | "repetida";
 
@@ -75,8 +76,23 @@ async function criarTarefaENotificacao(
   );
 }
 
+async function emTransacao<T>(db: BancoComTransacao, executar: (cliente: Banco) => Promise<T>) {
+  const cliente = await db.connect();
+  try {
+    await cliente.query("begin");
+    const resultado = await executar(cliente);
+    await cliente.query("commit");
+    return resultado;
+  } catch (erro) {
+    await cliente.query("rollback");
+    throw erro;
+  } finally {
+    cliente.release();
+  }
+}
+
 export async function gravarPublicacao(
-  db: Banco,
+  db: BancoComTransacao,
   termo: Termo,
   publicacao: PublicacaoExterna,
   hoje: string,
@@ -106,30 +122,39 @@ export async function gravarPublicacao(
     return (resultado.rowCount ?? 0) > 0 ? "andamento" : "repetida";
   }
 
-  const { rows } = await db.query(
-    `insert into intimacoes (escritorio_id, processo_id, origem, texto, data_disponibilizacao,
+  return emTransacao(db, async (cliente) => {
+    const { rows } = await cliente.query(
+      `insert into intimacoes (escritorio_id, processo_id, origem, texto, data_disponibilizacao,
        djen_id, status, termo_id, fonte, tribunal, uf, tipo_publicacao, numero_processo,
        publicada_em, hash)
      values ($1, $2, 'djen', $3, $4::date, $5, 'recebida', $6, $7, $8, $9, $10, $11, $4::date, $12)
      on conflict do nothing
      returning id`,
-    [
-      termo.escritorio_id,
+      [
+        termo.escritorio_id,
+        processoId,
+        publicacao.texto,
+        publicacao.publicadaEm,
+        publicacao.idExterno,
+        termo.id,
+        publicacao.fonte,
+        publicacao.tribunal,
+        publicacao.uf,
+        publicacao.tipoPublicacao,
+        publicacao.numeroProcesso,
+        publicacao.hash,
+      ],
+    );
+    const nova = rows[0] as { id: string } | undefined;
+    if (!nova) return "repetida" as const;
+    await criarTarefaENotificacao(
+      cliente,
+      termo,
+      nova.id,
       processoId,
-      publicacao.texto,
-      publicacao.publicadaEm,
-      publicacao.idExterno,
-      termo.id,
-      publicacao.fonte,
-      publicacao.tribunal,
-      publicacao.uf,
-      publicacao.tipoPublicacao,
       publicacao.numeroProcesso,
-      publicacao.hash,
-    ],
-  );
-  const nova = rows[0] as { id: string } | undefined;
-  if (!nova) return "repetida";
-  await criarTarefaENotificacao(db, termo, nova.id, processoId, publicacao.numeroProcesso, hoje);
-  return "intimacao";
+      hoje,
+    );
+    return "intimacao" as const;
+  });
 }

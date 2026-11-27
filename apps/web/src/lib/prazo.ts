@@ -50,3 +50,7 @@ export function ordenarPrazos(prazos: LinhaPrazo[]) {
     return chaveData(a.vencimento).localeCompare(chaveData(b.vencimento));
   });
 }
+
+export function statusSemConclusao({ pecaId }: Pick<LinhaPrazo, "pecaId">): LinhaPrazo["status"] {
+  return pecaId ? "rascunho_pronto" : "nao_iniciado";
+}

@@ -10,6 +10,7 @@ import { SelectNativo } from "@/components/ui/select-nativo";
 import { cn } from "@/lib/utils";
 import {
   contarFiltrosAtivos,
+  dataDeFiltroCompleta,
   parametrosDosFiltros,
   SEM_FILTROS,
   urlDasIntimacoes,
@@ -145,15 +146,23 @@ export function PainelFiltrosIntimacoes({
         <Campo rotulo="De" data>
           <Input
             type="date"
-            value={filtros.de ?? ""}
-            onChange={(e) => aplicar({ de: e.target.value || undefined })}
+            key={filtros.de ?? ""}
+            defaultValue={filtros.de ?? ""}
+            onChange={(e) => {
+              const valor = e.target.value;
+              if (dataDeFiltroCompleta(valor)) aplicar({ de: valor || undefined });
+            }}
           />
         </Campo>
         <Campo rotulo="Até" data>
           <Input
             type="date"
-            value={filtros.ate ?? ""}
-            onChange={(e) => aplicar({ ate: e.target.value || undefined })}
+            key={filtros.ate ?? ""}
+            defaultValue={filtros.ate ?? ""}
+            onChange={(e) => {
+              const valor = e.target.value;
+              if (dataDeFiltroCompleta(valor)) aplicar({ ate: valor || undefined });
+            }}
           />
         </Campo>
       </div>
