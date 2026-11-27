@@ -1,12 +1,13 @@
 "use client";
 
-import { Download, Search, X } from "lucide-react";
+import { Download, Search, SlidersHorizontal, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SelectNativo } from "@/components/ui/select-nativo";
+import { cn } from "@/lib/utils";
 import {
   contarFiltrosAtivos,
   parametrosDosFiltros,
@@ -21,9 +22,17 @@ type Opcoes = {
   termos: { id: string; nome: string }[];
 };
 
-function Campo({ rotulo, children }: { rotulo: string; children: React.ReactNode }) {
+function Campo({
+  rotulo,
+  data = false,
+  children,
+}: {
+  rotulo: string;
+  data?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex min-w-32 flex-1 flex-col gap-1">
+    <div className={cn("flex flex-1 flex-col gap-1", data ? "min-w-40 md:min-w-36" : "min-w-32")}>
       <Label className="text-xs text-texto-secundario">{rotulo}</Label>
       {children}
     </div>
@@ -40,6 +49,8 @@ export function PainelFiltrosIntimacoes({
   const router = useRouter();
   const entrada = useRef<HTMLInputElement>(null);
   const ativos = contarFiltrosAtivos(filtros) + (filtros.busca ? 1 : 0);
+  const nosCampos = contarFiltrosAtivos(filtros);
+  const [aberto, setAberto] = useState(false);
 
   function aplicar(mudar: Partial<FiltrosIntimacoes>) {
     const busca = entrada.current?.value.trim() ?? filtros.busca;
@@ -64,7 +75,7 @@ export function PainelFiltrosIntimacoes({
           <Search aria-hidden className="absolute top-2.5 left-2.5 size-4 text-texto-secundario" />
           <Input
             aria-label="Buscar intimações"
-            placeholder="Buscar por parte, número do processo ou conteúdo"
+            placeholder="Parte, número ou texto"
             className="pl-8"
             ref={entrada}
             key={filtros.busca}
@@ -73,7 +84,10 @@ export function PainelFiltrosIntimacoes({
         </div>
         <Button type="submit">Buscar</Button>
       </form>
-      <div className="flex flex-wrap gap-2">
+      <div
+        id="campos-dos-filtros"
+        className={cn("flex-wrap gap-2 md:flex", aberto ? "flex" : "hidden")}
+      >
         <Campo rotulo="Estado">
           <SelectNativo
             value={filtros.uf ?? ""}
@@ -128,14 +142,14 @@ export function PainelFiltrosIntimacoes({
             <option value="ignorada">Ignoradas</option>
           </SelectNativo>
         </Campo>
-        <Campo rotulo="De">
+        <Campo rotulo="De" data>
           <Input
             type="date"
             value={filtros.de ?? ""}
             onChange={(e) => aplicar({ de: e.target.value || undefined })}
           />
         </Campo>
-        <Campo rotulo="Até">
+        <Campo rotulo="Até" data>
           <Input
             type="date"
             value={filtros.ate ?? ""}
@@ -144,6 +158,18 @@ export function PainelFiltrosIntimacoes({
         </Campo>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          aria-expanded={aberto}
+          aria-controls="campos-dos-filtros"
+          onClick={() => setAberto((atual) => !atual)}
+        >
+          <SlidersHorizontal aria-hidden />
+          {nosCampos > 0 ? `Filtros (${nosCampos})` : "Filtros"}
+        </Button>
         {ativos > 0 ? (
           <Button
             variant="ghost"
@@ -156,7 +182,7 @@ export function PainelFiltrosIntimacoes({
             Limpar filtros ({ativos})
           </Button>
         ) : (
-          <span />
+          <span className="max-md:hidden" />
         )}
         <Button asChild variant="outline" size="sm">
           <a href={exportar}>

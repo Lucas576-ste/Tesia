@@ -37,7 +37,7 @@ export function ListaEnvios({ envios }: { envios: Envio[] }) {
           {status === "analisada" && intimacaoId && (
             <Link
               href={`/app/intimacoes/${intimacaoId}`}
-              className="shrink-0 text-xs font-medium text-primaria underline-offset-4 hover:underline"
+              className="shrink-0 text-xs font-medium text-primaria underline-offset-4 hover:underline max-md:inline-flex max-md:min-h-9 max-md:items-center"
             >
               Ver análise
             </Link>

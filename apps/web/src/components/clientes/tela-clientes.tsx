@@ -113,7 +113,7 @@ function PorCliente({
               aria-pressed={exibicao === valor}
               onClick={() => trocar(valor)}
               className={cn(
-                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-texto-secundario",
+                "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-texto-secundario max-md:min-h-9",
                 exibicao === valor && "bg-primaria-fundo text-primaria",
               )}
             >

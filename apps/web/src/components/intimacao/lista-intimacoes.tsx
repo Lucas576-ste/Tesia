@@ -96,7 +96,7 @@ export function ListaIntimacoes({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2 text-sm text-texto-secundario">
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-2 max-md:min-h-9">
           <input
             type="checkbox"
             className="size-4 accent-primaria"
@@ -112,13 +112,15 @@ export function ListaIntimacoes({
       <ul className="flex flex-col divide-y rounded-xl border bg-card shadow-xs">
         {pagina.linhas.map((linha) => (
           <li key={linha.id} className="flex items-start gap-3 p-4 hover:bg-muted/50">
-            <input
-              type="checkbox"
-              aria-label={`Selecionar intimação de ${linha.partes}`}
-              className="mt-1 size-4 shrink-0 accent-primaria"
-              checked={marcadas.includes(linha.id)}
-              onChange={() => alternar(linha.id)}
-            />
+            <label className="-m-2.5 flex shrink-0 cursor-pointer self-start p-2.5 md:m-0 md:p-0">
+              <input
+                type="checkbox"
+                aria-label={`Selecionar intimação de ${linha.partes}`}
+                className="mt-1 size-4 accent-primaria"
+                checked={marcadas.includes(linha.id)}
+                onChange={() => alternar(linha.id)}
+              />
+            </label>
             <Link
               href={`/app/intimacoes/${linha.id}`}
               className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-1 text-sm focus-visible:outline-none"

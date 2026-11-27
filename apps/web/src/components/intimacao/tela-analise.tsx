@@ -3,7 +3,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { gerarRascunho } from "@/app/app/intimacoes/acoes";
 import { toast } from "sonner";
 import { BalaoLia } from "@/components/lia/balao-lia";
@@ -26,6 +26,7 @@ import type { Responsavel } from "@/lib/termos";
 import type { DadosTratamento } from "@/lib/tratamento-dados";
 import { PainelTratamento } from "./painel-tratamento";
 import { PontosAtacaveis } from "./pontos-atacaveis";
+import { emUmaColuna, mostrarTrecho } from "./rolagem-do-trecho";
 
 function textoPontos(quantidade: number) {
   const pontos = quantidade === 1 ? "1 ponto" : `${quantidade} pontos`;
@@ -61,12 +62,11 @@ export function TelaAnalise({
   const [gerando, iniciar] = useTransition();
   const [limiteAberto, setLimiteAberto] = useState(false);
   const restantes = uso.limite - uso.usadas;
+  const posicaoNaAnalise = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!destaque[0]) return;
-    document
-      .getElementById(`trecho-${destaque[0].id}`)
-      ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    if (!destaque[0] || aba !== "documento") return;
+    mostrarTrecho(destaque[0].id);
   }, [destaque, aba]);
 
   function gerar() {
@@ -86,8 +86,18 @@ export function TelaAnalise({
   }
 
   function verTrecho(grifos: Grifo[]) {
+    posicaoNaAnalise.current = emUmaColuna() ? window.scrollY : null;
     setDestaque(grifos);
     setAba("documento");
+    if (!emUmaColuna() && grifos[0]) mostrarTrecho(grifos[0].id);
+  }
+
+  function mudarAba(nova: string) {
+    setAba(nova);
+    const posicao = posicaoNaAnalise.current;
+    if (nova === "analise" && posicao !== null) {
+      requestAnimationFrame(() => window.scrollTo({ top: posicao }));
+    }
   }
 
   return (
@@ -107,11 +117,13 @@ export function TelaAnalise({
       <BalaoLia className="text-sm">
         Li a intimação e separei o que importa. O prazo só vale depois que você confirmar.
       </BalaoLia>
-      <Tabs value={aba} onValueChange={setAba}>
-        <TabsList className="lg:hidden">
-          <TabsTrigger value="analise">Análise</TabsTrigger>
-          <TabsTrigger value="documento">Documento</TabsTrigger>
-        </TabsList>
+      <Tabs value={aba} onValueChange={mudarAba}>
+        <div className="sticky top-12 z-20 -mx-4 bg-background px-4 py-2 md:-mx-6 md:px-6 lg:hidden">
+          <TabsList>
+            <TabsTrigger value="analise">Análise</TabsTrigger>
+            <TabsTrigger value="documento">Documento</TabsTrigger>
+          </TabsList>
+        </div>
         <div className="grid items-start gap-5 lg:grid-cols-2">
           <TabsContent value="analise" forceMount className={`flex-col gap-4 ${conteudoAba}`}>
             <div className="flex flex-col gap-4">

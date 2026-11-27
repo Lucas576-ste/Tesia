@@ -18,7 +18,7 @@ export default async function NovaIntimacaoPage() {
       <EnvioIntimacao escritorioId={usuario.escritorio_id} />
       <Link
         href="/app/intimacoes"
-        className="self-start text-sm font-medium text-primaria underline-offset-4 hover:underline"
+        className="self-start text-sm font-medium text-primaria underline-offset-4 hover:underline max-md:flex max-md:min-h-9 max-md:items-center"
       >
         Ver todas as intimações
       </Link>

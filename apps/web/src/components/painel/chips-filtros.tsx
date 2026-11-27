@@ -39,7 +39,7 @@ function Chip({
       aria-pressed={ativo}
       onClick={aoClicar}
       className={cn(
-        "h-7 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+        "h-9 shrink-0 rounded-full border px-3 text-xs font-medium md:h-7 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
         ativo
           ? "border-primary bg-primaria-fundo text-primaria"
           : "bg-card text-texto-secundario hover:text-texto",
@@ -107,7 +107,7 @@ export function ChipsFiltros({ filtro, base }: { filtro: FiltroPrazos; base: str
       </Grupo>
       <label
         className={cn(
-          "relative flex h-7 items-center rounded-full border pr-7 pl-3 text-xs font-medium",
+          "relative flex h-9 items-center rounded-full border pr-7 pl-3 text-xs font-medium md:h-7",
           filtro.area !== "todas"
             ? "border-primary bg-primaria-fundo text-primaria"
             : "bg-card text-texto-secundario",
@@ -117,7 +117,7 @@ export function ChipsFiltros({ filtro, base }: { filtro: FiltroPrazos; base: str
         <select
           value={filtro.area}
           onChange={(evento) => mudar({ area: evento.target.value as FiltroPrazos["area"] })}
-          className="appearance-none bg-transparent outline-none"
+          className="h-full appearance-none bg-transparent outline-none"
         >
           <option value="todas">Todas as áreas</option>
           {AREAS_ATUACAO.map((area) => (
@@ -132,7 +132,7 @@ export function ChipsFiltros({ filtro, base }: { filtro: FiltroPrazos; base: str
         <button
           type="button"
           onClick={() => router.replace(filtroParaUrl(FILTRO_PADRAO, base), { scroll: false })}
-          className="flex h-7 items-center gap-1 rounded-full px-2 text-xs font-medium text-primaria hover:underline"
+          className="flex h-9 items-center gap-1 rounded-full px-2 text-xs font-medium text-primaria hover:underline md:h-7"
         >
           <X aria-hidden className="size-3.5" />
           Limpar

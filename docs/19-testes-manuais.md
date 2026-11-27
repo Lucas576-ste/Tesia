@@ -69,6 +69,8 @@ Rode `pnpm dev` na raiz, abra `http://localhost:3000`, teste e marque com a data
 - [ ] PDF ilegível aparece como "Não foi possível ler"
 
 ## Celular
+- [ ] "Ver trecho" mostra o grifo no meio da tela; voltar para "Análise" cai no mesmo ponto
+- [ ] Filtros abrem e fecham; datas e busca legíveis
 - [ ] Fases do processo legíveis; modelo de documento sem rolagem lateral
 - [ ] Lia no topo sem cobrir conteúdo; "Meu estilo" e "Sair da conta" em Configurações
 

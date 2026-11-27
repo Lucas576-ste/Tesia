@@ -118,7 +118,7 @@ export function AbaAgenda({ agenda }: { agenda: DadosAgenda }) {
         <button
           type="button"
           onClick={() => setConfirmando(true)}
-          className="font-medium text-primaria underline underline-offset-2"
+          className="font-medium text-primaria underline underline-offset-2 max-md:inline-flex max-md:min-h-9 max-md:items-center"
         >
           Gerar novo link
         </button>

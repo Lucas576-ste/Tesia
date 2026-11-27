@@ -40,7 +40,7 @@ export function ChamadaBuscaOab({ banner }: { banner: BannerSincronizacao | null
         <Inbox aria-hidden className="mt-0.5 size-5 shrink-0" />
         <div className="flex flex-col gap-1">
           <h2 className="text-base font-semibold text-titulo">{chamada.titulo}</h2>
-          <p className="text-sm text-texto-secundario">{chamada.texto}</p>
+          <p className="text-sm text-texto-secundario max-sm:hidden">{chamada.texto}</p>
         </div>
       </div>
       <Button asChild>

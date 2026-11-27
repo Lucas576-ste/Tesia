@@ -330,3 +330,4 @@ No MVP, essas tarefas são feitas direto no Supabase Studio. As telas entram na 
 - Prazo na análise: aviso quando o texto cita um prazo diferente do sugerido (sem mudar o cálculo) e quando a data fatal não é dia útil; o cartão mostra "Prazo confirmado" depois da confirmação.
 - A tarefa automática da intimação não aparece no painel nem em Prazos. "Concluir" com prazo confirmado abre a pergunta "Você também cumpriu o prazo?".
 - Celular: a Lia fica no topo à direita; Configurações mostra "Meu estilo", plano, indicação e "Sair da conta"; as fases do processo rolam para o lado.
+- Celular, intimações: filtros recolhidos no botão "Filtros"; na análise, as abas ficam fixas e voltar para "Análise" devolve a posição de leitura.
